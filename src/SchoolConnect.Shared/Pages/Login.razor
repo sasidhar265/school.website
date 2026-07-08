@@ -3,6 +3,7 @@
 @inject SchoolContentService Content
 @inject PortalSessionService PortalSession
 @inject NavigationManager Navigation
+@inject IJSRuntime JsRuntime
 
 @{
     var school = Content.GetProfile();
@@ -116,6 +117,15 @@
             pinError = "PIN or password does not match the selected login type.";
             passwordError = "Check your password and try again.";
             return;
+        }
+
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, loginModel.Role);
+        }
+        catch
+        {
+            // Browser storage is a convenience layer; the in-memory session remains authoritative.
         }
 
         var target = loginModel.Role == PortalRoles.Teacher ? "/teacher-login" : "/student-login";

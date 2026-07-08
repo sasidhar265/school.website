@@ -45,6 +45,16 @@
     transform: translateY(-1px);
 }
 
+.top-nav-link.nav-item-disabled,
+.top-nav-link.nav-item-disabled:hover,
+.top-nav-link.nav-item-disabled:focus {
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.42);
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+}
+
 .nav-item-pill {
     align-items: center;
     appearance: none;

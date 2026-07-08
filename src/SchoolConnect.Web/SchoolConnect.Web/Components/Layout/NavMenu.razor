@@ -1,6 +1,7 @@
 ﻿@implements IDisposable
 @inject SchoolConnect.Shared.Services.SchoolContentService Content
 @inject SchoolConnect.Shared.Services.PortalSessionService PortalSession
+@inject IJSRuntime JsRuntime
 @{
     var school = Content.GetProfile();
 }
@@ -28,6 +29,12 @@
                         <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
                     </NavLink>
                 }
+                else
+                {
+                    <span class="nav-link top-nav-link nav-item-pill nav-item-disabled" aria-disabled="true" title="@($"{activeSession.DisplayName} is already logged in")">
+                        <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
+                    </span>
+                }
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#admissions">
                     <span class="bi bi-calendar-check-fill-nav-menu" aria-hidden="true"></span> Admissions
@@ -35,6 +42,10 @@
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#about-us">
                     <span class="bi bi-info-circle-fill-nav-menu" aria-hidden="true"></span> About Us
+                </NavLink>
+
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/gallery">
+                    <span class="bi bi-images-nav-menu" aria-hidden="true"></span> Gallery
                 </NavLink>
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#contacts">
@@ -52,6 +63,30 @@
     {
         PortalSession.Changed += HandleSessionChanged;
         activeSession = PortalSession.GetActiveSession();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || activeSession is not null)
+        {
+            return;
+        }
+
+        string? storedRole = null;
+        try
+        {
+            storedRole = await JsRuntime.InvokeAsync<string?>("sessionStorage.getItem", SchoolConnect.Shared.Services.PortalSessionService.BrowserSessionRoleKey);
+        }
+        catch
+        {
+            // Session storage may be unavailable during prerender or in restricted browsers.
+        }
+
+        if (PortalSession.RestoreAuthenticatedRole(storedRole))
+        {
+            activeSession = PortalSession.GetActiveSession();
+            StateHasChanged();
+        }
     }
 
     private void HandleSessionChanged()

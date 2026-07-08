@@ -31,6 +31,8 @@ public sealed class SchoolConnectOptions
     public List<StudentContentOptions> StudentContents { get; set; } = [];
 
     public List<StudentProgressOptions> StudentProgresses { get; set; } = [];
+
+    public List<GalleryYearGroupOptions> GalleryYearGroups { get; set; } = [];
 }
 
 public sealed class SchoolIdentityOptions
@@ -137,6 +139,26 @@ public sealed class StudentCurriculumUnitOptions
     public List<string> Topics { get; set; } = [];
 
     public string Outcome { get; set; } = string.Empty;
+}
+
+public sealed class GalleryYearGroupOptions
+{
+    public string PassedOutYear { get; set; } = string.Empty;
+
+    public string Title { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
+
+    public List<GalleryPhotoOptions> Photos { get; set; } = [];
+}
+
+public sealed class GalleryPhotoOptions
+{
+    public string Title { get; set; } = string.Empty;
+
+    public string Caption { get; set; } = string.Empty;
+
+    public string ImageUrl { get; set; } = string.Empty;
 }
 
 public sealed class StudentContentOptions
