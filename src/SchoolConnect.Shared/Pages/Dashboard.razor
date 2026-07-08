@@ -1,0 +1,495 @@
+@page "/"
+@implements IDisposable
+@rendermode Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@inject SchoolContentService Content
+@inject PortalSessionService PortalSession
+@inject NavigationManager Navigation
+@inject IJSRuntime JsRuntime
+
+@{
+    var school = Content.GetProfile();
+}
+
+<PageTitle>@school.Name</PageTitle>
+
+<section id="top" class="modern-home">
+    <header class="modern-topbar">
+        <div class="brand-block">
+            <img class="brand-mark brand-logo" src="_content/SchoolConnect.Shared/venkateswara-logo.svg" alt="Sri Venkateswara Swamy logo" />
+            <div>
+                <strong>@school.Name</strong>
+                <small>@school.Location</small>
+                <p>
+                    A connected school experience for students, teachers, parents, and administrators with academics,
+                    attendance, notices, transport, and management workflows.
+                </p>
+                <div class="hero-badges">
+                    <span>@school.BoardLabel</span>
+                    <span>@string.Join(", ", school.Languages)</span>
+                    <span>@school.CampusLabel</span>
+                </div>
+            </div>
+        </div>
+        <div class="home-topbar-right">
+            @if (activeSession is not null)
+            {
+                <div class="home-session-card">
+                    <div>
+                        <span>@activeSession.RoleLabel Portal</span>
+                        <strong>@activeSession.DisplayName</strong>
+                    </div>
+                    <button class="btn btn-warning btn-sm fw-bold" type="button" @onclick="() => Logout(activeSession.Role)">
+                        Logout
+                    </button>
+                </div>
+            }
+        </div>
+    </header>
+
+    <section class="hero-media-stack">
+        <div id="homeCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="5000">
+            <div class="carousel-indicators hero-carousel-indicators">
+                <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Campus view"></button>
+                <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="1" aria-label="Classroom view"></button>
+                <button type="button" data-bs-target="#homeCarousel" data-bs-slide-to="2" aria-label="Sports view"></button>
+            </div>
+
+            <div class="carousel-inner hero-carousel-inner">
+                <div class="carousel-item active">
+                    <img src="_content/SchoolConnect.Shared/home-campus.jpg" class="d-block w-100 hero-carousel-image" alt="Sri Venkateswara Convent campus" />
+                    <div class="carousel-caption hero-carousel-caption">
+                        <span>Campus</span>
+                        <h3>Bright spaces for learning</h3>
+                        <p>Modern classrooms and a clean campus create a better daily school experience.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="_content/SchoolConnect.Shared/home-classroom.jpg" class="d-block w-100 hero-carousel-image" alt="Classroom learning session" />
+                    <div class="carousel-caption hero-carousel-caption">
+                        <span>Classroom</span>
+                        <h3>Interactive teaching moments</h3>
+                        <p>Students learn in structured sessions with attentive classroom engagement.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="_content/SchoolConnect.Shared/home-sports.jpg" class="d-block w-100 hero-carousel-image" alt="School sports and activity practice" />
+                    <div class="carousel-caption hero-carousel-caption">
+                        <span>Activity</span>
+                        <h3>Sports and activity time</h3>
+                        <p>Balanced growth comes from academics, movement, and student activities.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="carousel-control-prev hero-carousel-control" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev" aria-label="Previous slide">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next hero-carousel-control" type="button" data-bs-target="#homeCarousel" data-bs-slide="next" aria-label="Next slide">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+    </section>
+
+    <section id="portals" class="portal-grid">
+        <a class="portal-card primary" href="/student-login">
+            <span class="portal-icon">01</span>
+            <small>Student Portal</small>
+            <h2>Learn</h2>
+            <p>Timetable, curriculum, study content, assignments, attendance, progress, and school details.</p>
+            <strong>Open Student Login</strong>
+        </a>
+        <a class="portal-card" href="/teacher-login">
+            <span class="portal-icon">02</span>
+            <small>Teacher Portal</small>
+            <h2>Manage</h2>
+            <p>Student academic data, attendance, content publishing, records, reports, and maintenance tasks.</p>
+            <strong>Open Teacher Login</strong>
+        </a>
+        <button class="portal-card portal-card-action accent" type="button" @onclick="OpenAdmissionPopup">
+            <span class="portal-icon">03</span>
+            <small>Admissions</small>
+            <h2>Apply</h2>
+            <p>Admission enquiries, document collection, entrance slots, and fee confirmation workflows.</p>
+            <strong>Start Enquiry</strong>
+        </button>
+    </section>
+
+    <section class="content-showcase">
+        <div class="showcase-main">
+            <div class="section-heading-modern">
+                <p class="eyebrow">Why Choose Us</p>
+                <h2>Designed for a complete digital school experience</h2>
+            </div>
+            <div class="capability-grid">
+                <article>
+                    <span>Academics</span>
+                    <h3>Curriculum-first planning</h3>
+                    <p>Class-wise timetable, syllabus, lesson units, worksheets, and exam preparation content.</p>
+                </article>
+                <article>
+                    <span>Communication</span>
+                    <h3>Notices and feedback</h3>
+                    <p>Important circulars, teacher remarks, academic updates, and parent-visible progress.</p>
+                </article>
+                <article>
+                    <span>Operations</span>
+                    <h3>School management tools</h3>
+                    <p>Teacher workflows for attendance, reports, events, transport coordination, and maintenance.</p>
+                </article>
+                <article>
+                    <span>Growth</span>
+                    <h3>Student progress view</h3>
+                    <p>Attendance percentage, assessment summaries, homework status, and academic remarks.</p>
+                </article>
+            </div>
+        </div>
+
+        <aside class="notice-panel">
+            <div class="section-heading-modern compact">
+                <p class="eyebrow">Live Updates</p>
+                <h2>News & Announcements</h2>
+            </div>
+            @foreach (var notice in school.Notices)
+            {
+                <article class="notice-item">
+                    <time>@notice.Date</time>
+                    <div>
+                        <span>@notice.Priority</span>
+                        <h3>@notice.Title</h3>
+                        <p>@notice.Summary</p>
+                    </div>
+                </article>
+            }
+            <a class="btn btn-outline-success w-100 mt-3" href="/notices">View All Notices</a>
+        </aside>
+    </section>
+
+    <section id="about-us" class="about-preview">
+        <div class="section-heading-modern">
+            <p class="eyebrow">About Us</p>
+            <h2>@school.AboutUs.Title</h2>
+        </div>
+        <div class="about-preview-grid">
+            <p>@school.AboutUs.Summary</p>
+            <a class="btn btn-outline-success fw-semibold align-self-start" href="/#about-us">Read About Us</a>
+        </div>
+    </section>
+
+    <section class="events-strip">
+        @foreach (var item in school.AcademicEvents)
+        {
+            <article>
+                <strong>@item.Date</strong>
+                <div>
+                    <h3>@item.Title</h3>
+                    <p>@item.Description</p>
+                </div>
+            </article>
+        }
+    </section>
+
+    <section id="admissions" class="modern-cta admissions-inline-cta">
+        <div class="admissions-cta-copy">
+            <p class="eyebrow">@school.Name</p>
+            <h2>@school.AdmissionsHeadline</h2>
+            <p>@school.Location</p>
+            <p class="admissions-cta-note">Open the dedicated admissions page for the full application form.</p>
+        </div>
+
+        <div class="panel admissions-inline-form admissions-summary-card">
+            <div class="admissions-summary-grid">
+                <article>
+                    <p class="eyebrow">Full admission form</p>
+                    <h3>Dedicated admissions page</h3>
+                    <p>Submit the full application with student, parent, contact, and academic details.</p>
+                </article>
+                <article>
+                    <p class="eyebrow">Quick enquiry</p>
+                    <h3>Tile popup</h3>
+                    <p>The Admissions tile still opens a compact enquiry overlay for short requests.</p>
+                </article>
+                <a class="btn btn-warning btn-lg fw-bold" href="/admissions">Open full admission form</a>
+            </div>
+        </div>
+    </section>
+
+    @if (showAdmissionPopup)
+    {
+        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseAdmissionPopup">
+            <div class="admissions-popup admissions-popup-small" role="dialog" aria-modal="true" aria-labelledby="admissions-popup-title" @onclick:stopPropagation="true">
+                <div class="admissions-popup-header">
+                    <div>
+                        <p class="eyebrow mb-1">Admission enquiry</p>
+                        <h2 id="admissions-popup-title" class="mb-0">Quick enquiry</h2>
+                    </div>
+                    <button type="button" class="admissions-popup-close" aria-label="Close admission enquiry" @onclick="CloseAdmissionPopup">x</button>
+                </div>
+
+                @if (admissionPopupSubmitted)
+                {
+                    <div class="alert alert-success admissions-popup-success" role="status">
+                        <strong>Enquiry submitted.</strong>
+                        <span>@admissionPopupMessage</span>
+                    </div>
+                }
+
+                <EditForm Model="admissionPopup" OnValidSubmit="SubmitAdmissionPopup">
+                    <DataAnnotationsValidator />
+
+                    <div class="row g-3 admissions-popup-form">
+                        <div class="col-12">
+                            <label class="form-label" for="popupStudent">Student name</label>
+                            <InputText id="popupStudent" class="form-control" @bind-Value="admissionPopup.StudentName" />
+                            <ValidationMessage For="() => admissionPopup.StudentName" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="popupParent">Parent / guardian</label>
+                            <InputText id="popupParent" class="form-control" @bind-Value="admissionPopup.ParentName" />
+                            <ValidationMessage For="() => admissionPopup.ParentName" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="popupClass">Class</label>
+                            <InputSelect id="popupClass" class="form-select" @bind-Value="admissionPopup.ClassSeekingAdmission">
+                                <option value="">Select class</option>
+                                @foreach (var className in school.StudentTimetables.Select(tt => tt.ClassName))
+                                {
+                                    <option value="@className">@className</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => admissionPopup.ClassSeekingAdmission" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="popupMobile">Mobile number</label>
+                            <InputText id="popupMobile" class="form-control" @bind-Value="admissionPopup.Mobile" />
+                            <ValidationMessage For="() => admissionPopup.Mobile" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="popupEmail">Email address</label>
+                            <InputText id="popupEmail" type="email" class="form-control" @bind-Value="admissionPopup.Email" />
+                            <ValidationMessage For="() => admissionPopup.Email" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="popupDetails">Enquiry details</label>
+                            <InputTextArea id="popupDetails" rows="3" class="form-control" @bind-Value="admissionPopup.Details" />
+                            <ValidationMessage For="() => admissionPopup.Details" />
+                        </div>
+
+                        <div class="col-12 d-flex flex-wrap gap-2">
+                            <button class="btn btn-warning fw-bold" type="submit">Submit enquiry</button>
+                            <button class="btn btn-outline-secondary fw-semibold" type="button" @onclick="CloseAdmissionPopup">Close</button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    }
+
+    <section class="campus-map-section" aria-label="Campus location">
+            <div class="map-info">
+                <p class="eyebrow">Find Campus</p>
+                <h2>@school.CampusMapTitle</h2>
+                <p>@school.Location</p>
+                <div class="map-meta">
+                    <span>@school.BoardLabel</span>
+                    <span>@school.StateLabel</span>
+                    <span>@school.CampusLabel</span>
+                </div>
+            </div>
+
+        <div class="map-card">
+            <iframe
+                title="@school.CampusMapTitle"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=80.0950%2C16.4850%2C80.1850%2C16.5650&layer=mapnik&marker=16.5250%2C80.1400">
+            </iframe>
+        </div>
+    </section>
+
+    <section id="contacts" class="contacts-section">
+        <div class="section-heading-modern">
+            <p class="eyebrow">Contacts</p>
+            <h2>Reach the school team</h2>
+        </div>
+
+        <div class="contacts-grid">
+            <article class="panel contacts-card">
+                <div class="contact-row">
+                    <div>
+                        <p class="eyebrow">School Email</p>
+                        <h3>General Office</h3>
+                        <p>@school.Email</p>
+                    </div>
+                    <a class="contact-action" href="mailto:@school.Email">
+                        <span class="bi bi-envelope-fill" aria-hidden="true"></span>
+                        Email
+                    </a>
+                </div>
+                <div class="contact-row">
+                    <div>
+                        <p class="eyebrow">Phone</p>
+                        <h3>@school.Phone</h3>
+                        <p>Call during school hours for admissions, transport, and office support.</p>
+                    </div>
+                    <a class="contact-action" href="tel:@school.Phone">
+                        <span class="bi bi-telephone-fill" aria-hidden="true"></span>
+                        Call
+                    </a>
+                </div>
+            </article>
+
+            <article class="panel contacts-card">
+                <div class="contact-row">
+                    <div>
+                        <p class="eyebrow">Faculty Contacts</p>
+                        <h3>Administration & Support</h3>
+                        <p>Direct contacts for school coordination and academic support.</p>
+                    </div>
+                </div>
+                @foreach (var contact in school.FacultyContacts)
+                {
+                    <div class="contact-row">
+                        <div>
+                            <h3>@contact.Name</h3>
+                            <p>@contact.Role</p>
+                        </div>
+                        <a class="contact-action" href="tel:@contact.Phone">
+                            <span class="bi bi-person-badge-fill" aria-hidden="true"></span>
+                            @contact.Phone
+                        </a>
+                    </div>
+                }
+            </article>
+        </div>
+    </section>
+</section>
+
+@code {
+    private SchoolConnect.Shared.Services.PortalSessionInfo? activeSession;
+    private bool showAdmissionPopup;
+    private bool admissionPopupSubmitted;
+    private string? admissionPopupMessage;
+    private readonly AdmissionPopupModel admissionPopup = new();
+
+    protected override void OnInitialized()
+    {
+        PortalSession.Changed += HandleSessionChanged;
+        activeSession = PortalSession.GetActiveSession();
+    }
+
+    private void HandleSessionChanged()
+    {
+        activeSession = PortalSession.GetActiveSession();
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        PortalSession.Changed -= HandleSessionChanged;
+    }
+
+    private async Task Logout(string role)
+    {
+        PortalSession.SignOut(role);
+        await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", PortalSessionService.BrowserSessionRoleKey);
+        Navigation.NavigateTo("/");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var activeSession = PortalSession.GetActiveSession();
+        if (activeSession is not null)
+        {
+            try
+            {
+                await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, activeSession.Role);
+            }
+            catch
+            {
+                // Session storage is optional; the in-memory portal session still drives the UI.
+            }
+
+            return;
+        }
+
+        string? storedRole = null;
+        try
+        {
+            storedRole = await JsRuntime.InvokeAsync<string?>("sessionStorage.getItem", PortalSessionService.BrowserSessionRoleKey);
+        }
+        catch
+        {
+            // Ignore storage access failures and continue with the current session state.
+        }
+
+        if (PortalSession.RestoreAuthenticatedRole(storedRole))
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void OpenAdmissionPopup()
+    {
+        showAdmissionPopup = true;
+        admissionPopupSubmitted = false;
+        admissionPopupMessage = null;
+        admissionPopup.Reset();
+    }
+
+    private void CloseAdmissionPopup()
+    {
+        showAdmissionPopup = false;
+    }
+
+    private void SubmitAdmissionPopup()
+    {
+        var school = Content.GetProfile();
+        admissionPopupSubmitted = true;
+        admissionPopupMessage = $"Thanks {admissionPopup.ParentName.Trim()}. {school.Name} will contact you about {admissionPopup.StudentName} on {admissionPopup.Mobile}.";
+    }
+
+    private sealed class AdmissionPopupModel
+    {
+        [Required(ErrorMessage = "Student name is required.")]
+        public string StudentName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Parent or guardian name is required.")]
+        public string ParentName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select the class.")]
+        public string ClassSeekingAdmission { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Mobile number is required.")]
+        [Phone(ErrorMessage = "Enter a valid mobile number.")]
+        public string Mobile { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email address is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please add enquiry details.")]
+        [StringLength(250, ErrorMessage = "Details should stay within 250 characters.")]
+        public string Details { get; set; } = string.Empty;
+
+        public void Reset()
+        {
+            StudentName = string.Empty;
+            ParentName = string.Empty;
+            ClassSeekingAdmission = string.Empty;
+            Mobile = string.Empty;
+            Email = string.Empty;
+            Details = string.Empty;
+        }
+    }
+}

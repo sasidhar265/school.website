@@ -1,0 +1,1240 @@
+@page "/attendance"
+@page "/homework"
+@page "/fees"
+@page "/messages"
+@page "/admissions"
+@page "/notices"
+@page "/student-login"
+@page "/teacher-login"
+@rendermode Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@inject SchoolContentService Content
+@inject PortalSessionService PortalSession
+@inject NavigationManager Navigation
+@inject IJSRuntime JsRuntime
+
+@{
+    var school = Content.GetProfile();
+    var slug = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
+    var title = slug switch
+    {
+        "attendance" => "Attendance",
+        "homework" => "Homework",
+        "fees" => "Fees",
+        "messages" => "Messages",
+        "admissions" => "Admissions",
+        "notices" => "Notices",
+        "student-login" => "Student Login",
+        "teacher-login" => "Teacher Login",
+        _ => "School Portal"
+    };
+
+    var intro = slug switch
+    {
+        "student-login" => "Student portal modules for academic content, timetable, curriculum, assignments, school details, and progress tracking.",
+        "teacher-login" => "Teacher portal modules for student academic data plus school maintenance, administration, communication, and management tasks.",
+        "admissions" => "Submit a full admission application and the school team will contact you with the next steps.",
+        _ => "This module is scaffolded for the production workflow. Connect it to your database and role-based login to enable live records for parents, students, teachers, and administrators."
+    };
+
+    var roleModules = slug switch
+    {
+        "student-login" => school.StudentModules,
+        "teacher-login" => school.TeacherModules,
+        _ => []
+    };
+
+    var requiresAuthentication = roleModules.Count > 0;
+    var portalRole = slug == "teacher-login" ? PortalRoles.Teacher : PortalRoles.Student;
+    var isPortalAuthenticated = !requiresAuthentication || PortalSession.IsAuthenticated(portalRole);
+}
+
+<PageTitle>@title - @school.Name</PageTitle>
+
+<section class="feature-page">
+    @if (!requiresAuthentication)
+    {
+        <div class="feature-hero @(slug == "admissions" ? "admissions-hero" : string.Empty)">
+            <a class="back-link back-link-icon" href="/#top" aria-label="Back to dashboard">←</a>
+            <div class="row g-4 align-items-end mt-1">
+                <div class="col-lg-9">
+                    <p class="eyebrow">@school.Name</p>
+                    <h1>@title</h1>
+                    <p>@intro</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (slug == "admissions")
+    {
+        <section class="admissions-enquiry-shell">
+            <div class="row g-4">
+                <div class="col-12 col-xl-8">
+                    <div class="panel admissions-enquiry-card">
+                        <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+                            <div>
+                                <p class="eyebrow">Admission application</p>
+                                <h2 class="mb-1">Apply for admission</h2>
+                                <p class="mb-0">Fill in the mandatory details below and submit the admission request to the school.</p>
+                            </div>
+                            <span class="badge rounded-pill text-bg-success align-self-start">Online application</span>
+                        </div>
+
+                        @if (admissionSubmitted)
+                        {
+                            <div class="alert alert-success admissions-success" role="status">
+                                <strong>Application submitted.</strong>
+                                <span>@submissionMessage</span>
+                            </div>
+                        }
+
+                        <EditForm Model="admissionApplication" OnValidSubmit="SubmitAdmissionApplication">
+                            <DataAnnotationsValidator />
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="studentFullName">Student full name</label>
+                                    <InputText id="studentFullName" class="form-control form-control-lg" @bind-Value="admissionApplication.StudentFullName" />
+                                    <ValidationMessage For="() => admissionApplication.StudentFullName" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="dob">Date of birth</label>
+                                    <InputDate id="dob" class="form-control form-control-lg" @bind-Value="admissionApplication.DateOfBirth" />
+                                    <ValidationMessage For="() => admissionApplication.DateOfBirth" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="gender">Gender</label>
+                                    <InputSelect id="gender" class="form-select form-select-lg" @bind-Value="admissionApplication.Gender">
+                                        <option value="">Select gender</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Other">Other</option>
+                                    </InputSelect>
+                                    <ValidationMessage For="() => admissionApplication.Gender" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="classApplying">Class applying for</label>
+                                    <InputSelect id="classApplying" class="form-select form-select-lg" @bind-Value="admissionApplication.ClassApplyingFor">
+                                        <option value="">Select class</option>
+                                        @foreach (var className in school.StudentTimetables.Select(tt => tt.ClassName))
+                                        {
+                                            <option value="@className">@className</option>
+                                        }
+                                    </InputSelect>
+                                    <ValidationMessage For="() => admissionApplication.ClassApplyingFor" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="parentName">Parent / guardian name</label>
+                                    <InputText id="parentName" class="form-control form-control-lg" @bind-Value="admissionApplication.ParentName" />
+                                    <ValidationMessage For="() => admissionApplication.ParentName" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="relationship">Relationship to student</label>
+                                    <InputSelect id="relationship" class="form-select form-select-lg" @bind-Value="admissionApplication.Relationship">
+                                        <option value="">Select relationship</option>
+                                        <option value="Father">Father</option>
+                                        <option value="Mother">Mother</option>
+                                        <option value="Guardian">Guardian</option>
+                                    </InputSelect>
+                                    <ValidationMessage For="() => admissionApplication.Relationship" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="mobile">Mobile number</label>
+                                    <InputText id="mobile" class="form-control form-control-lg" @bind-Value="admissionApplication.Mobile" />
+                                    <ValidationMessage For="() => admissionApplication.Mobile" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="email">Email address</label>
+                                    <InputText id="email" type="email" class="form-control form-control-lg" @bind-Value="admissionApplication.Email" />
+                                    <ValidationMessage For="() => admissionApplication.Email" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label" for="address">Residential address</label>
+                                    <InputText id="address" class="form-control form-control-lg" @bind-Value="admissionApplication.Address" />
+                                    <ValidationMessage For="() => admissionApplication.Address" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="previousSchool">Previous school</label>
+                                    <InputText id="previousSchool" class="form-control form-control-lg" @bind-Value="admissionApplication.PreviousSchool" />
+                                    <ValidationMessage For="() => admissionApplication.PreviousSchool" />
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label" for="academicYear">Academic year</label>
+                                    <InputText id="academicYear" class="form-control form-control-lg" @bind-Value="admissionApplication.AcademicYear" />
+                                    <ValidationMessage For="() => admissionApplication.AcademicYear" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label" for="details">Additional details</label>
+                                    <InputTextArea id="details" rows="5" class="form-control form-control-lg" @bind-Value="admissionApplication.AdditionalDetails" />
+                                    <ValidationMessage For="() => admissionApplication.AdditionalDetails" />
+                                </div>
+
+                                <div class="col-12 d-flex flex-wrap gap-2">
+                                    <button class="btn btn-warning btn-lg fw-bold" type="submit">Submit admission</button>
+                                    <button class="btn btn-outline-secondary btn-lg fw-semibold" type="button" @onclick="ResetAdmissionForm">Reset form</button>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-4">
+                    <div class="panel admissions-side-card h-100">
+                        <p class="eyebrow">School contact</p>
+                        <h2 class="mb-3">Who will contact you</h2>
+                        <p class="mb-4">The admissions and office team will review the application and reach out using the details you provide.</p>
+
+                        <div class="admissions-team-list">
+                            @foreach (var contact in school.FacultyContacts)
+                            {
+                                <article class="admissions-team-item">
+                                    <div>
+                                        <h3>@contact.Name</h3>
+                                        <p>@contact.Role</p>
+                                    </div>
+                                    <a class="contact-action" href="tel:@contact.Phone">
+                                        <span class="bi bi-telephone-fill" aria-hidden="true"></span>
+                                        @contact.Phone
+                                    </a>
+                                </article>
+                            }
+                        </div>
+
+                        <div class="admissions-note">
+                            <strong>School office</strong>
+                            <p>@school.Email</p>
+                            <a class="btn btn-outline-success w-100" href="mailto:@school.Email">Email office</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+
+    @if (requiresAuthentication && !isPortalAuthenticated)
+    {
+        <div class="auth-shell auth-shell-centered auth-login-only">
+            <div class="row g-4 justify-content-center position-relative">
+                <div class="col-12 col-md-10 col-lg-7 col-xl-6">
+                    <div class="panel auth-preview auth-login-card">
+                        <div class="auth-preview-header">
+                            <div>
+                                <p class="eyebrow">@school.Name</p>
+                                <h2>Login required</h2>
+                            </div>
+                            <span class="auth-status-dot" aria-label="Secure portal active"></span>
+                        </div>
+                        <p>Use the Login page to choose Student or Teacher access and continue to this portal.</p>
+                        <a class="btn btn-warning btn-lg w-100 fw-bold auth-submit" href="/login">Go to Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (roleModules.Count > 0)
+    {
+        <div class="feature-hero portal-feature-hero">
+            @if (portalRole == PortalRoles.Student)
+            {
+                var activeSession = PortalSession.GetActiveSession();
+                <div class="portal-container-actions">
+                    <div class="student-profile-shell">
+                        <button class="student-profile-button" type="button" @onclick="ToggleStudentProfileMenu">
+                            <span class="student-profile-avatar" aria-hidden="true">
+                                @GetStudentAvatar(activeSession)
+                            </span>
+                            <span class="student-profile-copy">
+                                <strong>@(activeSession?.DisplayName ?? "Student User")</strong>
+                                <span>@(string.IsNullOrWhiteSpace(activeSession?.ClassName) ? "Student class" : activeSession.ClassName)</span>
+                            </span>
+                            <span class="student-profile-caret" aria-hidden="true">▾</span>
+                        </button>
+
+                        @if (isStudentProfileMenuOpen)
+                        {
+                            <div class="student-profile-menu" role="menu" aria-label="Student profile options">
+                                <button class="student-profile-menu-item" type="button" role="menuitem" @onclick="OpenStudentProfile">
+                                    View profile
+                                </button>
+                                <button class="student-profile-menu-item text-danger" type="button" role="menuitem" @onclick="() => SignOut(portalRole)">
+                                    Sign out
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (portalRole == PortalRoles.Teacher)
+            {
+                var activeSession = PortalSession.GetActiveSession();
+                <div class="portal-container-actions">
+                    <div class="student-profile-shell">
+                        <button class="student-profile-button" type="button" @onclick="ToggleTeacherProfileMenu">
+                            <span class="student-profile-avatar" aria-hidden="true">
+                                @GetTeacherAvatar(activeSession)
+                            </span>
+                            <span class="student-profile-copy">
+                                <strong>@(activeSession?.DisplayName ?? "Teacher User")</strong>
+                                <span>@(string.IsNullOrWhiteSpace(activeSession?.ClassName) ? "Teacher class" : activeSession.ClassName)</span>
+                            </span>
+                            <span class="student-profile-caret" aria-hidden="true">▾</span>
+                        </button>
+
+                        @if (isTeacherProfileMenuOpen)
+                        {
+                            <div class="student-profile-menu" role="menu" aria-label="Teacher profile options">
+                                <button class="student-profile-menu-item" type="button" role="menuitem" @onclick="OpenTeacherProfile">
+                                    View profile
+                                </button>
+                                <button class="student-profile-menu-item text-danger" type="button" role="menuitem" @onclick="() => SignOut(portalRole)">
+                                    Sign out
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            <div class="row g-4 align-items-end mt-1">
+                <div class="col-lg-9">
+                    <p class="eyebrow">@school.Name</p>
+                    <h1>@title</h1>
+                    <p>@intro</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+            @foreach (var module in roleModules.Select((Value, Index) => new { Value, Index }))
+            {
+                <div class="col-12 col-lg-6 col-xxl-4">
+                    <article class="panel role-card h-100">
+                        <div class="d-flex align-items-start justify-content-between gap-3">
+                            <div class="role-icon">@(module.Index + 1)</div>
+                            <span class="badge rounded-pill text-bg-light">Module</span>
+                        </div>
+                        <h2>@module.Value.Title</h2>
+                        <p>@module.Value.Description</p>
+                        <ul class="task-list">
+                            @foreach (var task in module.Value.Tasks)
+                            {
+                                <li>@task</li>
+                            }
+                        </ul>
+
+                        @if (portalRole == PortalRoles.Student && module.Value.Title == "Timetable")
+                        {
+                            <button class="btn btn-outline-success w-100 mt-3" type="button" @onclick="OpenTimetablePopup">
+                                Open module
+                            </button>
+                        }
+                        else if (portalRole == PortalRoles.Student && module.Value.Title == "Curriculum")
+                        {
+                            <button class="btn btn-outline-success w-100 mt-3" type="button" @onclick="OpenCurriculumPopup">
+                                Open module
+                            </button>
+                        }
+                        else if (portalRole == PortalRoles.Student && module.Value.Title == "Study Content")
+                        {
+                            <button class="btn btn-outline-success w-100 mt-3" type="button" @onclick="OpenStudentContentPopup">
+                                Open module
+                            </button>
+                        }
+                        else if (portalRole == PortalRoles.Student && module.Value.Title == "Attendance and Progress")
+                        {
+                            <button class="btn btn-outline-success w-100 mt-3" type="button" @onclick="OpenStudentProgressPopup">
+                                Open module
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline-success w-100 mt-3" type="button" disabled>View module</button>
+                        }
+                    </article>
+                </div>
+            }
+        </div>
+
+        @if (portalRole == PortalRoles.Student && isTimetablePopupOpen && school.StudentTimetables.Count > 0)
+        {
+            var selectedTimetable = GetSelectedTimetable(school.StudentTimetables);
+
+            <div class="timetable-popup-backdrop" role="presentation" @onclick="CloseTimetablePopup">
+                <div class="timetable-popup" role="dialog" aria-modal="true" aria-labelledby="timetable-popup-title" @onclick:stopPropagation="true">
+                    <div class="timetable-popup-header">
+                        <div>
+                            <p class="eyebrow mb-1">Student Timetable</p>
+                            <h2 id="timetable-popup-title" class="mb-0">Nursery, LKG, UKG, Class 1 to 5</h2>
+                        </div>
+                        <button type="button"
+                                class="timetable-popup-close"
+                                aria-label="Close timetable"
+                                @onclick="CloseTimetablePopup">
+                            x
+                        </button>
+                    </div>
+
+                    @if (selectedTimetable is not null)
+                    {
+                        <div class="timetable-module-shell timetable-popup-body">
+                            <div class="timetable-class-tabs" role="tablist" aria-label="Class timetable selector">
+                                @foreach (var timetable in school.StudentTimetables)
+                                {
+                                    <button type="button"
+                                            class="@GetTimetableTabClass(timetable.ClassName)"
+                                            @onclick="() => SelectTimetable(timetable.ClassName)">
+                                        @timetable.ClassName
+                                    </button>
+                                }
+                            </div>
+
+                            <div class="timetable-viewer">
+                                <div class="timetable-viewer-header">
+                                    <div>
+                                        <p class="eyebrow mb-1">@selectedTimetable.ClassName</p>
+                                        <h3 class="mb-0">Weekly Schedule</h3>
+                                    </div>
+                                    <div class="timetable-meta">
+                                        <span>@selectedTimetable.PeriodLabels.Length periods</span>
+                                        <span>Monday - Saturday</span>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive timetable-table-wrap">
+                                    <table class="table table-bordered align-middle timetable-table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="timetable-day-col">Day</th>
+                                                @foreach (var period in selectedTimetable.PeriodLabels)
+                                                {
+                                                    <th scope="col">@period</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var day in selectedTimetable.Days)
+                                            {
+                                                <tr>
+                                                    <th scope="row" class="timetable-day-col">@day.Day</th>
+                                                    @foreach (var lesson in day.Lessons)
+                                                    {
+                                                        <td>@lesson</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (portalRole == PortalRoles.Student && isCurriculumPopupOpen && school.StudentCurricula.Count > 0)
+        {
+            var selectedCurriculum = GetSelectedCurriculum(school.StudentCurricula);
+
+            <div class="timetable-popup-backdrop" role="presentation" @onclick="CloseCurriculumPopup">
+                <div class="timetable-popup curriculum-popup" role="dialog" aria-modal="true" aria-labelledby="curriculum-popup-title" @onclick:stopPropagation="true">
+                    <div class="timetable-popup-header">
+                        <div>
+                            <p class="eyebrow mb-1">Student Curriculum</p>
+                            <h2 id="curriculum-popup-title" class="mb-0">Nursery, LKG, UKG, Class 1 to 5</h2>
+                        </div>
+                        <button type="button"
+                                class="timetable-popup-close"
+                                aria-label="Close curriculum"
+                                @onclick="CloseCurriculumPopup">
+                            x
+                        </button>
+                    </div>
+
+                    @if (selectedCurriculum is not null)
+                    {
+                        <div class="timetable-module-shell timetable-popup-body">
+                            <div class="timetable-class-tabs" role="tablist" aria-label="Class curriculum selector">
+                                @foreach (var curriculum in school.StudentCurricula)
+                                {
+                                    <button type="button"
+                                            class="@GetCurriculumTabClass(curriculum.ClassName)"
+                                            @onclick="() => SelectCurriculum(curriculum.ClassName)">
+                                        @curriculum.ClassName
+                                    </button>
+                                }
+                            </div>
+
+                            <div class="curriculum-viewer">
+                                <div class="timetable-viewer-header">
+                                    <div>
+                                        <p class="eyebrow mb-1">@selectedCurriculum.ClassName</p>
+                                        <h3 class="mb-0">Academic Plan</h3>
+                                    </div>
+                                    <div class="timetable-meta">
+                                        <span>@GetCurriculumSubjects(selectedCurriculum).Count subjects</span>
+                                        <span>Weekly learning structure</span>
+                                    </div>
+                                </div>
+
+                                <div class="timetable-class-tabs curriculum-subject-tabs" role="tablist" aria-label="Subject curriculum selector">
+                                    @foreach (var subject in GetCurriculumSubjects(selectedCurriculum))
+                                    {
+                                        <button type="button"
+                                                class="@GetCurriculumSubjectTabClass(subject)"
+                                                @onclick="() => SelectCurriculumSubject(subject)">
+                                            @subject
+                                        </button>
+                                    }
+                                </div>
+
+                                <div class="curriculum-unit-list">
+                                    @foreach (var unit in GetFilteredCurriculumUnits(selectedCurriculum))
+                                    {
+                                        <article class="curriculum-unit-card">
+                                            <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                                                <div>
+                                                    <p class="eyebrow mb-1">@unit.Subject</p>
+                                                    <h4 class="mb-2">@unit.Outcome</h4>
+                                                </div>
+                                                <span class="badge rounded-pill text-bg-light">Unit</span>
+                                            </div>
+
+                                            <ul class="curriculum-topic-list">
+                                                @foreach (var topic in unit.Topics)
+                                                {
+                                                    <li>@topic</li>
+                                                }
+                                            </ul>
+                                        </article>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (portalRole == PortalRoles.Student && isStudentContentPopupOpen && school.StudentContents.Count > 0)
+        {
+            var selectedContent = GetSelectedStudentContent(school.StudentContents);
+
+            <div class="timetable-popup-backdrop" role="presentation" @onclick="CloseStudentContentPopup">
+                <div class="timetable-popup curriculum-popup" role="dialog" aria-modal="true" aria-labelledby="student-content-popup-title" @onclick:stopPropagation="true">
+                    <div class="timetable-popup-header">
+                        <div>
+                            <p class="eyebrow mb-1">Student Content</p>
+                            <h2 id="student-content-popup-title" class="mb-0">Notes, worksheets, and homework</h2>
+                        </div>
+                        <button type="button" class="timetable-popup-close" aria-label="Close student content" @onclick="CloseStudentContentPopup">x</button>
+                    </div>
+
+                    @if (selectedContent is not null)
+                    {
+                        <div class="timetable-module-shell timetable-popup-body">
+                            <div class="timetable-class-tabs" role="tablist" aria-label="Class content selector">
+                                @foreach (var content in school.StudentContents)
+                                {
+                                    <button type="button"
+                                            class="@GetStudentContentTabClass(content.ClassName)"
+                                            @onclick="() => SelectStudentContent(content.ClassName)">
+                                        @content.ClassName
+                                    </button>
+                                }
+                            </div>
+
+                            <div class="timetable-class-tabs curriculum-subject-tabs" role="tablist" aria-label="Content category selector">
+                                @foreach (var category in GetStudentContentCategories(selectedContent))
+                                {
+                                    <button type="button"
+                                            class="@GetStudentContentCategoryTabClass(category)"
+                                            @onclick="() => SelectStudentContentCategory(category)">
+                                        @category
+                                    </button>
+                                }
+                            </div>
+
+                            <div class="curriculum-unit-list">
+                                @foreach (var item in GetFilteredStudentContentItems(selectedContent))
+                                {
+                                    <article class="curriculum-unit-card">
+                                        <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                                            <div>
+                                                <p class="eyebrow mb-1">@item.Category</p>
+                                                <h4 class="mb-2">@item.Title</h4>
+                                            </div>
+                                            <span class="badge rounded-pill text-bg-light">@item.ActionLabel</span>
+                                        </div>
+                                        <p class="mb-0 text-muted">@item.Detail</p>
+                                    </article>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (portalRole == PortalRoles.Student && isStudentProgressPopupOpen && school.StudentProgresses.Count > 0)
+        {
+            var selectedProgress = GetSelectedStudentProgress(school.StudentProgresses);
+
+            <div class="timetable-popup-backdrop" role="presentation" @onclick="CloseStudentProgressPopup">
+                <div class="timetable-popup curriculum-popup" role="dialog" aria-modal="true" aria-labelledby="student-progress-popup-title" @onclick:stopPropagation="true">
+                    <div class="timetable-popup-header">
+                        <div>
+                            <p class="eyebrow mb-1">Attendance and Progress</p>
+                            <h2 id="student-progress-popup-title" class="mb-0">Attendance summary and academic progress</h2>
+                        </div>
+                        <button type="button" class="timetable-popup-close" aria-label="Close progress" @onclick="CloseStudentProgressPopup">x</button>
+                    </div>
+
+                    @if (selectedProgress is not null)
+                    {
+                        <div class="timetable-module-shell timetable-popup-body">
+                            <div class="timetable-class-tabs" role="tablist" aria-label="Class progress selector">
+                                @foreach (var progress in school.StudentProgresses)
+                                {
+                                    <button type="button"
+                                            class="@GetStudentProgressTabClass(progress.ClassName)"
+                                            @onclick="() => SelectStudentProgress(progress.ClassName)">
+                                        @progress.ClassName
+                                    </button>
+                                }
+                            </div>
+
+                            <div class="curriculum-unit-card">
+                                <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                                    <div>
+                                        <p class="eyebrow mb-1">@selectedProgress.ClassName</p>
+                                        <h4 class="mb-2">@selectedProgress.Status</h4>
+                                    </div>
+                                    <span class="badge rounded-pill text-bg-success">@selectedProgress.Attendance attendance</span>
+                                </div>
+                                <p class="mb-0 text-muted">@selectedProgress.Remark</p>
+                            </div>
+
+                            <div class="curriculum-unit-list">
+                                @foreach (var subject in selectedProgress.Subjects)
+                                {
+                                    <article class="curriculum-unit-card">
+                                        <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                                            <div>
+                                                <p class="eyebrow mb-1">@subject.Subject</p>
+                                                <h4 class="mb-2">@subject.Score</h4>
+                                            </div>
+                                            <span class="badge rounded-pill text-bg-light">Subject progress</span>
+                                        </div>
+                                        <p class="mb-0 text-muted">@subject.Remark</p>
+                                    </article>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (portalRole == PortalRoles.Student && isStudentProfilePopupOpen)
+        {
+            var activeSession = PortalSession.GetActiveSession();
+            <div class="timetable-popup-backdrop" role="presentation" @onclick="CloseStudentProfile">
+                <div class="timetable-popup curriculum-popup student-profile-popup" role="dialog" aria-modal="true" aria-labelledby="student-profile-popup-title" @onclick:stopPropagation="true">
+                    <div class="timetable-popup-header">
+                        <div>
+                            <p class="eyebrow mb-1">Student Profile</p>
+                            <h2 id="student-profile-popup-title" class="mb-0">Profile details</h2>
+                        </div>
+                        <button type="button" class="timetable-popup-close" aria-label="Close profile" @onclick="CloseStudentProfile">x</button>
+                    </div>
+
+                    <div class="student-profile-popup-body">
+                        <div class="student-profile-summary">
+                            <div class="student-profile-avatar student-profile-avatar-lg" aria-hidden="true">
+                                @GetStudentAvatar(activeSession)
+                            </div>
+                            <div>
+                                <p class="eyebrow mb-1">Logged in student</p>
+                                <h3 class="mb-1">@(activeSession?.DisplayName ?? "Student User")</h3>
+                                <p class="mb-0">@((activeSession?.ClassName is { Length: > 0 } className) ? className : "Class not assigned")</p>
+                            </div>
+                        </div>
+
+                        <div class="curriculum-unit-list">
+                            <article class="curriculum-unit-card">
+                                <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                                    <div>
+                                        <p class="eyebrow mb-1">Profile overview</p>
+                                        <h4 class="mb-2">Student details</h4>
+                                    </div>
+                                    <span class="badge rounded-pill text-bg-success">Active</span>
+                                </div>
+                                <div class="student-profile-detail-grid">
+                                    <div><span>Student name</span><strong>@(activeSession?.DisplayName ?? "Student User")</strong></div>
+                                    <div><span>Class</span><strong>@(activeSession?.ClassName ?? "Class not assigned")</strong></div>
+                                    <div><span>Gender</span><strong>@(activeSession?.Gender ?? "Not assigned")</strong></div>
+                                    <div><span>Parents / Guardian name</span><strong>@(activeSession?.GuardianName ?? "Not assigned")</strong></div>
+                                    <div><span>Mobile phone number</span><strong>@(activeSession?.MobileNumber ?? "Not assigned")</strong></div>
+                                    <div><span>Class teacher</span><strong>@(activeSession?.ClassTeacher ?? "Not assigned")</strong></div>
+                                    <div><span>School joined year</span><strong>@(activeSession?.SchoolJoinedYear ?? "Not assigned")</strong></div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (portalRole == PortalRoles.Teacher && isTeacherProfilePopupOpen)
+        {
+            var activeSession = PortalSession.GetActiveSession();
+            <div class="timetable-popup-backdrop" role="presentation" @onclick="CloseTeacherProfile">
+                <div class="timetable-popup curriculum-popup student-profile-popup" role="dialog" aria-modal="true" aria-labelledby="teacher-profile-popup-title" @onclick:stopPropagation="true">
+                    <div class="timetable-popup-header">
+                        <div>
+                            <p class="eyebrow mb-1">Teacher Profile</p>
+                            <h2 id="teacher-profile-popup-title" class="mb-0">Profile details</h2>
+                        </div>
+                        <button type="button" class="timetable-popup-close" aria-label="Close profile" @onclick="CloseTeacherProfile">x</button>
+                    </div>
+
+                    <div class="student-profile-popup-body">
+                        <div class="student-profile-summary">
+                            <div class="student-profile-avatar student-profile-avatar-lg" aria-hidden="true">
+                                @GetTeacherAvatar(activeSession)
+                            </div>
+                            <div>
+                                <p class="eyebrow mb-1">Logged in teacher</p>
+                                <h3 class="mb-1">@(activeSession?.DisplayName ?? "Teacher User")</h3>
+                                <p class="mb-0">
+                                    @((activeSession?.ClassDealingWith is { Length: > 0 } className) ? className : "Class dealing not assigned")
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="curriculum-unit-list">
+                            <article class="curriculum-unit-card">
+                                <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                                    <div>
+                                        <p class="eyebrow mb-1">Profile overview</p>
+                                        <h4 class="mb-2">Teacher details</h4>
+                                    </div>
+                                    <span class="badge rounded-pill text-bg-success">Active</span>
+                                </div>
+                                <div class="student-profile-detail-grid">
+                                    <div><span>Teacher name</span><strong>@(activeSession?.DisplayName ?? "Teacher User")</strong></div>
+                                    <div><span>Class dealing with</span><strong>@(activeSession?.ClassDealingWith ?? "Not assigned")</strong></div>
+                                    <div><span>Subject</span><strong>@(activeSession?.Subject ?? "Not assigned")</strong></div>
+                                    <div><span>Qualification</span><strong>@(activeSession?.Qualification ?? "Not assigned")</strong></div>
+                                    <div><span>Gender</span><strong>@(activeSession?.Gender ?? "Not assigned")</strong></div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else if (slug != "admissions")
+    {
+        <div class="row g-3 mt-1">
+            <div class="col-md-6">
+                <div class="panel h-100">
+                    <h2>Included workflow</h2>
+                    <ul class="task-list">
+                        <li>Role-specific access for school staff and families.</li>
+                        <li>Mobile-friendly screens shared by web, Android, and iOS.</li>
+                        <li>Ready for API integration with SQL Server or PostgreSQL.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="panel h-100">
+                    <h2>Next integration</h2>
+                    <p>
+                        Add authentication, database entities, push notifications, and payment gateway credentials when the
+                        school operations data is available.
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    private readonly AdmissionApplicationModel admissionApplication = new();
+    private string? activeStudentModule;
+    private string? activeTimetableClass;
+    private string? activeCurriculumClass;
+    private string? activeCurriculumSubject;
+    private string? activeStudentContentClass;
+    private string? activeStudentContentCategory;
+    private string? activeStudentProgressClass;
+    private bool isTimetablePopupOpen;
+    private bool isCurriculumPopupOpen;
+    private bool isStudentContentPopupOpen;
+    private bool isStudentProgressPopupOpen;
+    private bool isStudentProfileMenuOpen;
+    private bool isStudentProfilePopupOpen;
+    private bool isTeacherProfileMenuOpen;
+    private bool isTeacherProfilePopupOpen;
+    private bool admissionSubmitted;
+    private string? submissionMessage;
+
+    private void ResetAdmissionForm()
+    {
+        admissionSubmitted = false;
+        submissionMessage = null;
+        admissionApplication.Reset();
+    }
+
+    private void SubmitAdmissionApplication()
+    {
+        var school = Content.GetProfile();
+        admissionSubmitted = true;
+        submissionMessage = $"Thanks {admissionApplication.ParentName.Trim()}. {school.Name} will review the admission request for {admissionApplication.StudentFullName} and contact you on {admissionApplication.Mobile}.";
+    }
+
+    private async Task SignOut(string role)
+    {
+        PortalSession.SignOut(role);
+        await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", PortalSessionService.BrowserSessionRoleKey);
+        Navigation.NavigateTo("/login");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var requiredRole = GetRequiredPortalRole();
+        if (!firstRender || requiredRole is null)
+        {
+            return;
+        }
+
+        if (PortalSession.IsAuthenticated(requiredRole))
+        {
+            try
+            {
+                await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, requiredRole);
+            }
+            catch
+            {
+                // Session storage is a convenience layer; the portal session itself remains authoritative.
+            }
+
+            return;
+        }
+
+        string? storedRole = null;
+        try
+        {
+            storedRole = await JsRuntime.InvokeAsync<string?>("sessionStorage.getItem", PortalSessionService.BrowserSessionRoleKey);
+        }
+        catch
+        {
+            // Ignore storage access failures and fall back to the rendered login state.
+        }
+
+        if (PortalSession.RestoreAuthenticatedRole(storedRole))
+        {
+            StateHasChanged();
+        }
+    }
+
+    private string? GetRequiredPortalRole()
+    {
+        var slug = Navigation.ToBaseRelativePath(Navigation.Uri).Trim('/');
+        return slug switch
+        {
+            "student-login" => PortalRoles.Student,
+            "teacher-login" => PortalRoles.Teacher,
+            _ => null
+        };
+    }
+
+    private void ToggleStudentModule(string moduleTitle)
+    {
+        activeStudentModule = activeStudentModule == moduleTitle ? null : moduleTitle;
+        if (activeStudentModule != "Timetable")
+        {
+            activeTimetableClass = null;
+            isTimetablePopupOpen = false;
+        }
+
+        if (activeStudentModule != "Curriculum")
+        {
+            activeCurriculumClass = null;
+            isCurriculumPopupOpen = false;
+        }
+
+        if (activeStudentModule != "Study Content")
+        {
+            activeStudentContentClass = null;
+            activeStudentContentCategory = null;
+            isStudentContentPopupOpen = false;
+        }
+
+        if (activeStudentModule != "Attendance and Progress")
+        {
+            activeStudentProgressClass = null;
+            isStudentProgressPopupOpen = false;
+        }
+
+        if (activeStudentModule != "Student Profile")
+        {
+            isStudentProfileMenuOpen = false;
+            isStudentProfilePopupOpen = false;
+        }
+
+        if (activeStudentModule != "Teacher Profile")
+        {
+            isTeacherProfileMenuOpen = false;
+            isTeacherProfilePopupOpen = false;
+        }
+    }
+
+    private void OpenTimetablePopup()
+    {
+        activeStudentModule = "Timetable";
+        isTimetablePopupOpen = true;
+    }
+
+    private void OpenCurriculumPopup()
+    {
+        activeStudentModule = "Curriculum";
+        isCurriculumPopupOpen = true;
+    }
+
+    private void OpenStudentContentPopup()
+    {
+        activeStudentModule = "Study Content";
+        isStudentContentPopupOpen = true;
+    }
+
+    private void OpenStudentProgressPopup()
+    {
+        activeStudentModule = "Attendance and Progress";
+        isStudentProgressPopupOpen = true;
+    }
+
+    private void ToggleStudentProfileMenu()
+    {
+        isStudentProfileMenuOpen = !isStudentProfileMenuOpen;
+    }
+
+    private void OpenStudentProfile()
+    {
+        activeStudentModule = "Student Profile";
+        isStudentProfileMenuOpen = false;
+        isStudentProfilePopupOpen = true;
+    }
+
+    private void SelectTimetable(string className)
+    {
+        activeTimetableClass = className;
+    }
+
+    private void CloseTimetablePopup()
+    {
+        activeStudentModule = null;
+        isTimetablePopupOpen = false;
+    }
+
+    private void SelectCurriculum(string className)
+    {
+        activeCurriculumClass = className;
+        activeCurriculumSubject = null;
+    }
+
+    private void CloseCurriculumPopup()
+    {
+        activeStudentModule = null;
+        isCurriculumPopupOpen = false;
+        activeCurriculumSubject = null;
+    }
+
+    private void SelectStudentContent(string className)
+    {
+        activeStudentContentClass = className;
+        activeStudentContentCategory = null;
+    }
+
+    private void CloseStudentContentPopup()
+    {
+        activeStudentModule = null;
+        isStudentContentPopupOpen = false;
+        activeStudentContentCategory = null;
+    }
+
+    private void SelectStudentContentCategory(string category)
+    {
+        activeStudentContentCategory = category;
+    }
+
+    private void SelectStudentProgress(string className)
+    {
+        activeStudentProgressClass = className;
+    }
+
+    private void CloseStudentProgressPopup()
+    {
+        activeStudentModule = null;
+        isStudentProgressPopupOpen = false;
+    }
+
+    private void CloseStudentProfile()
+    {
+        activeStudentModule = null;
+        isStudentProfilePopupOpen = false;
+        isStudentProfileMenuOpen = false;
+    }
+
+    private void ToggleTeacherProfileMenu()
+    {
+        isTeacherProfileMenuOpen = !isTeacherProfileMenuOpen;
+    }
+
+    private void OpenTeacherProfile()
+    {
+        activeStudentModule = "Teacher Profile";
+        isTeacherProfileMenuOpen = false;
+        isTeacherProfilePopupOpen = true;
+    }
+
+    private void CloseTeacherProfile()
+    {
+        activeStudentModule = null;
+        isTeacherProfilePopupOpen = false;
+        isTeacherProfileMenuOpen = false;
+    }
+
+    private StudentTimetable? GetSelectedTimetable(IReadOnlyList<StudentTimetable> timetables)
+    {
+        if (timetables.Count == 0)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(activeTimetableClass))
+        {
+            activeTimetableClass = timetables[0].ClassName;
+        }
+
+        return timetables.FirstOrDefault(t => t.ClassName == activeTimetableClass) ?? timetables[0];
+    }
+
+    private string GetTimetableTabClass(string className) =>
+        $"timetable-tab {(activeTimetableClass == className ? "active" : string.Empty)}".Trim();
+
+    private StudentCurriculum? GetSelectedCurriculum(IReadOnlyList<StudentCurriculum> curricula)
+    {
+        if (curricula.Count == 0)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(activeCurriculumClass))
+        {
+            activeCurriculumClass = curricula[0].ClassName;
+        }
+
+        var selectedCurriculum = curricula.FirstOrDefault(c => c.ClassName == activeCurriculumClass) ?? curricula[0];
+        if (string.IsNullOrWhiteSpace(activeCurriculumSubject))
+        {
+            activeCurriculumSubject = GetCurriculumSubjects(selectedCurriculum).FirstOrDefault();
+        }
+
+        return selectedCurriculum;
+    }
+
+    private string GetCurriculumTabClass(string className) =>
+        $"timetable-tab {(activeCurriculumClass == className ? "active" : string.Empty)}".Trim();
+
+    private void SelectCurriculumSubject(string subject)
+    {
+        activeCurriculumSubject = subject;
+    }
+
+    private IReadOnlyList<string> GetCurriculumSubjects(StudentCurriculum curriculum) =>
+        curriculum.Subjects.Length > 0
+            ? curriculum.Subjects.Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
+            : curriculum.Units.Select(unit => unit.Subject).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+
+    private IReadOnlyList<StudentCurriculumUnit> GetFilteredCurriculumUnits(StudentCurriculum curriculum)
+    {
+        var subjects = GetCurriculumSubjects(curriculum);
+        if (subjects.Count == 0)
+        {
+            return curriculum.Units;
+        }
+
+        if (string.IsNullOrWhiteSpace(activeCurriculumSubject) || !subjects.Contains(activeCurriculumSubject, StringComparer.OrdinalIgnoreCase))
+        {
+            activeCurriculumSubject = subjects[0];
+        }
+
+        return curriculum.Units
+            .Where(unit => string.Equals(unit.Subject, activeCurriculumSubject, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+    }
+
+    private string GetCurriculumSubjectTabClass(string subject) =>
+        ("timetable-tab " + (string.Equals(activeCurriculumSubject, subject, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)).Trim();
+
+    private StudentStudyContent? GetSelectedStudentContent(IReadOnlyList<StudentStudyContent> contents)
+    {
+        if (contents.Count == 0)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(activeStudentContentClass))
+        {
+            activeStudentContentClass = contents[0].ClassName;
+        }
+
+        var selectedContent = contents.FirstOrDefault(content => content.ClassName == activeStudentContentClass) ?? contents[0];
+        if (string.IsNullOrWhiteSpace(activeStudentContentCategory))
+        {
+            activeStudentContentCategory = GetStudentContentCategories(selectedContent).FirstOrDefault();
+        }
+
+        return selectedContent;
+    }
+
+    private IReadOnlyList<string> GetStudentContentCategories(StudentStudyContent content) =>
+        content.Categories.Length > 0
+            ? content.Categories.Distinct(StringComparer.OrdinalIgnoreCase).ToArray()
+            : content.Items.Select(item => item.Category).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+
+    private IReadOnlyList<StudentStudyContentItem> GetFilteredStudentContentItems(StudentStudyContent content)
+    {
+        var categories = GetStudentContentCategories(content);
+        if (categories.Count == 0)
+        {
+            return content.Items;
+        }
+
+        if (string.IsNullOrWhiteSpace(activeStudentContentCategory) || !categories.Contains(activeStudentContentCategory, StringComparer.OrdinalIgnoreCase))
+        {
+            activeStudentContentCategory = categories[0];
+        }
+
+        return content.Items
+            .Where(item => string.Equals(item.Category, activeStudentContentCategory, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+    }
+
+    private string GetStudentContentTabClass(string className) =>
+        ("timetable-tab " + (string.Equals(activeStudentContentClass, className, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)).Trim();
+
+    private string GetStudentContentCategoryTabClass(string category) =>
+        ("timetable-tab " + (string.Equals(activeStudentContentCategory, category, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)).Trim();
+
+    private StudentProgressSummary? GetSelectedStudentProgress(IReadOnlyList<StudentProgressSummary> progresses)
+    {
+        if (progresses.Count == 0)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(activeStudentProgressClass))
+        {
+            activeStudentProgressClass = progresses[0].ClassName;
+        }
+
+        return progresses.FirstOrDefault(progress => progress.ClassName == activeStudentProgressClass) ?? progresses[0];
+    }
+
+    private string GetStudentProgressTabClass(string className) =>
+        ("timetable-tab " + (string.Equals(activeStudentProgressClass, className, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)).Trim();
+
+    private string GetStudentAvatar(PortalSessionInfo? session)
+    {
+        var name = session?.DisplayName?.Trim();
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "S";
+        }
+
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length == 1)
+        {
+            return parts[0].Length > 0 ? parts[0][0].ToString().ToUpperInvariant() : "S";
+        }
+
+        return string.Concat(parts.Take(2).Select(part => char.ToUpperInvariant(part[0])));
+    }
+
+    private string GetTeacherAvatar(PortalSessionInfo? session) => GetStudentAvatar(session);
+
+    private sealed class AdmissionApplicationModel
+    {
+        [Required(ErrorMessage = "Student full name is required.")]
+        public string StudentFullName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Date of birth is required.")]
+        public DateTime? DateOfBirth { get; set; }
+
+        [Required(ErrorMessage = "Please select the gender.")]
+        public string Gender { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please select the class.")]
+        public string ClassApplyingFor { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Parent or guardian name is required.")]
+        public string ParentName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Relationship to student is required.")]
+        public string Relationship { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Mobile number is required.")]
+        [Phone(ErrorMessage = "Enter a valid mobile number.")]
+        public string Mobile { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email address is required.")]
+        [EmailAddress(ErrorMessage = "Enter a valid email address.")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Residential address is required.")]
+        public string Address { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Previous school is required.")]
+        public string PreviousSchool { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Academic year is required.")]
+        public string AcademicYear { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Please add additional details.")]
+        [StringLength(500, ErrorMessage = "Additional details should stay within 500 characters.")]
+        public string AdditionalDetails { get; set; } = string.Empty;
+
+        public void Reset()
+        {
+            StudentFullName = string.Empty;
+            DateOfBirth = null;
+            Gender = string.Empty;
+            ClassApplyingFor = string.Empty;
+            ParentName = string.Empty;
+            Relationship = string.Empty;
+            Mobile = string.Empty;
+            Email = string.Empty;
+            Address = string.Empty;
+            PreviousSchool = string.Empty;
+            AcademicYear = string.Empty;
+            AdditionalDetails = string.Empty;
+        }
+    }
+}

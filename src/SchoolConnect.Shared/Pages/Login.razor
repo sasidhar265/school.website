@@ -1,0 +1,162 @@
+@page "/login"
+@rendermode Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer
+@inject SchoolContentService Content
+@inject PortalSessionService PortalSession
+@inject NavigationManager Navigation
+
+@{
+    var school = Content.GetProfile();
+}
+
+<PageTitle>Login - @school.Name</PageTitle>
+
+<section class="feature-page">
+    <div class="auth-shell auth-shell-centered auth-login-only">
+        <div class="row g-4 justify-content-center position-relative">
+            <div class="col-12 col-md-10 col-lg-7 col-xl-6">
+                <div class="panel auth-preview auth-login-card">
+                    <div class="auth-preview-header">
+                        <div>
+                            <p class="eyebrow">@school.Name</p>
+                            <h2>Login to portal</h2>
+                        </div>
+                        <span class="auth-status-dot" aria-label="Secure portal active"></span>
+                    </div>
+
+                    @if (showAlreadyLoggedInNotice && activeSession is not null)
+                    {
+                        <div class="login-session-banner" role="status" aria-live="polite">
+                            <div class="login-session-banner-copy">
+                                <strong>You are already logged in</strong>
+                                <span>@activeSession.DisplayName is signed in to the @activeSession.RoleLabel portal.</span>
+                            </div>
+                            <button type="button" class="login-session-banner-close" aria-label="Close notice" @onclick="DismissSessionNotice">x</button>
+                        </div>
+                    }
+
+                    <p>Select your login type and enter your PIN and password.</p>
+
+                    <EditForm Model="loginModel" OnValidSubmit="Authenticate">
+                        <DataAnnotationsValidator />
+
+                        <InputRadioGroup @bind-Value="loginModel.Role">
+                            <div class="role-picker" role="radiogroup" aria-label="Login type">
+                                <label class="role-option @(loginModel.Role == PortalRoles.Student ? "selected" : string.Empty)">
+                                    <InputRadio Value="@PortalRoles.Student" />
+                                    <span>Student Login</span>
+                                </label>
+
+                                <label class="role-option @(loginModel.Role == PortalRoles.Teacher ? "selected" : string.Empty)">
+                                    <InputRadio Value="@PortalRoles.Teacher" />
+                                    <span>Teacher Login</span>
+                                </label>
+                            </div>
+                        </InputRadioGroup>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="pin">PIN</label>
+                            <div class="input-shell @(string.IsNullOrWhiteSpace(pinError) ? string.Empty : "is-invalid")">
+                                <span>PIN</span>
+                                <InputText id="pin" class="form-control form-control-lg" @bind-Value="loginModel.Pin" autocomplete="username" />
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(pinError))
+                            {
+                                <div class="field-error">@pinError</div>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="password">Password</label>
+                            <div class="input-shell @(string.IsNullOrWhiteSpace(passwordError) ? string.Empty : "is-invalid")">
+                                <span>KEY</span>
+                                <InputText id="password" type="password" class="form-control form-control-lg" @bind-Value="loginModel.Password" autocomplete="current-password" />
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(passwordError))
+                            {
+                                <div class="field-error">@passwordError</div>
+                            }
+                        </div>
+
+                        <button class="btn btn-warning btn-lg w-100 fw-bold auth-submit" type="submit">Continue</button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private readonly LoginModel loginModel = new();
+    private string? pinError;
+    private string? passwordError;
+    private bool showAlreadyLoggedInNotice;
+    private PortalSessionInfo? activeSession;
+
+    private async Task Authenticate()
+    {
+        ClearErrors();
+
+        if (string.IsNullOrWhiteSpace(loginModel.Pin))
+        {
+            pinError = "PIN is required.";
+        }
+
+        if (string.IsNullOrWhiteSpace(loginModel.Password))
+        {
+            passwordError = "Password is required.";
+        }
+
+        if (!string.IsNullOrWhiteSpace(pinError) || !string.IsNullOrWhiteSpace(passwordError))
+        {
+            return;
+        }
+
+        if (!PortalSession.TrySignIn(loginModel.Role, loginModel.Pin, loginModel.Password))
+        {
+            pinError = "PIN or password does not match the selected login type.";
+            passwordError = "Check your password and try again.";
+            return;
+        }
+
+        var target = loginModel.Role == PortalRoles.Teacher ? "/teacher-login" : "/student-login";
+        Navigation.NavigateTo(target);
+    }
+
+    private void DismissSessionNotice()
+    {
+        showAlreadyLoggedInNotice = false;
+        activeSession = null;
+    }
+
+    private void ClearErrors()
+    {
+        pinError = null;
+        passwordError = null;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var session = PortalSession.GetActiveSession();
+        if (session is not null)
+        {
+            activeSession = session;
+            showAlreadyLoggedInNotice = true;
+            StateHasChanged();
+            return;
+        }
+    }
+
+    private sealed class LoginModel
+    {
+        public string Role { get; set; } = PortalRoles.Student;
+
+        public string? Pin { get; set; }
+
+        public string? Password { get; set; }
+    }
+}

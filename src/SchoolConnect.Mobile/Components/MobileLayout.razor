@@ -1,0 +1,24 @@
+@inherits LayoutComponentBase
+@inject SchoolConnect.Shared.Services.SchoolContentService Content
+
+@{
+    var school = Content.GetProfile();
+}
+
+<main class="mobile-shell">
+    <header class="mobile-header">
+        <a href="/">@school.ShortName</a>
+        <span>SchoolConnect</span>
+    </header>
+
+    <section class="mobile-content">
+        @Body
+    </section>
+
+    <nav class="mobile-tabs" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/student-login">Student</a>
+        <a href="/teacher-login">Teacher</a>
+        <a href="/notices">Notices</a>
+    </nav>
+</main>

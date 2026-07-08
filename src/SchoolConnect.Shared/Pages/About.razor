@@ -1,0 +1,49 @@
+@page "/about"
+@rendermode Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer
+@inject SchoolContentService Content
+
+@{
+    var school = Content.GetProfile();
+    var about = school.AboutUs;
+}
+
+<PageTitle>About Us - @school.Name</PageTitle>
+
+<section class="feature-page">
+    <div class="feature-hero">
+        <a class="back-link" href="/">Back to dashboard</a>
+        <div class="row g-4 align-items-end mt-1">
+            <div class="col-lg-9">
+                <p class="eyebrow">@school.Name</p>
+                <h1>@about.Title</h1>
+                <p>@about.Summary</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-12 col-lg-7">
+            <div class="panel h-100">
+                <h2>What we stand for</h2>
+                <ul class="task-list">
+                    @foreach (var principle in about.Principles)
+                    {
+                        <li>@principle</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="panel h-100">
+                <h2>Highlights</h2>
+                <ul class="task-list">
+                    @foreach (var highlight in about.Highlights)
+                    {
+                        <li>@highlight</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>

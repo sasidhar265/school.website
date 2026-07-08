@@ -1,0 +1,72 @@
+html,
+body {
+    background: #f7fafc;
+    color: #10202f;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    margin: 0;
+}
+
+a {
+    color: inherit;
+}
+
+.mobile-shell {
+    min-height: 100vh;
+    padding-bottom: 76px;
+}
+
+.mobile-header {
+    align-items: center;
+    background: #0f766e;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: calc(env(safe-area-inset-top) + 14px) 16px 14px;
+}
+
+.mobile-header a {
+    font-size: 1.05rem;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.mobile-header span {
+    color: #b8f4ed;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.mobile-content {
+    padding: 14px;
+}
+
+.mobile-tabs {
+    background: #fff;
+    border-top: 1px solid #dce4ec;
+    bottom: 0;
+    display: grid;
+    gap: 4px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    left: 0;
+    padding: 8px 8px calc(env(safe-area-inset-bottom) + 8px);
+    position: fixed;
+    right: 0;
+}
+
+.mobile-tabs a {
+    border-radius: 8px;
+    color: #115e59;
+    font-size: .78rem;
+    font-weight: 800;
+    overflow: hidden;
+    padding: 9px 4px;
+    text-align: center;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mobile-tabs a:hover,
+.mobile-tabs a:focus {
+    background: #e6fffb;
+}
