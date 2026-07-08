@@ -2,8 +2,10 @@
 @inject SchoolConnect.Shared.Services.SchoolContentService Content
 @inject SchoolConnect.Shared.Services.PortalSessionService PortalSession
 @inject IJSRuntime JsRuntime
+@inject NavigationManager Navigation
 @{
     var school = Content.GetProfile();
+    var hideLoginNav = ShouldHideLoginNav();
 }
 
 <header class="navbar navbar-expand-lg navbar-dark top-nav-shell">
@@ -23,17 +25,17 @@
                     <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
                 </NavLink>
 
-                @if (activeSession is null)
+                @if (!hideLoginNav && activeSession is null)
                 {
                     <NavLink class="nav-link top-nav-link nav-item-pill" href="/login">
                         <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
                     </NavLink>
                 }
-                else
+                else if (!hideLoginNav)
                 {
-                    <span class="nav-link top-nav-link nav-item-pill nav-item-disabled" aria-disabled="true" title="@($"{activeSession.DisplayName} is already logged in")">
+                    <button class="nav-link top-nav-link nav-item-pill" type="button" title="@GetLoggedInLoginTitle()" @onclick="OpenActivePortal">
                         <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
-                    </span>
+                    </button>
                 }
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#admissions">
@@ -67,26 +69,30 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender || activeSession is not null)
+        if (!firstRender)
         {
             return;
         }
 
-        string? storedRole = null;
-        try
+        if (activeSession is null)
         {
-            storedRole = await JsRuntime.InvokeAsync<string?>("sessionStorage.getItem", SchoolConnect.Shared.Services.PortalSessionService.BrowserSessionRoleKey);
-        }
-        catch
-        {
-            // Session storage may be unavailable during prerender or in restricted browsers.
+            string? storedRole = null;
+            try
+            {
+                storedRole = await JsRuntime.InvokeAsync<string?>("sessionStorage.getItem", SchoolConnect.Shared.Services.PortalSessionService.BrowserSessionRoleKey);
+            }
+            catch
+            {
+                // Session storage may be unavailable during prerender or in restricted browsers.
+            }
+
+            if (PortalSession.RestoreAuthenticatedRole(storedRole))
+            {
+                activeSession = PortalSession.GetActiveSession();
+            }
         }
 
-        if (PortalSession.RestoreAuthenticatedRole(storedRole))
-        {
-            activeSession = PortalSession.GetActiveSession();
-            StateHasChanged();
-        }
+        StateHasChanged();
     }
 
     private void HandleSessionChanged()
@@ -98,5 +104,40 @@
     public void Dispose()
     {
         PortalSession.Changed -= HandleSessionChanged;
+    }
+
+    private string GetLoggedInLoginTitle()
+    {
+        return activeSession is null ? "Login" : $"{activeSession.DisplayName} is already logged in";
+    }
+
+    private async Task OpenActivePortal()
+    {
+        if (activeSession is null)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        var target = activeSession.Role == SchoolConnect.Shared.Services.PortalRoles.Teacher
+            ? "/teacher-login"
+            : "/student-login";
+
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", "schoolconnect.alreadyLoggedInNotice", activeSession.Role);
+        }
+        catch
+        {
+            // The target portal still opens even if browser storage is unavailable.
+        }
+
+        Navigation.NavigateTo(target);
+    }
+
+    private bool ShouldHideLoginNav()
+    {
+        var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
+        return path is "login" or "student-login" or "teacher-login";
     }
 }

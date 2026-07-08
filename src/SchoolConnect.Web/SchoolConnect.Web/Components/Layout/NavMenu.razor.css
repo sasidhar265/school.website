@@ -49,9 +49,9 @@
 .top-nav-link.nav-item-disabled:hover,
 .top-nav-link.nav-item-disabled:focus {
     background: rgba(255,255,255,.08);
+    border: 1px solid transparent;
     color: rgba(255,255,255,.42);
     cursor: not-allowed;
-    pointer-events: none;
     transform: none;
 }
 

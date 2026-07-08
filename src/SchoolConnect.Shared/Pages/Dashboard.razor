@@ -99,13 +99,13 @@
             <p>Timetable, curriculum, study content, assignments, attendance, progress, and school details.</p>
             <strong>Open Student Login</strong>
         </a>
-        <a class="portal-card" href="/teacher-login">
+        <button class="portal-card portal-card-action" type="button" @onclick="OpenTeacherPortal">
             <span class="portal-icon">02</span>
             <small>Teacher Portal</small>
             <h2>Manage</h2>
             <p>Student academic data, attendance, content publishing, records, reports, and maintenance tasks.</p>
             <strong>Open Teacher Login</strong>
-        </a>
+        </button>
         <button class="portal-card portal-card-action accent" type="button" @onclick="OpenAdmissionPopup">
             <span class="portal-icon">03</span>
             <small>Admissions</small>
@@ -221,6 +221,23 @@
                         <p>At our school, every child is valued and encouraged to discover their unique talents. We believe that education extends beyond textbooks, helping students develop confidence, curiosity, leadership, and integrity. Together with parents and the community, we are committed to building a brighter future for every learner.</p>
                     </section>
                 </div>
+            </div>
+        </div>
+    }
+
+    @if (showRoleAccessPopup)
+    {
+        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseRoleAccessPopup">
+            <div class="admissions-popup admissions-popup-small role-access-popup" role="alertdialog" aria-modal="true" aria-labelledby="role-access-title" @onclick:stopPropagation="true">
+                <div class="admissions-popup-header">
+                    <div>
+                        <p class="eyebrow mb-1">Access denied</p>
+                        <h2 id="role-access-title" class="mb-0">Teacher portal unavailable</h2>
+                    </div>
+                    <button type="button" class="admissions-popup-close" aria-label="Close access error" @onclick="CloseRoleAccessPopup">x</button>
+                </div>
+                <p class="mb-3">@roleAccessMessage</p>
+                <button class="btn btn-warning fw-bold" type="button" @onclick="CloseRoleAccessPopup">OK</button>
             </div>
         </div>
     }
@@ -407,9 +424,11 @@
 @code {
     private SchoolConnect.Shared.Services.PortalSessionInfo? activeSession;
     private bool showAboutPopup;
+    private bool showRoleAccessPopup;
     private bool showAdmissionPopup;
     private bool admissionPopupSubmitted;
     private string? admissionPopupMessage;
+    private string roleAccessMessage = string.Empty;
     private readonly AdmissionPopupModel admissionPopup = new();
 
     protected override void OnInitialized()
@@ -495,6 +514,23 @@
     private void CloseAboutPopup()
     {
         showAboutPopup = false;
+    }
+
+    private void OpenTeacherPortal()
+    {
+        if (PortalSession.GetActiveSession()?.Role == PortalRoles.Student)
+        {
+            roleAccessMessage = "Student users can't log in to the teacher portal. Please log out from the student portal before using teacher login.";
+            showRoleAccessPopup = true;
+            return;
+        }
+
+        Navigation.NavigateTo("/teacher-login");
+    }
+
+    private void CloseRoleAccessPopup()
+    {
+        showRoleAccessPopup = false;
     }
 
     private void SubmitAdmissionPopup()

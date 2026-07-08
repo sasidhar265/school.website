@@ -35,6 +35,23 @@
                         </div>
                     }
 
+                    @if (showRoleAccessPopup)
+                    {
+                        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseRoleAccessPopup">
+                            <div class="admissions-popup admissions-popup-small role-access-popup" role="alertdialog" aria-modal="true" aria-labelledby="role-access-title" @onclick:stopPropagation="true">
+                                <div class="admissions-popup-header">
+                                    <div>
+                                        <p class="eyebrow mb-1">Access denied</p>
+                                        <h2 id="role-access-title" class="mb-0">Teacher login unavailable</h2>
+                                    </div>
+                                    <button type="button" class="admissions-popup-close" aria-label="Close access error" @onclick="CloseRoleAccessPopup">x</button>
+                                </div>
+                                <p class="mb-3">@roleAccessMessage</p>
+                                <button class="btn btn-warning fw-bold" type="button" @onclick="CloseRoleAccessPopup">OK</button>
+                            </div>
+                        </div>
+                    }
+
                     <p>Select your login type and enter your PIN and password.</p>
 
                     <EditForm Model="loginModel" OnValidSubmit="Authenticate">
@@ -91,11 +108,20 @@
     private string? pinError;
     private string? passwordError;
     private bool showAlreadyLoggedInNotice;
+    private bool showRoleAccessPopup;
+    private string roleAccessMessage = string.Empty;
     private PortalSessionInfo? activeSession;
 
     private async Task Authenticate()
     {
         ClearErrors();
+
+        activeSession = PortalSession.GetActiveSession();
+        if (activeSession?.Role == PortalRoles.Student && loginModel.Role == PortalRoles.Teacher)
+        {
+            ShowStudentTeacherAccessError();
+            return;
+        }
 
         if (string.IsNullOrWhiteSpace(loginModel.Pin))
         {
@@ -135,7 +161,17 @@
     private void DismissSessionNotice()
     {
         showAlreadyLoggedInNotice = false;
-        activeSession = null;
+    }
+
+    private void ShowStudentTeacherAccessError()
+    {
+        roleAccessMessage = "Student users can't log in to the teacher portal. Please log out from the student portal before using teacher login.";
+        showRoleAccessPopup = true;
+    }
+
+    private void CloseRoleAccessPopup()
+    {
+        showRoleAccessPopup = false;
     }
 
     private void ClearErrors()
@@ -155,10 +191,46 @@
         if (session is not null)
         {
             activeSession = session;
-            showAlreadyLoggedInNotice = true;
-            StateHasChanged();
+            await RedirectActiveSession(session);
             return;
         }
+
+        string? storedRole = null;
+        try
+        {
+            storedRole = await JsRuntime.InvokeAsync<string?>("sessionStorage.getItem", PortalSessionService.BrowserSessionRoleKey);
+        }
+        catch
+        {
+            // Session storage may be unavailable in restricted browser contexts.
+        }
+
+        if (PortalSession.RestoreAuthenticatedRole(storedRole))
+        {
+            activeSession = PortalSession.GetActiveSession();
+            if (activeSession is not null)
+            {
+                await RedirectActiveSession(activeSession);
+            }
+        }
+    }
+
+    private async Task RedirectActiveSession(PortalSessionInfo session)
+    {
+        var target = session.Role == PortalRoles.Teacher
+            ? "/teacher-login"
+            : "/student-login";
+
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", "schoolconnect.alreadyLoggedInNotice", session.Role);
+        }
+        catch
+        {
+            // The target portal still opens even if browser storage is unavailable.
+        }
+
+        Navigation.NavigateTo(target, replace: true);
     }
 
     private sealed class LoginModel
