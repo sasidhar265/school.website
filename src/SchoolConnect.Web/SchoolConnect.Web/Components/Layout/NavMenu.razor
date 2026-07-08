@@ -21,13 +21,13 @@
 
         <div class="collapse navbar-collapse" id="primaryNav">
             <nav class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
-                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#top">
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#top" data-scrollspy-link="top">
                     <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
                 </NavLink>
 
                 @if (!hideLoginNav && activeSession is null)
                 {
-                    <NavLink class="nav-link top-nav-link nav-item-pill" href="/login">
+                    <NavLink class="nav-link top-nav-link nav-item-pill" href="/login" data-scrollspy-link="login">
                         <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
                     </NavLink>
                 }
@@ -38,11 +38,11 @@
                     </button>
                 }
 
-                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#admissions">
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#admissions" data-scrollspy-link="admissions">
                     <span class="bi bi-calendar-check-fill-nav-menu" aria-hidden="true"></span> Admissions
                 </NavLink>
 
-                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#about-us">
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#about-us" data-scrollspy-link="about-us">
                     <span class="bi bi-info-circle-fill-nav-menu" aria-hidden="true"></span> About Us
                 </NavLink>
 
@@ -50,7 +50,7 @@
                     <span class="bi bi-images-nav-menu" aria-hidden="true"></span> Gallery
                 </NavLink>
 
-                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#contacts">
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#contacts" data-scrollspy-link="contacts">
                     <span class="bi bi-envelope-paper-fill-nav-menu" aria-hidden="true"></span> Contacts
                 </NavLink>
             </nav>
@@ -60,10 +60,12 @@
 
 @code {
     private SchoolConnect.Shared.Services.PortalSessionInfo? activeSession;
+    private bool shouldSyncScrollSpy = true;
 
     protected override void OnInitialized()
     {
         PortalSession.Changed += HandleSessionChanged;
+        Navigation.LocationChanged += HandleLocationChanged;
         activeSession = PortalSession.GetActiveSession();
     }
 
@@ -92,6 +94,19 @@
             }
         }
 
+        if (shouldSyncScrollSpy)
+        {
+            shouldSyncScrollSpy = false;
+            try
+            {
+                await JsRuntime.InvokeVoidAsync("schoolConnectScrollSpy.sync");
+            }
+            catch
+            {
+                // The helper script may not be available during very early loads.
+            }
+        }
+
         StateHasChanged();
     }
 
@@ -101,9 +116,16 @@
         _ = InvokeAsync(StateHasChanged);
     }
 
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        shouldSyncScrollSpy = true;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
     public void Dispose()
     {
         PortalSession.Changed -= HandleSessionChanged;
+        Navigation.LocationChanged -= HandleLocationChanged;
     }
 
     private string GetLoggedInLoginTitle()
