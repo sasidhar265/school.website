@@ -47,6 +47,8 @@
     var requiresAuthentication = roleModules.Count > 0;
     var portalRole = slug == "teacher-login" ? PortalRoles.Teacher : PortalRoles.Student;
     var isPortalAuthenticated = !requiresAuthentication || PortalSession.IsAuthenticated(portalRole);
+    var activePortalSession = PortalSession.GetActiveSession();
+    var hasRoleMismatch = requiresAuthentication && activePortalSession is not null && activePortalSession.Role != portalRole;
 }
 
 <PageTitle>@title - @school.Name</PageTitle>
@@ -223,7 +225,41 @@
         </section>
     }
 
-    @if (requiresAuthentication && !isPortalAuthenticated)
+    @if (hasRoleMismatch || showRoleAccessPopup)
+    {
+        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseRoleAccessPopup">
+            <div class="admissions-popup admissions-popup-small role-access-popup" role="alertdialog" aria-modal="true" aria-labelledby="role-access-title" @onclick:stopPropagation="true">
+                <div class="admissions-popup-header">
+                    <div>
+                        <p class="eyebrow mb-1">Access denied</p>
+                        <h2 id="role-access-title" class="mb-0">@GetRoleAccessTitle(portalRole)</h2>
+                    </div>
+                    <button type="button" class="admissions-popup-close" aria-label="Close access error" @onclick="CloseRoleAccessPopup">x</button>
+                </div>
+                <p class="mb-3">@GetRoleAccessMessage(portalRole)</p>
+                <a class="btn btn-warning fw-bold" href="/#top">Back to home</a>
+            </div>
+        </div>
+    }
+
+    @if (showAlreadyLoggedInPopup)
+    {
+        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseAlreadyLoggedInPopup">
+            <div class="admissions-popup admissions-popup-small role-access-popup" role="alertdialog" aria-modal="true" aria-labelledby="already-logged-in-title" @onclick:stopPropagation="true">
+                <div class="admissions-popup-header">
+                    <div>
+                        <p class="eyebrow mb-1">Already logged in</p>
+                        <h2 id="already-logged-in-title" class="mb-0">@GetAlreadyLoggedInTitle(portalRole)</h2>
+                    </div>
+                    <button type="button" class="admissions-popup-close" aria-label="Close already logged in notice" @onclick="CloseAlreadyLoggedInPopup">x</button>
+                </div>
+                <p class="mb-3">@GetAlreadyLoggedInMessage(portalRole)</p>
+                <button class="btn btn-warning fw-bold" type="button" @onclick="CloseAlreadyLoggedInPopup">OK</button>
+            </div>
+        </div>
+    }
+
+    @if (requiresAuthentication && !isPortalAuthenticated && !hasRoleMismatch && !showRoleAccessPopup)
     {
         <div class="auth-shell auth-shell-centered auth-login-only">
             <div class="row g-4 justify-content-center position-relative">
@@ -237,7 +273,7 @@
                             <span class="auth-status-dot" aria-label="Secure portal active"></span>
                         </div>
                         <p>Use the Login page to choose Student or Teacher access and continue to this portal.</p>
-                        <a class="btn btn-warning btn-lg w-100 fw-bold auth-submit" href="/login">Go to Login</a>
+                        <a class="btn btn-warning btn-lg w-100 fw-bold auth-submit" href="@($"/login?role={portalRole}")">Go to Login</a>
                     </div>
                 </div>
             </div>
@@ -775,6 +811,7 @@
 </section>
 
 @code {
+    private const string AlreadyLoggedInNoticeKey = "schoolconnect.alreadyLoggedInNotice";
     private readonly AdmissionApplicationModel admissionApplication = new();
     private string? activeStudentModule;
     private string? activeTimetableClass;
@@ -791,6 +828,8 @@
     private bool isStudentProfilePopupOpen;
     private bool isTeacherProfileMenuOpen;
     private bool isTeacherProfilePopupOpen;
+    private bool showRoleAccessPopup;
+    private bool showAlreadyLoggedInPopup;
     private bool admissionSubmitted;
     private string? submissionMessage;
 
@@ -834,6 +873,12 @@
                 // Session storage is a convenience layer; the portal session itself remains authoritative.
             }
 
+            if (await ShouldShowAlreadyLoggedInPopup(requiredRole))
+            {
+                showAlreadyLoggedInPopup = true;
+                StateHasChanged();
+            }
+
             return;
         }
 
@@ -849,6 +894,16 @@
 
         if (PortalSession.RestoreAuthenticatedRole(storedRole))
         {
+            var restoredSession = PortalSession.GetActiveSession();
+            if (restoredSession is not null && restoredSession.Role != requiredRole)
+            {
+                showRoleAccessPopup = true;
+            }
+            else if (restoredSession is not null && await ShouldShowAlreadyLoggedInPopup(requiredRole))
+            {
+                showAlreadyLoggedInPopup = true;
+            }
+
             StateHasChanged();
         }
     }
@@ -862,6 +917,73 @@
             "teacher-login" => PortalRoles.Teacher,
             _ => null
         };
+    }
+
+    private void CloseRoleAccessPopup()
+    {
+        showRoleAccessPopup = false;
+        Navigation.NavigateTo("/#top");
+    }
+
+    private void CloseAlreadyLoggedInPopup()
+    {
+        showAlreadyLoggedInPopup = false;
+        Navigation.NavigateTo($"/{Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0]}", forceLoad: false);
+    }
+
+    private bool HasAlreadyLoggedInFlag()
+    {
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        return uri.Query.Contains("alreadyLoggedIn=true", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task<bool> ShouldShowAlreadyLoggedInPopup(string requiredRole)
+    {
+        if (HasAlreadyLoggedInFlag())
+        {
+            return true;
+        }
+
+        string? noticeRole = null;
+        try
+        {
+            noticeRole = await JsRuntime.InvokeAsync<string?>("sessionStorage.getItem", AlreadyLoggedInNoticeKey);
+            await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", AlreadyLoggedInNoticeKey);
+        }
+        catch
+        {
+            return false;
+        }
+
+        return string.Equals(noticeRole, requiredRole, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string GetAlreadyLoggedInTitle(string role)
+    {
+        return role == PortalRoles.Teacher
+            ? "Teacher portal is already active"
+            : "Student portal is already active";
+    }
+
+    private static string GetAlreadyLoggedInMessage(string role)
+    {
+        return role == PortalRoles.Teacher
+            ? "Teacher user is already logged in. Redirecting to the teacher portal instead of the login page."
+            : "Student user is already logged in. Redirecting to the student portal instead of the login page.";
+    }
+
+    private static string GetRoleAccessTitle(string requiredRole)
+    {
+        return requiredRole == PortalRoles.Teacher
+            ? "Teacher portal unavailable"
+            : "Student portal unavailable";
+    }
+
+    private static string GetRoleAccessMessage(string requiredRole)
+    {
+        return requiredRole == PortalRoles.Teacher
+            ? "Student users can't log in to the teacher portal. Please log out from the student portal before using teacher login."
+            : "Teacher users can't log in to the student portal. Please log out from the teacher portal before using student login.";
     }
 
     private void ToggleStudentModule(string moduleTitle)

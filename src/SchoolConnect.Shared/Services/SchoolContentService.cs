@@ -69,6 +69,14 @@ public sealed class SchoolContentService
                 progress.Subjects.Select(subject => new StudentProgressSubject(
                     subject.Subject,
                     subject.Score,
-                    subject.Remark)).ToArray())).ToArray());
+                    subject.Remark)).ToArray())).ToArray(),
+            GalleryYearGroups: options.GalleryYearGroups.Select(group => new GalleryYearGroup(
+                group.PassedOutYear,
+                group.Title,
+                group.Description,
+                group.Photos.Select(photo => new GalleryPhoto(
+                    photo.Title,
+                    photo.Caption,
+                    photo.ImageUrl)).ToArray())).ToArray());
     }
 }

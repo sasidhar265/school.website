@@ -15,20 +15,43 @@
         <div class="row g-4 align-items-end mt-1">
             <div class="col-lg-9">
                 <p class="eyebrow">@school.Name</p>
-                <h1>@about.Title</h1>
+                <h1>Welcome to Our School</h1>
                 <p>@about.Summary</p>
             </div>
         </div>
     </div>
 
     <div class="row g-3 mt-1">
+        <div class="col-12">
+            <div class="panel h-100">
+                <h2>About Us</h2>
+                <p>With a proud legacy of <strong>35+ years of excellence in education</strong>, our school has been committed to shaping young minds through quality learning, strong values, and holistic development. Since our establishment, we have provided a nurturing and inspiring environment where every child is encouraged to learn, grow, and achieve their full potential.</p>
+                <p>We offer education from <strong>Nursery to Class 5</strong> in both <strong>Telugu Medium</strong> and <strong>English Medium</strong>, ensuring that students receive a strong academic foundation while preserving cultural values and language proficiency.</p>
+                <p>Over the past three and a half decades, <strong>more than 1,000 students</strong> have successfully completed their primary education at our school. Our alumni have gone on to build successful careers across diverse fields and industries, making meaningful contributions in India and around the world. Their achievements stand as a testament to the quality of education and values instilled during their formative years.</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="panel h-100">
+                <h2>Our Mission</h2>
+                <p>Our mission is to provide a safe, inclusive, and stimulating learning environment that fosters academic excellence, creativity, discipline, and character. We strive to nurture confident, responsible, and compassionate individuals who are prepared to meet the challenges of the future.</p>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-6">
+            <div class="panel h-100">
+                <h2>Our Vision</h2>
+                <p>To be a center of excellence in primary education by inspiring lifelong learning, promoting moral values, and empowering every child with the knowledge and skills needed to succeed in an ever-changing world.</p>
+            </div>
+        </div>
+
         <div class="col-12 col-lg-7">
             <div class="panel h-100">
-                <h2>What we stand for</h2>
+                <h2>Why Choose Our School?</h2>
                 <ul class="task-list">
-                    @foreach (var principle in about.Principles)
+                    @foreach (var highlight in about.Highlights)
                     {
-                        <li>@principle</li>
+                        <li>@highlight</li>
                     }
                 </ul>
             </div>
@@ -36,11 +59,13 @@
 
         <div class="col-12 col-lg-5">
             <div class="panel h-100">
-                <h2>Highlights</h2>
+                <h2>Our Commitment</h2>
+                <p>At our school, every child is valued and encouraged to discover their unique talents. We believe that education extends beyond textbooks, helping students develop confidence, curiosity, leadership, and integrity. Together with parents and the community, we are committed to building a brighter future for every learner.</p>
+                <h3 class="h5 mt-4">What we stand for</h3>
                 <ul class="task-list">
-                    @foreach (var highlight in about.Highlights)
+                    @foreach (var principle in about.Principles)
                     {
-                        <li>@highlight</li>
+                        <li>@principle</li>
                     }
                 </ul>
             </div>

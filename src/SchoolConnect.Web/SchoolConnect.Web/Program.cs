@@ -54,7 +54,7 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddAdditionalAssemblies(typeof(SchoolConnect.Shared.Pages.Dashboard).Assembly);
 
-app.Run("http://localhost:5080");
+app.Run();
 
 static string ResolveWebRootPath()
 {

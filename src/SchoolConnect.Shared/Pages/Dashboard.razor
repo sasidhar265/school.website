@@ -92,20 +92,20 @@
     </section>
 
     <section id="portals" class="portal-grid">
-        <a class="portal-card primary" href="/student-login">
+        <button class="portal-card portal-card-action primary" type="button" @onclick="OpenStudentPortal">
             <span class="portal-icon">01</span>
             <small>Student Portal</small>
             <h2>Learn</h2>
             <p>Timetable, curriculum, study content, assignments, attendance, progress, and school details.</p>
             <strong>Open Student Login</strong>
-        </a>
-        <a class="portal-card" href="/teacher-login">
+        </button>
+        <button class="portal-card portal-card-action" type="button" @onclick="OpenTeacherPortal">
             <span class="portal-icon">02</span>
             <small>Teacher Portal</small>
             <h2>Manage</h2>
             <p>Student academic data, attendance, content publishing, records, reports, and maintenance tasks.</p>
             <strong>Open Teacher Login</strong>
-        </a>
+        </button>
         <button class="portal-card portal-card-action accent" type="button" @onclick="OpenAdmissionPopup">
             <span class="portal-icon">03</span>
             <small>Admissions</small>
@@ -172,9 +172,75 @@
         </div>
         <div class="about-preview-grid">
             <p>@school.AboutUs.Summary</p>
-            <a class="btn btn-outline-success fw-semibold align-self-start" href="/#about-us">Read About Us</a>
+            <button class="btn btn-outline-success fw-semibold align-self-start" type="button" @onclick="OpenAboutPopup">Read About Us</button>
         </div>
     </section>
+
+    @if (showAboutPopup)
+    {
+        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseAboutPopup">
+            <div class="admissions-popup about-popup" role="dialog" aria-modal="true" aria-labelledby="about-popup-title" @onclick:stopPropagation="true">
+                <div class="admissions-popup-header">
+                    <div>
+                        <p class="eyebrow mb-1">@school.Name</p>
+                        <h2 id="about-popup-title" class="mb-0">Welcome to Our School</h2>
+                    </div>
+                    <button type="button" class="admissions-popup-close" aria-label="Close about us" @onclick="CloseAboutPopup">x</button>
+                </div>
+
+                <div class="about-popup-content">
+                    <section>
+                        <h3>About Us</h3>
+                        <p>With a proud legacy of <strong>35+ years of excellence in education</strong>, our school has been committed to shaping young minds through quality learning, strong values, and holistic development. Since our establishment, we have provided a nurturing and inspiring environment where every child is encouraged to learn, grow, and achieve their full potential.</p>
+                        <p>We offer education from <strong>Nursery to Class 5</strong> in both <strong>Telugu Medium</strong> and <strong>English Medium</strong>, ensuring that students receive a strong academic foundation while preserving cultural values and language proficiency.</p>
+                        <p>Over the past three and a half decades, <strong>more than 1,000 students</strong> have successfully completed their primary education at our school. Our alumni have gone on to build successful careers across diverse fields and industries, making meaningful contributions in India and around the world. Their achievements stand as a testament to the quality of education and values instilled during their formative years.</p>
+                    </section>
+
+                    <section>
+                        <h3>Our Mission</h3>
+                        <p>Our mission is to provide a safe, inclusive, and stimulating learning environment that fosters academic excellence, creativity, discipline, and character. We strive to nurture confident, responsible, and compassionate individuals who are prepared to meet the challenges of the future.</p>
+                    </section>
+
+                    <section>
+                        <h3>Our Vision</h3>
+                        <p>To be a center of excellence in primary education by inspiring lifelong learning, promoting moral values, and empowering every child with the knowledge and skills needed to succeed in an ever-changing world.</p>
+                    </section>
+
+                    <section>
+                        <h3>Why Choose Our School?</h3>
+                        <ul class="task-list">
+                            @foreach (var highlight in school.AboutUs.Highlights)
+                            {
+                                <li>@highlight</li>
+                            }
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3>Our Commitment</h3>
+                        <p>At our school, every child is valued and encouraged to discover their unique talents. We believe that education extends beyond textbooks, helping students develop confidence, curiosity, leadership, and integrity. Together with parents and the community, we are committed to building a brighter future for every learner.</p>
+                    </section>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (showRoleAccessPopup)
+    {
+        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseRoleAccessPopup">
+            <div class="admissions-popup admissions-popup-small role-access-popup" role="alertdialog" aria-modal="true" aria-labelledby="role-access-title" @onclick:stopPropagation="true">
+                <div class="admissions-popup-header">
+                    <div>
+                        <p class="eyebrow mb-1">Access denied</p>
+                        <h2 id="role-access-title" class="mb-0">Teacher portal unavailable</h2>
+                    </div>
+                    <button type="button" class="admissions-popup-close" aria-label="Close access error" @onclick="CloseRoleAccessPopup">x</button>
+                </div>
+                <p class="mb-3">@roleAccessMessage</p>
+                <button class="btn btn-warning fw-bold" type="button" @onclick="CloseRoleAccessPopup">OK</button>
+            </div>
+        </div>
+    }
 
     <section class="events-strip">
         @foreach (var item in school.AcademicEvents)
@@ -193,24 +259,9 @@
         <div class="admissions-cta-copy">
             <p class="eyebrow">@school.Name</p>
             <h2>@school.AdmissionsHeadline</h2>
-            <p>@school.Location</p>
-            <p class="admissions-cta-note">Open the dedicated admissions page for the full application form.</p>
         </div>
-
-        <div class="panel admissions-inline-form admissions-summary-card">
-            <div class="admissions-summary-grid">
-                <article>
-                    <p class="eyebrow">Full admission form</p>
-                    <h3>Dedicated admissions page</h3>
-                    <p>Submit the full application with student, parent, contact, and academic details.</p>
-                </article>
-                <article>
-                    <p class="eyebrow">Quick enquiry</p>
-                    <h3>Tile popup</h3>
-                    <p>The Admissions tile still opens a compact enquiry overlay for short requests.</p>
-                </article>
-                <a class="btn btn-warning btn-lg fw-bold" href="/admissions">Open full admission form</a>
-            </div>
+        <div class="admissions-cta-action">
+            <a class="btn btn-warning btn-lg fw-bold" href="/admissions">Admission Form</a>
         </div>
     </section>
 
@@ -372,9 +423,12 @@
 
 @code {
     private SchoolConnect.Shared.Services.PortalSessionInfo? activeSession;
+    private bool showAboutPopup;
+    private bool showRoleAccessPopup;
     private bool showAdmissionPopup;
     private bool admissionPopupSubmitted;
     private string? admissionPopupMessage;
+    private string roleAccessMessage = string.Empty;
     private readonly AdmissionPopupModel admissionPopup = new();
 
     protected override void OnInitialized()
@@ -450,6 +504,57 @@
     private void CloseAdmissionPopup()
     {
         showAdmissionPopup = false;
+    }
+
+    private void OpenAboutPopup()
+    {
+        showAboutPopup = true;
+    }
+
+    private void CloseAboutPopup()
+    {
+        showAboutPopup = false;
+    }
+
+    private void OpenTeacherPortal()
+    {
+        if (PortalSession.GetActiveSession()?.Role == PortalRoles.Student)
+        {
+            roleAccessMessage = "Student users can't log in to the teacher portal. Please log out from the student portal before using teacher login.";
+            showRoleAccessPopup = true;
+            return;
+        }
+
+        if (PortalSession.GetActiveSession()?.Role == PortalRoles.Teacher)
+        {
+            Navigation.NavigateTo("/teacher-login");
+            return;
+        }
+
+        Navigation.NavigateTo("/login?role=teacher");
+    }
+
+    private void OpenStudentPortal()
+    {
+        if (PortalSession.GetActiveSession()?.Role == PortalRoles.Teacher)
+        {
+            roleAccessMessage = "Teacher users can't log in to the student portal. Please log out from the teacher portal before using student login.";
+            showRoleAccessPopup = true;
+            return;
+        }
+
+        if (PortalSession.GetActiveSession()?.Role == PortalRoles.Student)
+        {
+            Navigation.NavigateTo("/student-login");
+            return;
+        }
+
+        Navigation.NavigateTo("/login?role=student");
+    }
+
+    private void CloseRoleAccessPopup()
+    {
+        showRoleAccessPopup = false;
     }
 
     private void SubmitAdmissionPopup()

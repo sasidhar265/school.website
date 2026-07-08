@@ -1,0 +1,82 @@
+@page "/gallery"
+@rendermode Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer
+@inject SchoolContentService Content
+
+@{
+    var school = Content.GetProfile();
+    var groups = school.GalleryYearGroups.OrderByDescending(group => group.PassedOutYear).ToArray();
+    var activeGroup = groups.FirstOrDefault(group => group.PassedOutYear == selectedYear) ?? groups.FirstOrDefault();
+}
+
+<PageTitle>Gallery - @school.Name</PageTitle>
+
+<section class="feature-page gallery-page">
+    <div class="feature-hero gallery-hero">
+        <a class="gallery-home-link" href="/#top" aria-label="Back to home page">
+            <span aria-hidden="true">⌂</span>
+            Home
+        </a>
+        <div class="row g-4 align-items-end mt-1">
+            <div class="col-lg-9">
+                <p class="eyebrow">@school.Name</p>
+                <h1>Student Gallery</h1>
+                <p>Browse old student memories grouped by passed-out year.</p>
+            </div>
+        </div>
+    </div>
+
+    @if (groups.Length == 0)
+    {
+        <div class="panel">
+            <h2>No gallery photos yet</h2>
+            <p>Add gallery year groups in configuration to show old student photos by passed-out year.</p>
+        </div>
+    }
+    else
+    {
+        <div class="gallery-year-bar" aria-label="Passed out year filters">
+            @foreach (var group in groups)
+            {
+                <button class="gallery-year-pill @(group == activeGroup ? "active" : string.Empty)" type="button" @onclick="() => SelectYear(group.PassedOutYear)">
+                    @group.PassedOutYear
+                </button>
+            }
+        </div>
+
+        @if (activeGroup is not null)
+        {
+            <section class="panel gallery-year-panel">
+                <div class="gallery-year-heading">
+                    <div>
+                        <p class="eyebrow">Passed out year @activeGroup.PassedOutYear</p>
+                        <h2>@activeGroup.Title</h2>
+                        <p>@activeGroup.Description</p>
+                    </div>
+                    <span>@activeGroup.Photos.Count photo@(activeGroup.Photos.Count == 1 ? string.Empty : "s")</span>
+                </div>
+
+                <div class="gallery-grid">
+                    @foreach (var photo in activeGroup.Photos)
+                    {
+                        <article class="gallery-card">
+                            <img src="@photo.ImageUrl" alt="@photo.Title" />
+                            <div>
+                                <h3>@photo.Title</h3>
+                                <p>@photo.Caption</p>
+                            </div>
+                        </article>
+                    }
+                </div>
+            </section>
+        }
+    }
+</section>
+
+@code {
+    private string? selectedYear;
+
+    private void SelectYear(string year)
+    {
+        selectedYear = year;
+    }
+}

@@ -25,7 +25,8 @@ public sealed record SchoolProfile(
     IReadOnlyList<StudentTimetable> StudentTimetables,
     IReadOnlyList<StudentCurriculum> StudentCurricula,
     IReadOnlyList<StudentStudyContent> StudentContents,
-    IReadOnlyList<StudentProgressSummary> StudentProgresses);
+    IReadOnlyList<StudentProgressSummary> StudentProgresses,
+    IReadOnlyList<GalleryYearGroup> GalleryYearGroups);
 
 public sealed record Notice(string Title, string Audience, string Date, string Summary, string Priority);
 
@@ -61,3 +62,7 @@ public sealed record StudentProgressSummary(
     IReadOnlyList<StudentProgressSubject> Subjects);
 
 public sealed record StudentProgressSubject(string Subject, string Score, string Remark);
+
+public sealed record GalleryYearGroup(string PassedOutYear, string Title, string Description, IReadOnlyList<GalleryPhoto> Photos);
+
+public sealed record GalleryPhoto(string Title, string Caption, string ImageUrl);
