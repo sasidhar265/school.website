@@ -92,13 +92,13 @@
     </section>
 
     <section id="portals" class="portal-grid">
-        <a class="portal-card primary" href="/student-login">
+        <button class="portal-card portal-card-action primary" type="button" @onclick="OpenStudentPortal">
             <span class="portal-icon">01</span>
             <small>Student Portal</small>
             <h2>Learn</h2>
             <p>Timetable, curriculum, study content, assignments, attendance, progress, and school details.</p>
             <strong>Open Student Login</strong>
-        </a>
+        </button>
         <button class="portal-card portal-card-action" type="button" @onclick="OpenTeacherPortal">
             <span class="portal-icon">02</span>
             <small>Teacher Portal</small>
@@ -525,7 +525,31 @@
             return;
         }
 
-        Navigation.NavigateTo("/teacher-login");
+        if (PortalSession.GetActiveSession()?.Role == PortalRoles.Teacher)
+        {
+            Navigation.NavigateTo("/teacher-login");
+            return;
+        }
+
+        Navigation.NavigateTo("/login?role=teacher");
+    }
+
+    private void OpenStudentPortal()
+    {
+        if (PortalSession.GetActiveSession()?.Role == PortalRoles.Teacher)
+        {
+            roleAccessMessage = "Teacher users can't log in to the student portal. Please log out from the teacher portal before using student login.";
+            showRoleAccessPopup = true;
+            return;
+        }
+
+        if (PortalSession.GetActiveSession()?.Role == PortalRoles.Student)
+        {
+            Navigation.NavigateTo("/student-login");
+            return;
+        }
+
+        Navigation.NavigateTo("/login?role=student");
     }
 
     private void CloseRoleAccessPopup()

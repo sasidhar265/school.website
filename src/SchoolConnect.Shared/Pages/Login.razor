@@ -112,6 +112,11 @@
     private string roleAccessMessage = string.Empty;
     private PortalSessionInfo? activeSession;
 
+    protected override void OnInitialized()
+    {
+        loginModel.Role = GetRequestedRole();
+    }
+
     private async Task Authenticate()
     {
         ClearErrors();
@@ -178,6 +183,17 @@
     {
         pinError = null;
         passwordError = null;
+    }
+
+    private string GetRequestedRole()
+    {
+        var query = Navigation.ToAbsoluteUri(Navigation.Uri).Query;
+        if (query.Contains("role=teacher", StringComparison.OrdinalIgnoreCase))
+        {
+            return PortalRoles.Teacher;
+        }
+
+        return PortalRoles.Student;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
