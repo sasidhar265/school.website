@@ -1,7 +1,11 @@
 html, body {
     font-family: Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f4f8fb;
+    background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, .16), transparent 30%),
+        radial-gradient(circle at top right, rgba(245, 158, 11, .14), transparent 26%),
+        linear-gradient(180deg, #f8fbfd 0%, #eef6fb 55%, #f7fafc 100%);
     color: #10202f;
+    min-height: 100%;
 }
 
 a, .btn-link {
@@ -21,6 +25,19 @@ a, .btn-link {
 .content {
     padding-bottom: 2rem;
     padding-top: 1.1rem;
+}
+
+body::before {
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, .55), transparent 18%),
+        radial-gradient(circle at 80% 12%, rgba(255, 255, 255, .40), transparent 16%),
+        radial-gradient(circle at 50% 85%, rgba(255, 255, 255, .24), transparent 18%);
+    content: "";
+    inset: 0;
+    opacity: .65;
+    pointer-events: none;
+    position: fixed;
+    z-index: -1;
 }
 
 h1:focus {

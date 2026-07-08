@@ -1,7 +1,9 @@
 .top-nav-shell {
+    backdrop-filter: blur(22px);
     background:
-        radial-gradient(circle at 90% 20%, rgba(245, 158, 11, .18), transparent 28%),
-        linear-gradient(135deg, #0f766e 0%, #115e59 48%, #10202f 100%);
+        linear-gradient(135deg, rgba(15, 118, 110, .72) 0%, rgba(17, 94, 89, .58) 48%, rgba(16, 32, 47, .72) 100%),
+        radial-gradient(circle at 90% 20%, rgba(245, 158, 11, .18), transparent 28%);
+    border-bottom: 1px solid rgba(255, 255, 255, .16);
     box-shadow: 0 18px 44px rgba(16, 32, 47, .16);
     position: sticky;
     top: 0;
@@ -24,7 +26,7 @@
 }
 
 .top-nav-shell .navbar-brand {
-    color: #fff;
+    color: #000;
     font-size: 1rem;
     font-weight: 900;
     letter-spacing: 0;
@@ -32,7 +34,7 @@
 
 .top-nav-link {
     border-radius: 999px;
-    color: rgba(255,255,255,.84);
+    color: #000;
     font-weight: 800;
     padding: .65rem .95rem !important;
     transition: background-color .18s ease, color .18s ease, transform .18s ease;
@@ -40,17 +42,17 @@
 
 .top-nav-link:hover,
 .top-nav-link.active {
-    background: rgba(255,255,255,.12);
-    color: #fff;
+    background: rgba(255,255,255,.26);
+    color: #000;
     transform: translateY(-1px);
 }
 
 .top-nav-link.nav-item-disabled,
 .top-nav-link.nav-item-disabled:hover,
 .top-nav-link.nav-item-disabled:focus {
-    background: rgba(255,255,255,.08);
+    background: rgba(255,255,255,.18);
     border: 1px solid transparent;
-    color: rgba(255,255,255,.42);
+    color: rgba(0,0,0,.38);
     cursor: not-allowed;
     transform: none;
 }
