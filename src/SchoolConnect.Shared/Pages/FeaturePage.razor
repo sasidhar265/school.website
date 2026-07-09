@@ -57,7 +57,9 @@
     @if (!requiresAuthentication)
     {
         <div class="feature-hero @(slug == "admissions" ? "admissions-hero" : string.Empty)">
-            <a class="back-link back-link-icon" href="/#top" aria-label="Back to dashboard">←</a>
+            <a class="back-link back-link-icon" href="/#top" aria-label="Back to dashboard">
+                <span class="bi bi-arrow-left" aria-hidden="true"></span>
+            </a>
             <div class="row g-4 align-items-end mt-1">
                 <div class="col-lg-9">
                     <p class="eyebrow">@school.Name</p>
@@ -295,7 +297,7 @@
                                 <strong>@(activeSession?.DisplayName ?? "Student User")</strong>
                                 <span>@(string.IsNullOrWhiteSpace(activeSession?.ClassName) ? "Student class" : activeSession.ClassName)</span>
                             </span>
-                            <span class="student-profile-caret" aria-hidden="true">▾</span>
+                            <span class="student-profile-caret bi bi-caret-down-fill" aria-hidden="true"></span>
                         </button>
 
                         @if (isStudentProfileMenuOpen)
@@ -325,7 +327,7 @@
                                 <strong>@(activeSession?.DisplayName ?? "Teacher User")</strong>
                                 <span>@(string.IsNullOrWhiteSpace(activeSession?.ClassName) ? "Teacher class" : activeSession.ClassName)</span>
                             </span>
-                            <span class="student-profile-caret" aria-hidden="true">▾</span>
+                            <span class="student-profile-caret bi bi-caret-down-fill" aria-hidden="true"></span>
                         </button>
 
                         @if (isTeacherProfileMenuOpen)

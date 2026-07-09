@@ -1,4 +1,5 @@
 ﻿@implements IDisposable
+@rendermode Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer
 @inject SchoolConnect.Shared.Services.SchoolContentService Content
 @inject SchoolConnect.Shared.Services.PortalSessionService PortalSession
 @inject IJSRuntime JsRuntime
@@ -22,66 +23,150 @@
         <div class="collapse navbar-collapse" id="primaryNav">
             <nav class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#top" data-scrollspy-link="top">
-                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                    <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
                 </NavLink>
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/gallery">
-                    <span class="bi bi-images-nav-menu" aria-hidden="true"></span> Gallery
+                    <span class="bi bi-images" aria-hidden="true"></span> Gallery
+                </NavLink>
+
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#why-choose-us" data-scrollspy-link="why-choose-us">
+                    <span class="bi bi-patch-check-fill" aria-hidden="true"></span> Why Choose Us
+                </NavLink>
+
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#latest-updates" data-scrollspy-link="latest-updates">
+                    <span class="bi bi-megaphone-fill" aria-hidden="true"></span> Latest Updates
                 </NavLink>
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#admissions" data-scrollspy-link="admissions">
-                    <span class="bi bi-calendar-check-fill-nav-menu" aria-hidden="true"></span> Admissions
+                    <span class="bi bi-calendar-check-fill" aria-hidden="true"></span> Admissions
                 </NavLink>
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#about-us" data-scrollspy-link="about-us">
-                    <span class="bi bi-info-circle-fill-nav-menu" aria-hidden="true"></span> About Us
+                    <span class="bi bi-info-circle-fill" aria-hidden="true"></span> About Us
                 </NavLink>
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#contacts" data-scrollspy-link="contacts">
-                    <span class="bi bi-envelope-paper-fill-nav-menu" aria-hidden="true"></span> Contact Us
+                    <span class="bi bi-envelope-paper-fill" aria-hidden="true"></span> Contact Us
                 </NavLink>
 
                 @if (!hideLoginNav)
                 {
-                    @if (activeSession is null)
-                    {
-                        <div class="nav-item dropdown login-profile-dropdown">
-                            <button class="nav-link top-nav-link nav-item-pill login-profile-toggle dropdown-toggle" type="button" id="loginProfileMenu" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open login options">
-                                <span class="profile-icon profile-icon-person" aria-hidden="true"></span>
-                                <span class="login-profile-label">Login</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end login-profile-menu" aria-labelledby="loginProfileMenu">
+                    <div class="nav-item dropdown login-profile-dropdown">
+                        <button class="nav-link top-nav-link nav-item-pill login-profile-toggle dropdown-toggle" type="button" id="loginProfileMenu" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open login options">
+                            <span class="profile-icon bi bi-person-circle" aria-hidden="true"></span>
+                            <span class="login-profile-label">@GetLoginDropdownLabel()</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end login-profile-menu" aria-labelledby="loginProfileMenu">
+                            @if (activeSession is null)
+                            {
                                 <li>
                                     <NavLink class="dropdown-item login-profile-option" href="/login?role=student">
-                                        <span class="login-option-icon" aria-hidden="true">S</span>
+                                        <span class="login-option-icon bi bi-mortarboard-fill" aria-hidden="true"></span>
                                         Student Login
                                     </NavLink>
                                 </li>
                                 <li>
                                     <NavLink class="dropdown-item login-profile-option" href="/login?role=teacher">
-                                        <span class="login-option-icon" aria-hidden="true">T</span>
+                                        <span class="login-option-icon bi bi-person-workspace" aria-hidden="true"></span>
                                         Teacher Login
                                     </NavLink>
                                 </li>
-                            </ul>
-                        </div>
-                    }
-                    else
-                    {
-                        <button class="nav-link top-nav-link nav-item-pill" type="button" title="@GetLoggedInLoginTitle()" @onclick="OpenActivePortal">
-                            <span class="profile-icon" aria-hidden="true">@GetActiveSessionInitial()</span>
-                            <span>@activeSession.RoleLabel</span>
-                        </button>
-                    }
+                            }
+                            else
+                            {
+                                <li>
+                                    <button class="dropdown-item login-profile-option" type="button" @onclick="OpenProfilePopup">
+                                        <span class="login-option-icon bi bi-person-badge-fill" aria-hidden="true"></span>
+                                        Profile
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item login-profile-option" type="button" @onclick="OpenActivePortal">
+                                        <span class="login-option-icon bi bi-box-arrow-up-right" aria-hidden="true"></span>
+                                        Open Portal
+                                    </button>
+                                </li>
+                                <li>
+                                    <button class="dropdown-item login-profile-option" type="button" @onclick="LogoutActiveSession">
+                                        <span class="login-option-icon bi bi-box-arrow-right" aria-hidden="true"></span>
+                                        Sign out
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 }
             </nav>
         </div>
     </div>
 </header>
 
+@if (isProfilePopupOpen && activeSession is not null)
+{
+    <div class="timetable-popup-backdrop" role="presentation" @onclick="CloseProfilePopup">
+        <div class="timetable-popup curriculum-popup student-profile-popup" role="dialog" aria-modal="true" aria-labelledby="nav-profile-popup-title" @onclick:stopPropagation="true">
+            <div class="timetable-popup-header">
+                <div>
+                    <p class="eyebrow mb-1">@activeSession.RoleLabel Profile</p>
+                    <h2 id="nav-profile-popup-title" class="mb-0">Profile details</h2>
+                </div>
+                <button type="button" class="timetable-popup-close" aria-label="Close profile" @onclick="CloseProfilePopup">x</button>
+            </div>
+
+            <div class="student-profile-popup-body">
+                <div class="student-profile-summary">
+                    <div class="student-profile-avatar student-profile-avatar-lg" aria-hidden="true">
+                        @GetActiveSessionAvatar()
+                    </div>
+                    <div>
+                        <p class="eyebrow mb-1">Logged in @activeSession.RoleLabel.ToLowerInvariant()</p>
+                        <h3 class="mb-1">@activeSession.DisplayName</h3>
+                        <p class="mb-0">@GetActiveSessionClassLine()</p>
+                    </div>
+                </div>
+
+                <div class="curriculum-unit-list">
+                    <article class="curriculum-unit-card">
+                        <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
+                            <div>
+                                <p class="eyebrow mb-1">Profile overview</p>
+                                <h4 class="mb-2">@activeSession.RoleLabel details</h4>
+                            </div>
+                            <span class="badge rounded-pill text-bg-success">Active</span>
+                        </div>
+                        <div class="student-profile-detail-grid">
+                            @if (activeSession.Role == SchoolConnect.Shared.Services.PortalRoles.Student)
+                            {
+                                <div><span>Student name</span><strong>@activeSession.DisplayName</strong></div>
+                                <div><span>Class</span><strong>@GetValueOrFallback(activeSession.ClassName)</strong></div>
+                                <div><span>Gender</span><strong>@GetValueOrFallback(activeSession.Gender)</strong></div>
+                                <div><span>Parents / Guardian name</span><strong>@GetValueOrFallback(activeSession.GuardianName)</strong></div>
+                                <div><span>Mobile phone number</span><strong>@GetValueOrFallback(activeSession.MobileNumber)</strong></div>
+                                <div><span>Class teacher</span><strong>@GetValueOrFallback(activeSession.ClassTeacher)</strong></div>
+                                <div><span>School joined year</span><strong>@GetValueOrFallback(activeSession.SchoolJoinedYear)</strong></div>
+                            }
+                            else
+                            {
+                                <div><span>Teacher name</span><strong>@activeSession.DisplayName</strong></div>
+                                <div><span>Class dealing with</span><strong>@GetValueOrFallback(activeSession.ClassDealingWith)</strong></div>
+                                <div><span>Subject</span><strong>@GetValueOrFallback(activeSession.Subject)</strong></div>
+                                <div><span>Qualification</span><strong>@GetValueOrFallback(activeSession.Qualification)</strong></div>
+                                <div><span>Gender</span><strong>@GetValueOrFallback(activeSession.Gender)</strong></div>
+                            }
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private SchoolConnect.Shared.Services.PortalSessionInfo? activeSession;
     private bool shouldSyncScrollSpy = true;
+    private bool shouldRestoreBrowserSession = true;
+    private bool isProfilePopupOpen;
 
     protected override void OnInitialized()
     {
@@ -92,8 +177,9 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender && activeSession is null)
+        if (shouldRestoreBrowserSession && activeSession is null)
         {
+            shouldRestoreBrowserSession = false;
             string? storedRole = null;
             try
             {
@@ -132,12 +218,15 @@
     private void HandleSessionChanged()
     {
         activeSession = PortalSession.GetActiveSession();
+        shouldRestoreBrowserSession = activeSession is null;
         _ = InvokeAsync(StateHasChanged);
     }
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
     {
         shouldSyncScrollSpy = true;
+        activeSession = PortalSession.GetActiveSession();
+        shouldRestoreBrowserSession = activeSession is null;
         _ = InvokeAsync(StateHasChanged);
     }
 
@@ -145,21 +234,6 @@
     {
         PortalSession.Changed -= HandleSessionChanged;
         Navigation.LocationChanged -= HandleLocationChanged;
-    }
-
-    private string GetLoggedInLoginTitle()
-    {
-        return activeSession is null ? "Login" : $"{activeSession.DisplayName} is already logged in";
-    }
-
-    private string GetActiveSessionInitial()
-    {
-        if (string.IsNullOrWhiteSpace(activeSession?.DisplayName))
-        {
-            return "P";
-        }
-
-        return activeSession.DisplayName.Trim()[0].ToString().ToUpperInvariant();
     }
 
     private async Task OpenActivePortal()
@@ -184,6 +258,86 @@
         }
 
         Navigation.NavigateTo(target);
+    }
+
+    private void OpenProfilePopup()
+    {
+        activeSession = PortalSession.GetActiveSession();
+        if (activeSession is not null)
+        {
+            isProfilePopupOpen = true;
+        }
+    }
+
+    private void CloseProfilePopup()
+    {
+        isProfilePopupOpen = false;
+    }
+
+    private string GetLoginDropdownLabel()
+    {
+        return string.IsNullOrWhiteSpace(activeSession?.DisplayName)
+            ? "Login"
+            : activeSession.DisplayName;
+    }
+
+    private async Task LogoutActiveSession()
+    {
+        if (activeSession is null)
+        {
+            return;
+        }
+
+        PortalSession.SignOut(activeSession.Role);
+
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", SchoolConnect.Shared.Services.PortalSessionService.BrowserSessionRoleKey);
+            await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "schoolconnect.alreadyLoggedInNotice");
+        }
+        catch
+        {
+            // Session storage is optional; the server-side session state has already been cleared.
+        }
+
+        activeSession = null;
+        isProfilePopupOpen = false;
+        shouldRestoreBrowserSession = false;
+        Navigation.NavigateTo("/");
+    }
+
+    private string GetActiveSessionAvatar()
+    {
+        if (string.IsNullOrWhiteSpace(activeSession?.DisplayName))
+        {
+            return activeSession?.Role == SchoolConnect.Shared.Services.PortalRoles.Teacher ? "T" : "S";
+        }
+
+        return activeSession.DisplayName.Trim()[0].ToString().ToUpperInvariant();
+    }
+
+    private string GetActiveSessionClassLine()
+    {
+        if (activeSession is null)
+        {
+            return "Profile details";
+        }
+
+        if (activeSession.Role == SchoolConnect.Shared.Services.PortalRoles.Teacher)
+        {
+            return string.IsNullOrWhiteSpace(activeSession.ClassDealingWith)
+                ? "Class dealing not assigned"
+                : activeSession.ClassDealingWith;
+        }
+
+        return string.IsNullOrWhiteSpace(activeSession.ClassName)
+            ? "Class not assigned"
+            : activeSession.ClassName;
+    }
+
+    private static string GetValueOrFallback(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? "Not assigned" : value;
     }
 
     private bool ShouldHideLoginNav()

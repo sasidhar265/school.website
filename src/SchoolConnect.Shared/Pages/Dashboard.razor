@@ -32,18 +32,12 @@
             </div>
         </div>
         <div class="home-topbar-right">
-            @if (activeSession is not null)
-            {
-                <div class="home-session-card">
-                    <div>
-                        <span>@activeSession.RoleLabel Portal</span>
-                        <strong>@activeSession.DisplayName</strong>
-                    </div>
-                    <button class="btn btn-warning btn-sm fw-bold" type="button" @onclick="() => Logout(activeSession.Role)">
-                        Logout
-                    </button>
-                </div>
-            }
+            <div class="heritage-emblem" aria-label="Teaching excellence since 1986">
+                <span>Since 1986</span>
+                <strong>40 Years</strong>
+                <small>Excellence in Teaching</small>
+                <em>35+ years of trusted education</em>
+            </div>
         </div>
     </header>
 
@@ -91,32 +85,8 @@
         </div>
     </section>
 
-    <section id="portals" class="portal-grid">
-        <button class="portal-card portal-card-action primary" type="button" @onclick="OpenStudentPortal">
-            <span class="portal-icon">01</span>
-            <small>Student Portal</small>
-            <h2>Learn</h2>
-            <p>Timetable, curriculum, study content, assignments, attendance, progress, and school details.</p>
-            <strong>Open Student Login</strong>
-        </button>
-        <button class="portal-card portal-card-action" type="button" @onclick="OpenTeacherPortal">
-            <span class="portal-icon">02</span>
-            <small>Teacher Portal</small>
-            <h2>Manage</h2>
-            <p>Student academic data, attendance, content publishing, records, reports, and maintenance tasks.</p>
-            <strong>Open Teacher Login</strong>
-        </button>
-        <button class="portal-card portal-card-action accent" type="button" @onclick="OpenAdmissionPopup">
-            <span class="portal-icon">03</span>
-            <small>Admissions</small>
-            <h2>Apply</h2>
-            <p>Admission enquiries, document collection, entrance slots, and fee confirmation workflows.</p>
-            <strong>Start Enquiry</strong>
-        </button>
-    </section>
-
     <section class="content-showcase">
-        <div class="showcase-main">
+        <div id="why-choose-us" class="showcase-main" data-scrollspy-target="why-choose-us">
             <div class="section-heading-modern">
                 <p class="eyebrow">Why Choose Us</p>
                 <h2>Designed for a complete digital school experience</h2>
@@ -145,7 +115,7 @@
             </div>
         </div>
 
-        <aside class="notice-panel">
+        <aside id="latest-updates" class="notice-panel" data-scrollspy-target="latest-updates">
             <div class="section-heading-modern compact">
                 <p class="eyebrow">Live Updates</p>
                 <h2>News & Announcements</h2>
@@ -171,7 +141,8 @@
             <h2>@school.AdmissionsHeadline</h2>
         </div>
         <div class="admissions-cta-action">
-            <a class="btn btn-warning btn-lg fw-bold" href="/admissions">Admission Form</a>
+            <button class="btn btn-outline-success btn-lg fw-bold admissions-action-button" type="button" @onclick="OpenAdmissionPopup">Start Enquiry</button>
+            <a class="btn btn-warning btn-lg fw-bold admissions-action-button" href="/admissions">Admission Form</a>
         </div>
     </section>
 
@@ -328,19 +299,6 @@
         </div>
     }
 
-    <section class="events-strip">
-        @foreach (var item in school.AcademicEvents)
-        {
-            <article>
-                <strong>@item.Date</strong>
-                <div>
-                    <h3>@item.Title</h3>
-                    <p>@item.Description</p>
-                </div>
-            </article>
-        }
-    </section>
-
     <section class="campus-map-section" aria-label="Campus location">
             <div class="map-info">
                 <p class="eyebrow">Find Campus</p>
@@ -446,13 +404,6 @@
     public void Dispose()
     {
         PortalSession.Changed -= HandleSessionChanged;
-    }
-
-    private async Task Logout(string role)
-    {
-        PortalSession.SignOut(role);
-        await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", PortalSessionService.BrowserSessionRoleKey);
-        Navigation.NavigateTo("/");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
