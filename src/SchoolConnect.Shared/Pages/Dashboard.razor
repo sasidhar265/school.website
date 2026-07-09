@@ -165,6 +165,92 @@
         </aside>
     </section>
 
+    <section id="admissions" class="modern-cta admissions-inline-cta" data-scrollspy-target="admissions">
+        <div class="admissions-cta-copy">
+            <p class="eyebrow">@school.Name</p>
+            <h2>@school.AdmissionsHeadline</h2>
+        </div>
+        <div class="admissions-cta-action">
+            <a class="btn btn-warning btn-lg fw-bold" href="/admissions">Admission Form</a>
+        </div>
+    </section>
+
+    @if (showAdmissionPopup)
+    {
+        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseAdmissionPopup">
+            <div class="admissions-popup admissions-popup-small" role="dialog" aria-modal="true" aria-labelledby="admissions-popup-title" @onclick:stopPropagation="true">
+                <div class="admissions-popup-header">
+                    <div>
+                        <p class="eyebrow mb-1">Admission enquiry</p>
+                        <h2 id="admissions-popup-title" class="mb-0">Quick enquiry</h2>
+                    </div>
+                    <button type="button" class="admissions-popup-close" aria-label="Close admission enquiry" @onclick="CloseAdmissionPopup">x</button>
+                </div>
+
+                @if (admissionPopupSubmitted)
+                {
+                    <div class="alert alert-success admissions-popup-success" role="status">
+                        <strong>Enquiry submitted.</strong>
+                        <span>@admissionPopupMessage</span>
+                    </div>
+                }
+
+                <EditForm Model="admissionPopup" OnValidSubmit="SubmitAdmissionPopup">
+                    <DataAnnotationsValidator />
+
+                    <div class="row g-3 admissions-popup-form">
+                        <div class="col-12">
+                            <label class="form-label" for="popupStudent">Student name</label>
+                            <InputText id="popupStudent" class="form-control" @bind-Value="admissionPopup.StudentName" />
+                            <ValidationMessage For="() => admissionPopup.StudentName" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="popupParent">Parent / guardian</label>
+                            <InputText id="popupParent" class="form-control" @bind-Value="admissionPopup.ParentName" />
+                            <ValidationMessage For="() => admissionPopup.ParentName" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="popupClass">Class</label>
+                            <InputSelect id="popupClass" class="form-select" @bind-Value="admissionPopup.ClassSeekingAdmission">
+                                <option value="">Select class</option>
+                                @foreach (var className in school.StudentTimetables.Select(tt => tt.ClassName))
+                                {
+                                    <option value="@className">@className</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => admissionPopup.ClassSeekingAdmission" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="popupMobile">Mobile number</label>
+                            <InputText id="popupMobile" class="form-control" @bind-Value="admissionPopup.Mobile" />
+                            <ValidationMessage For="() => admissionPopup.Mobile" />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label" for="popupEmail">Email address</label>
+                            <InputText id="popupEmail" type="email" class="form-control" @bind-Value="admissionPopup.Email" />
+                            <ValidationMessage For="() => admissionPopup.Email" />
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label" for="popupDetails">Enquiry details</label>
+                            <InputTextArea id="popupDetails" rows="3" class="form-control" @bind-Value="admissionPopup.Details" />
+                            <ValidationMessage For="() => admissionPopup.Details" />
+                        </div>
+
+                        <div class="col-12 d-flex flex-wrap gap-2">
+                            <button class="btn btn-warning fw-bold" type="submit">Submit enquiry</button>
+                            <button class="btn btn-outline-secondary fw-semibold" type="button" @onclick="CloseAdmissionPopup">Close</button>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    }
+
     <section id="about-us" class="about-preview" data-scrollspy-target="about-us">
         <div class="section-heading-modern">
             <p class="eyebrow">About Us</p>
@@ -255,92 +341,6 @@
         }
     </section>
 
-    <section id="admissions" class="modern-cta admissions-inline-cta" data-scrollspy-target="admissions">
-        <div class="admissions-cta-copy">
-            <p class="eyebrow">@school.Name</p>
-            <h2>@school.AdmissionsHeadline</h2>
-        </div>
-        <div class="admissions-cta-action">
-            <a class="btn btn-warning btn-lg fw-bold" href="/admissions">Admission Form</a>
-        </div>
-    </section>
-
-    @if (showAdmissionPopup)
-    {
-        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseAdmissionPopup">
-            <div class="admissions-popup admissions-popup-small" role="dialog" aria-modal="true" aria-labelledby="admissions-popup-title" @onclick:stopPropagation="true">
-                <div class="admissions-popup-header">
-                    <div>
-                        <p class="eyebrow mb-1">Admission enquiry</p>
-                        <h2 id="admissions-popup-title" class="mb-0">Quick enquiry</h2>
-                    </div>
-                    <button type="button" class="admissions-popup-close" aria-label="Close admission enquiry" @onclick="CloseAdmissionPopup">x</button>
-                </div>
-
-                @if (admissionPopupSubmitted)
-                {
-                    <div class="alert alert-success admissions-popup-success" role="status">
-                        <strong>Enquiry submitted.</strong>
-                        <span>@admissionPopupMessage</span>
-                    </div>
-                }
-
-                <EditForm Model="admissionPopup" OnValidSubmit="SubmitAdmissionPopup">
-                    <DataAnnotationsValidator />
-
-                    <div class="row g-3 admissions-popup-form">
-                        <div class="col-12">
-                            <label class="form-label" for="popupStudent">Student name</label>
-                            <InputText id="popupStudent" class="form-control" @bind-Value="admissionPopup.StudentName" />
-                            <ValidationMessage For="() => admissionPopup.StudentName" />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label" for="popupParent">Parent / guardian</label>
-                            <InputText id="popupParent" class="form-control" @bind-Value="admissionPopup.ParentName" />
-                            <ValidationMessage For="() => admissionPopup.ParentName" />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label" for="popupClass">Class</label>
-                            <InputSelect id="popupClass" class="form-select" @bind-Value="admissionPopup.ClassSeekingAdmission">
-                                <option value="">Select class</option>
-                                @foreach (var className in school.StudentTimetables.Select(tt => tt.ClassName))
-                                {
-                                    <option value="@className">@className</option>
-                                }
-                            </InputSelect>
-                            <ValidationMessage For="() => admissionPopup.ClassSeekingAdmission" />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label" for="popupMobile">Mobile number</label>
-                            <InputText id="popupMobile" class="form-control" @bind-Value="admissionPopup.Mobile" />
-                            <ValidationMessage For="() => admissionPopup.Mobile" />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label" for="popupEmail">Email address</label>
-                            <InputText id="popupEmail" type="email" class="form-control" @bind-Value="admissionPopup.Email" />
-                            <ValidationMessage For="() => admissionPopup.Email" />
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label" for="popupDetails">Enquiry details</label>
-                            <InputTextArea id="popupDetails" rows="3" class="form-control" @bind-Value="admissionPopup.Details" />
-                            <ValidationMessage For="() => admissionPopup.Details" />
-                        </div>
-
-                        <div class="col-12 d-flex flex-wrap gap-2">
-                            <button class="btn btn-warning fw-bold" type="submit">Submit enquiry</button>
-                            <button class="btn btn-outline-secondary fw-semibold" type="button" @onclick="CloseAdmissionPopup">Close</button>
-                        </div>
-                    </div>
-                </EditForm>
-            </div>
-        </div>
-    }
-
     <section class="campus-map-section" aria-label="Campus location">
             <div class="map-info">
                 <p class="eyebrow">Find Campus</p>
@@ -365,7 +365,7 @@
 
     <section id="contacts" class="contacts-section" data-scrollspy-target="contacts">
         <div class="section-heading-modern">
-            <p class="eyebrow">Contacts</p>
+            <p class="eyebrow">Contact Us</p>
             <h2>Reach the school team</h2>
         </div>
 

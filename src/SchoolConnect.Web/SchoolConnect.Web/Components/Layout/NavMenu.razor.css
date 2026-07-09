@@ -42,7 +42,8 @@
 
 .top-nav-link:hover,
 .top-nav-link.active {
-    background: rgba(255,255,255,.26);
+    background: rgba(245, 158, 11, .92);
+    box-shadow: 0 10px 24px rgba(245, 158, 11, .28);
     color: #000;
     transform: translateY(-1px);
 }

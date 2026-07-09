@@ -25,18 +25,9 @@
                     <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
                 </NavLink>
 
-                @if (!hideLoginNav && activeSession is null)
-                {
-                    <NavLink class="nav-link top-nav-link nav-item-pill" href="/login" data-scrollspy-link="login">
-                        <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                }
-                else if (!hideLoginNav)
-                {
-                    <button class="nav-link top-nav-link nav-item-pill" type="button" title="@GetLoggedInLoginTitle()" @onclick="OpenActivePortal">
-                        <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
-                    </button>
-                }
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/gallery">
+                    <span class="bi bi-images-nav-menu" aria-hidden="true"></span> Gallery
+                </NavLink>
 
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#admissions" data-scrollspy-link="admissions">
                     <span class="bi bi-calendar-check-fill-nav-menu" aria-hidden="true"></span> Admissions
@@ -46,13 +37,22 @@
                     <span class="bi bi-info-circle-fill-nav-menu" aria-hidden="true"></span> About Us
                 </NavLink>
 
-                <NavLink class="nav-link top-nav-link nav-item-pill" href="/gallery">
-                    <span class="bi bi-images-nav-menu" aria-hidden="true"></span> Gallery
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#contacts" data-scrollspy-link="contacts">
+                    <span class="bi bi-envelope-paper-fill-nav-menu" aria-hidden="true"></span> Contact Us
                 </NavLink>
 
-                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#contacts" data-scrollspy-link="contacts">
-                    <span class="bi bi-envelope-paper-fill-nav-menu" aria-hidden="true"></span> Contacts
-                </NavLink>
+                @if (!hideLoginNav && activeSession is null)
+                {
+                    <NavLink class="nav-link top-nav-link nav-item-pill" href="/login">
+                        <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
+                    </NavLink>
+                }
+                else if (!hideLoginNav)
+                {
+                    <button class="nav-link top-nav-link nav-item-pill" type="button" title="@GetLoggedInLoginTitle()" @onclick="OpenActivePortal">
+                        <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
+                    </button>
+                }
             </nav>
         </div>
     </div>
@@ -71,12 +71,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender)
-        {
-            return;
-        }
-
-        if (activeSession is null)
+        if (firstRender && activeSession is null)
         {
             string? storedRole = null;
             try
@@ -107,7 +102,10 @@
             }
         }
 
-        StateHasChanged();
+        if (firstRender)
+        {
+            StateHasChanged();
+        }
     }
 
     private void HandleSessionChanged()

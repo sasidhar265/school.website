@@ -1,6 +1,9 @@
 window.schoolConnectScrollSpy = (function () {
     let scrollHandler = null;
     let resizeHandler = null;
+    let hashChangeHandler = null;
+    let mutationObserver = null;
+    let syncTimeout = null;
     let activeLinkSelector = '[data-scrollspy-link]';
 
     function getIsHomePage() {
@@ -77,16 +80,15 @@ window.schoolConnectScrollSpy = (function () {
             return;
         }
 
-        const targets = getTargets();
-        const links = getLinks();
-
-        if (!targets.length || !links.size) {
-            clearActive();
-            destroyListeners();
-            return;
-        }
-
         const update = () => {
+            const targets = getTargets();
+            const links = getLinks();
+
+            if (!targets.length || !links.size) {
+                clearActive();
+                return;
+            }
+
             const current = pickCurrentTarget(targets);
             if (current) {
                 setActive(current.target, links);
@@ -96,9 +98,28 @@ window.schoolConnectScrollSpy = (function () {
         destroyListeners();
         scrollHandler = () => update();
         resizeHandler = () => update();
+        hashChangeHandler = () => window.setTimeout(update, 80);
         window.addEventListener('scroll', scrollHandler, { passive: true });
         window.addEventListener('resize', resizeHandler);
+        window.addEventListener('hashchange', hashChangeHandler);
         update();
+    }
+
+    function scheduleSync() {
+        window.clearTimeout(syncTimeout);
+        syncTimeout = window.setTimeout(sync, 50);
+    }
+
+    function start() {
+        scheduleSync();
+
+        if (!mutationObserver) {
+            mutationObserver = new MutationObserver(scheduleSync);
+            mutationObserver.observe(document.body, {
+                childList: true,
+                subtree: true,
+            });
+        }
     }
 
     function destroyListeners() {
@@ -111,9 +132,24 @@ window.schoolConnectScrollSpy = (function () {
             window.removeEventListener('resize', resizeHandler);
             resizeHandler = null;
         }
+
+        if (hashChangeHandler) {
+            window.removeEventListener('hashchange', hashChangeHandler);
+            hashChangeHandler = null;
+        }
     }
 
     return {
         sync,
+        start,
     };
 })();
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', window.schoolConnectScrollSpy.start, { once: true });
+} else {
+    window.schoolConnectScrollSpy.start();
+}
+
+window.addEventListener('pageshow', window.schoolConnectScrollSpy.start);
+document.addEventListener('enhancedload', window.schoolConnectScrollSpy.start);
