@@ -41,17 +41,38 @@
                     <span class="bi bi-envelope-paper-fill-nav-menu" aria-hidden="true"></span> Contact Us
                 </NavLink>
 
-                @if (!hideLoginNav && activeSession is null)
+                @if (!hideLoginNav)
                 {
-                    <NavLink class="nav-link top-nav-link nav-item-pill" href="/login">
-                        <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                }
-                else if (!hideLoginNav)
-                {
-                    <button class="nav-link top-nav-link nav-item-pill" type="button" title="@GetLoggedInLoginTitle()" @onclick="OpenActivePortal">
-                        <span class="bi bi-shield-lock-fill-nav-menu" aria-hidden="true"></span> Login
-                    </button>
+                    @if (activeSession is null)
+                    {
+                        <div class="nav-item dropdown login-profile-dropdown">
+                            <button class="nav-link top-nav-link nav-item-pill login-profile-toggle dropdown-toggle" type="button" id="loginProfileMenu" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Open login options">
+                                <span class="profile-icon profile-icon-person" aria-hidden="true"></span>
+                                <span class="login-profile-label">Login</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end login-profile-menu" aria-labelledby="loginProfileMenu">
+                                <li>
+                                    <NavLink class="dropdown-item login-profile-option" href="/login?role=student">
+                                        <span class="login-option-icon" aria-hidden="true">S</span>
+                                        Student Login
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink class="dropdown-item login-profile-option" href="/login?role=teacher">
+                                        <span class="login-option-icon" aria-hidden="true">T</span>
+                                        Teacher Login
+                                    </NavLink>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <button class="nav-link top-nav-link nav-item-pill" type="button" title="@GetLoggedInLoginTitle()" @onclick="OpenActivePortal">
+                            <span class="profile-icon" aria-hidden="true">@GetActiveSessionInitial()</span>
+                            <span>@activeSession.RoleLabel</span>
+                        </button>
+                    }
                 }
             </nav>
         </div>
@@ -129,6 +150,16 @@
     private string GetLoggedInLoginTitle()
     {
         return activeSession is null ? "Login" : $"{activeSession.DisplayName} is already logged in";
+    }
+
+    private string GetActiveSessionInitial()
+    {
+        if (string.IsNullOrWhiteSpace(activeSession?.DisplayName))
+        {
+            return "P";
+        }
+
+        return activeSession.DisplayName.Trim()[0].ToString().ToUpperInvariant();
     }
 
     private async Task OpenActivePortal()
