@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolConnect.Web", "src\Sc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolConnect.Mobile", "src\SchoolConnect.Mobile\SchoolConnect.Mobile.csproj", "{5FFB4921-9308-4760-A89F-005E34B8020D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolConnect.Tests", "tests\SchoolConnect.Tests\SchoolConnect.Tests.csproj", "{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +63,18 @@ Global
 		{5FFB4921-9308-4760-A89F-005E34B8020D}.Release|x64.Build.0 = Release|Any CPU
 		{5FFB4921-9308-4760-A89F-005E34B8020D}.Release|x86.ActiveCfg = Release|Any CPU
 		{5FFB4921-9308-4760-A89F-005E34B8020D}.Release|x86.Build.0 = Release|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Debug|x64.Build.0 = Debug|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Debug|x86.Build.0 = Debug|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Release|x64.ActiveCfg = Release|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Release|x64.Build.0 = Release|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Release|x86.ActiveCfg = Release|Any CPU
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,5 +84,6 @@ Global
 		{E6972167-42B8-EDDA-7B22-9F7D1E8BC48B} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{4AACAEC4-1BBC-4F7E-AAF2-B3C6B45674AD} = {E6972167-42B8-EDDA-7B22-9F7D1E8BC48B}
 		{5FFB4921-9308-4760-A89F-005E34B8020D} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{AC70A191-F0CC-4AF9-93E7-F13DC63C441B} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
