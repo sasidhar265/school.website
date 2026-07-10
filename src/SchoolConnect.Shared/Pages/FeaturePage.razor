@@ -261,6 +261,52 @@
         </div>
     }
 
+    @if (showLoginRequestPopup)
+    {
+        <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseLoginRequestPopup">
+            <div class="admissions-popup admissions-popup-small role-access-popup login-request-popup" role="dialog" aria-modal="true" aria-labelledby="feature-login-request-title" @onclick:stopPropagation="true">
+                <div class="admissions-popup-header">
+                    <div>
+                        <p class="eyebrow mb-1">@GetLoginRequestEyebrow(loginRequestRole)</p>
+                        <h2 id="feature-login-request-title" class="mb-0">@GetLoginRequestTitle(loginRequestRole)</h2>
+                    </div>
+                    <button type="button" class="admissions-popup-close" aria-label="Close login request" @onclick="CloseLoginRequestPopup">x</button>
+                </div>
+
+                <p class="mb-3">@GetLoginRequestMessage(loginRequestRole)</p>
+
+                <div class="mb-3">
+                    <label class="form-label" for="feature-login-pin">PIN</label>
+                    <div class="input-shell @(string.IsNullOrWhiteSpace(loginRequestPinError) ? string.Empty : "is-invalid")">
+                        <span class="bi bi-person-badge-fill" aria-hidden="true"></span>
+                        <InputText id="feature-login-pin" class="form-control form-control-lg" @bind-Value="loginRequestModel.Pin" autocomplete="username" />
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(loginRequestPinError))
+                    {
+                        <div class="field-error">@loginRequestPinError</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="feature-login-password">Password</label>
+                    <div class="input-shell @(string.IsNullOrWhiteSpace(loginRequestPasswordError) ? string.Empty : "is-invalid")">
+                        <span class="bi bi-shield-lock-fill" aria-hidden="true"></span>
+                        <InputText id="feature-login-password" type="password" class="form-control form-control-lg" @bind-Value="loginRequestModel.Password" autocomplete="current-password" />
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(loginRequestPasswordError))
+                    {
+                        <div class="field-error">@loginRequestPasswordError</div>
+                    }
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-warning btn-lg fw-bold flex-grow-1" type="button" @onclick="SubmitLoginRequest">Continue</button>
+                    <button class="btn btn-outline-secondary btn-lg fw-semibold" type="button" @onclick="CloseLoginRequestPopup">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+
     @if (requiresAuthentication && !isPortalAuthenticated && !hasRoleMismatch && !showRoleAccessPopup)
     {
         <div class="auth-shell auth-shell-centered auth-login-only">
@@ -275,7 +321,7 @@
                             <span class="auth-status-dot" aria-label="Secure portal active"></span>
                         </div>
                         <p>Use the Login page to choose Student or Teacher access and continue to this portal.</p>
-                        <a class="btn btn-warning btn-lg w-100 fw-bold auth-submit" href="@($"/login?role={portalRole}")">Go to Login</a>
+                        <button class="btn btn-warning btn-lg w-100 fw-bold auth-submit" type="button" @onclick="() => OpenLoginRequestPopup(portalRole)">Open Login</button>
                     </div>
                 </div>
             </div>
@@ -832,8 +878,13 @@
     private bool isTeacherProfilePopupOpen;
     private bool showRoleAccessPopup;
     private bool showAlreadyLoggedInPopup;
+    private bool showLoginRequestPopup;
     private bool admissionSubmitted;
     private string? submissionMessage;
+    private string loginRequestRole = PortalRoles.Student;
+    private readonly LoginRequestModel loginRequestModel = new();
+    private string? loginRequestPinError;
+    private string? loginRequestPasswordError;
 
     private void ResetAdmissionForm()
     {
@@ -933,6 +984,63 @@
         Navigation.NavigateTo($"/{Navigation.ToBaseRelativePath(Navigation.Uri).Split('?')[0]}", forceLoad: false);
     }
 
+    private void OpenLoginRequestPopup(string role)
+    {
+        loginRequestRole = role;
+        loginRequestModel.Pin = null;
+        loginRequestModel.Password = null;
+        loginRequestPinError = null;
+        loginRequestPasswordError = null;
+        showLoginRequestPopup = true;
+    }
+
+    private void CloseLoginRequestPopup()
+    {
+        showLoginRequestPopup = false;
+        loginRequestPinError = null;
+        loginRequestPasswordError = null;
+    }
+
+    private async Task SubmitLoginRequest()
+    {
+        loginRequestPinError = null;
+        loginRequestPasswordError = null;
+
+        if (string.IsNullOrWhiteSpace(loginRequestModel.Pin))
+        {
+            loginRequestPinError = "PIN is required.";
+        }
+
+        if (string.IsNullOrWhiteSpace(loginRequestModel.Password))
+        {
+            loginRequestPasswordError = "Password is required.";
+        }
+
+        if (!string.IsNullOrWhiteSpace(loginRequestPinError) || !string.IsNullOrWhiteSpace(loginRequestPasswordError))
+        {
+            return;
+        }
+
+        if (!PortalSession.TrySignIn(loginRequestRole, loginRequestModel.Pin, loginRequestModel.Password))
+        {
+            loginRequestPinError = "PIN or password does not match the selected login type.";
+            loginRequestPasswordError = "Check your password and try again.";
+            return;
+        }
+
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, loginRequestRole);
+        }
+        catch
+        {
+            // The in-memory session remains authoritative if browser storage is unavailable.
+        }
+
+        showLoginRequestPopup = false;
+        Navigation.NavigateTo(loginRequestRole == PortalRoles.Teacher ? "/teacher-login" : "/student-login");
+    }
+
     private bool HasAlreadyLoggedInFlag()
     {
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
@@ -974,6 +1082,23 @@
             : "Student user is already logged in. Redirecting to the student portal instead of the login page.";
     }
 
+    private static string GetLoginRequestEyebrow(string role)
+    {
+        return role == PortalRoles.Teacher ? "Teacher login request" : "Student login request";
+    }
+
+    private static string GetLoginRequestTitle(string role)
+    {
+        return role == PortalRoles.Teacher ? "Teacher portal access" : "Student portal access";
+    }
+
+    private static string GetLoginRequestMessage(string role)
+    {
+        return role == PortalRoles.Teacher
+            ? "Enter the teacher PIN and password to continue in the teacher portal."
+            : "Enter the student PIN and password to continue in the student portal.";
+    }
+
     private static string GetRoleAccessTitle(string requiredRole)
     {
         return requiredRole == PortalRoles.Teacher
@@ -986,6 +1111,15 @@
         return requiredRole == PortalRoles.Teacher
             ? "Student users can't log in to the teacher portal. Please log out from the student portal before using teacher login."
             : "Teacher users can't log in to the student portal. Please log out from the teacher portal before using student login.";
+    }
+
+    private sealed class LoginRequestModel
+    {
+        [Required(ErrorMessage = "PIN is required.")]
+        public string? Pin { get; set; }
+
+        [Required(ErrorMessage = "Password is required.")]
+        public string? Password { get; set; }
     }
 
     private void ToggleStudentModule(string moduleTitle)

@@ -61,16 +61,16 @@
                             @if (activeSession is null)
                             {
                                 <li>
-                                    <NavLink class="dropdown-item login-profile-option" href="/login?role=student">
+                                    <button class="dropdown-item login-profile-option" type="button" @onclick="() => OpenLoginRequestPopup(SchoolConnect.Shared.Services.PortalRoles.Student)">
                                         <span class="login-option-icon bi bi-mortarboard-fill" aria-hidden="true"></span>
                                         Student Login
-                                    </NavLink>
+                                    </button>
                                 </li>
                                 <li>
-                                    <NavLink class="dropdown-item login-profile-option" href="/login?role=teacher">
+                                    <button class="dropdown-item login-profile-option" type="button" @onclick="() => OpenLoginRequestPopup(SchoolConnect.Shared.Services.PortalRoles.Teacher)">
                                         <span class="login-option-icon bi bi-person-workspace" aria-hidden="true"></span>
                                         Teacher Login
-                                    </NavLink>
+                                    </button>
                                 </li>
                             }
                             else
@@ -162,11 +162,62 @@
     </div>
 }
 
+@if (isLoginRequestPopupOpen)
+{
+    <div class="admissions-popup-backdrop" role="presentation" @onclick="CloseLoginRequestPopup">
+        <div class="admissions-popup admissions-popup-small role-access-popup login-request-popup" role="dialog" aria-modal="true" aria-labelledby="login-request-title" @onclick:stopPropagation="true">
+            <div class="admissions-popup-header">
+                <div>
+                    <p class="eyebrow mb-1">@GetLoginRequestEyebrow()</p>
+                    <h2 id="login-request-title" class="mb-0">@GetLoginRequestTitle()</h2>
+                </div>
+                <button type="button" class="admissions-popup-close" aria-label="Close login request" @onclick="CloseLoginRequestPopup">x</button>
+            </div>
+
+            <p class="mb-3">@GetLoginRequestMessage()</p>
+
+            <div class="mb-3">
+                <label class="form-label" for="nav-login-pin">PIN</label>
+                <div class="input-shell @(string.IsNullOrWhiteSpace(loginRequestPinError) ? string.Empty : "is-invalid")">
+                    <span class="bi bi-person-badge-fill" aria-hidden="true"></span>
+                    <InputText id="nav-login-pin" class="form-control form-control-lg" @bind-Value="loginRequestModel.Pin" autocomplete="username" />
+                </div>
+                @if (!string.IsNullOrWhiteSpace(loginRequestPinError))
+                {
+                    <div class="field-error">@loginRequestPinError</div>
+                }
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="nav-login-password">Password</label>
+                <div class="input-shell @(string.IsNullOrWhiteSpace(loginRequestPasswordError) ? string.Empty : "is-invalid")">
+                    <span class="bi bi-shield-lock-fill" aria-hidden="true"></span>
+                    <InputText id="nav-login-password" type="password" class="form-control form-control-lg" @bind-Value="loginRequestModel.Password" autocomplete="current-password" />
+                </div>
+                @if (!string.IsNullOrWhiteSpace(loginRequestPasswordError))
+                {
+                    <div class="field-error">@loginRequestPasswordError</div>
+                }
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-warning btn-lg fw-bold flex-grow-1" type="button" @onclick="SubmitLoginRequest">Continue</button>
+                <button class="btn btn-outline-secondary btn-lg fw-semibold" type="button" @onclick="CloseLoginRequestPopup">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     private SchoolConnect.Shared.Services.PortalSessionInfo? activeSession;
     private bool shouldSyncScrollSpy = true;
     private bool shouldRestoreBrowserSession = true;
     private bool isProfilePopupOpen;
+    private bool isLoginRequestPopupOpen;
+    private string loginRequestRole = SchoolConnect.Shared.Services.PortalRoles.Student;
+    private readonly LoginRequestModel loginRequestModel = new();
+    private string? loginRequestPinError;
+    private string? loginRequestPasswordError;
 
     protected override void OnInitialized()
     {
@@ -269,6 +320,64 @@
         }
     }
 
+    private void OpenLoginRequestPopup(string role)
+    {
+        loginRequestRole = role;
+        loginRequestModel.Pin = null;
+        loginRequestModel.Password = null;
+        loginRequestPinError = null;
+        loginRequestPasswordError = null;
+        isLoginRequestPopupOpen = true;
+    }
+
+    private void CloseLoginRequestPopup()
+    {
+        isLoginRequestPopupOpen = false;
+        loginRequestPinError = null;
+        loginRequestPasswordError = null;
+    }
+
+    private async Task SubmitLoginRequest()
+    {
+        loginRequestPinError = null;
+        loginRequestPasswordError = null;
+
+        if (string.IsNullOrWhiteSpace(loginRequestModel.Pin))
+        {
+            loginRequestPinError = "PIN is required.";
+        }
+
+        if (string.IsNullOrWhiteSpace(loginRequestModel.Password))
+        {
+            loginRequestPasswordError = "Password is required.";
+        }
+
+        if (!string.IsNullOrWhiteSpace(loginRequestPinError) || !string.IsNullOrWhiteSpace(loginRequestPasswordError))
+        {
+            return;
+        }
+
+        if (!PortalSession.TrySignIn(loginRequestRole, loginRequestModel.Pin, loginRequestModel.Password))
+        {
+            loginRequestPinError = "PIN or password does not match the selected login type.";
+            loginRequestPasswordError = "Check your password and try again.";
+            return;
+        }
+
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", SchoolConnect.Shared.Services.PortalSessionService.BrowserSessionRoleKey, loginRequestRole);
+        }
+        catch
+        {
+            // The in-memory session remains authoritative if browser storage is unavailable.
+        }
+
+        isLoginRequestPopupOpen = false;
+        var target = loginRequestRole == SchoolConnect.Shared.Services.PortalRoles.Teacher ? "/teacher-login" : "/student-login";
+        Navigation.NavigateTo(target);
+    }
+
     private void CloseProfilePopup()
     {
         isProfilePopupOpen = false;
@@ -340,9 +449,37 @@
         return string.IsNullOrWhiteSpace(value) ? "Not assigned" : value;
     }
 
+    private string GetLoginRequestEyebrow()
+    {
+        return loginRequestRole == SchoolConnect.Shared.Services.PortalRoles.Teacher
+            ? "Teacher login request"
+            : "Student login request";
+    }
+
+    private string GetLoginRequestTitle()
+    {
+        return loginRequestRole == SchoolConnect.Shared.Services.PortalRoles.Teacher
+            ? "Teacher portal access"
+            : "Student portal access";
+    }
+
+    private string GetLoginRequestMessage()
+    {
+        return loginRequestRole == SchoolConnect.Shared.Services.PortalRoles.Teacher
+            ? "Enter the teacher PIN and password to continue in the teacher portal."
+            : "Enter the student PIN and password to continue in the student portal.";
+    }
+
     private bool ShouldHideLoginNav()
     {
         var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
         return path is "login" or "student-login" or "teacher-login";
+    }
+
+    private sealed class LoginRequestModel
+    {
+        public string? Pin { get; set; }
+
+        public string? Password { get; set; }
     }
 }

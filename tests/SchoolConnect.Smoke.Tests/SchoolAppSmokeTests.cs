@@ -24,6 +24,11 @@ public sealed class SchoolAppSmokeTests
         Assert.That(body, Does.Contain("Latest Updates"));
         Assert.That(body, Does.Contain("Start Enquiry"));
         Assert.That(body, Does.Contain("Admission Form"));
+        Assert.That(body, Does.Contain("Student Login"));
+        Assert.That(body, Does.Contain("Teacher Login"));
+        Assert.That(body, Does.Contain("Open login options"));
+        Assert.That(body, Does.Not.Contain("href=\"/login?role=student\""));
+        Assert.That(body, Does.Not.Contain("href=\"/login?role=teacher\""));
     }
 
     [Test]
