@@ -339,7 +339,6 @@
 
                 <div class="d-flex gap-2">
                     <button class="btn btn-warning btn-lg fw-bold flex-grow-1" type="button" @onclick="SubmitLoginRequest">Continue</button>
-                    <button class="btn btn-outline-secondary btn-lg fw-semibold" type="button" @onclick="CloseLoginRequestPopup">Cancel</button>
                 </div>
             </div>
         </div>
@@ -364,6 +363,47 @@
                 referrerpolicy="no-referrer-when-downgrade"
                 src="https://www.openstreetmap.org/export/embed.html?bbox=80.0950%2C16.4850%2C80.1850%2C16.5650&layer=mapnik&marker=16.5250%2C80.1400">
             </iframe>
+        </div>
+    </section>
+
+    <section id="careers" class="careers-section" data-scrollspy-target="careers">
+        <div class="careers-intro">
+            <div class="section-heading-modern">
+                <p class="eyebrow">Careers</p>
+                <h2>Grow with our school community</h2>
+            </div>
+            <p>Join a caring team committed to excellent teaching, strong values, and meaningful opportunities for every child.</p>
+            <a class="btn btn-warning btn-lg fw-bold careers-apply" href="mailto:@school.Email">
+                <span class="bi bi-send-fill" aria-hidden="true"></span>
+                Send your application
+            </a>
+        </div>
+
+        <div class="careers-grid">
+            <article class="career-card">
+                <span class="career-icon bi bi-person-video3" aria-hidden="true"></span>
+                <div>
+                    <p class="eyebrow">Teaching</p>
+                    <h3>Inspire young learners</h3>
+                    <p>We welcome passionate primary teachers who bring subject knowledge, patience, and creativity to the classroom.</p>
+                </div>
+            </article>
+            <article class="career-card">
+                <span class="career-icon bi bi-people-fill" aria-hidden="true"></span>
+                <div>
+                    <p class="eyebrow">Administration</p>
+                    <h3>Support school operations</h3>
+                    <p>Help families, faculty, and students through organised, responsive, and dependable school administration.</p>
+                </div>
+            </article>
+            <article class="career-card">
+                <span class="career-icon bi bi-stars" aria-hidden="true"></span>
+                <div>
+                    <p class="eyebrow">Activities</p>
+                    <h3>Develop every talent</h3>
+                    <p>Coaches and activity mentors can help students grow through sports, arts, communication, and enrichment.</p>
+                </div>
+            </article>
         </div>
     </section>
 
@@ -423,6 +463,37 @@
             </article>
         </div>
     </section>
+
+    <footer class="school-footer">
+        <div class="school-footer-main">
+            <div class="school-footer-brand">
+                <img src="_content/SchoolConnect.Shared/venkateswara-logo.svg" alt="@school.Name logo" />
+                <div>
+                    <strong>@school.Name</strong>
+                    <p>@school.Tagline</p>
+                </div>
+            </div>
+
+            <div class="school-footer-links" aria-label="Footer navigation">
+                <h2>Explore</h2>
+                <a href="/#top">Home</a>
+                <a href="/#admissions">Admissions</a>
+                <a href="/#about-us">About Us</a>
+                <a href="/#careers">Careers</a>
+            </div>
+
+            <div class="school-footer-contact">
+                <h2>Visit & Contact</h2>
+                <p><span class="bi bi-geo-alt-fill" aria-hidden="true"></span>@school.Location</p>
+                <a href="tel:@school.Phone"><span class="bi bi-telephone-fill" aria-hidden="true"></span>@school.Phone</a>
+                <a href="mailto:@school.Email"><span class="bi bi-envelope-fill" aria-hidden="true"></span>@school.Email</a>
+            </div>
+        </div>
+        <div class="school-footer-bottom">
+            <span>© @DateTime.UtcNow.Year @school.Name. All rights reserved.</span>
+            <a href="/#top">Back to top <span class="bi bi-arrow-up" aria-hidden="true"></span></a>
+        </div>
+    </footer>
 </section>
 
 @code {

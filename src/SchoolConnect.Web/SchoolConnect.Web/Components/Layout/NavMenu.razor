@@ -46,6 +46,10 @@
                     <span class="bi bi-info-circle-fill" aria-hidden="true"></span> About Us
                 </NavLink>
 
+                <NavLink class="nav-link top-nav-link nav-item-pill" href="/#careers" data-scrollspy-link="careers">
+                    <span class="bi bi-briefcase-fill" aria-hidden="true"></span> Careers
+                </NavLink>
+
                 <NavLink class="nav-link top-nav-link nav-item-pill" href="/#contacts" data-scrollspy-link="contacts">
                     <span class="bi bi-envelope-paper-fill" aria-hidden="true"></span> Contact Us
                 </NavLink>
@@ -202,7 +206,6 @@
 
             <div class="d-flex gap-2">
                 <button class="btn btn-warning btn-lg fw-bold flex-grow-1" type="button" @onclick="SubmitLoginRequest">Continue</button>
-                <button class="btn btn-outline-secondary btn-lg fw-semibold" type="button" @onclick="CloseLoginRequestPopup">Cancel</button>
             </div>
         </div>
     </div>
@@ -412,7 +415,7 @@
         activeSession = null;
         isProfilePopupOpen = false;
         shouldRestoreBrowserSession = false;
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/#top", forceLoad: true);
     }
 
     private string GetActiveSessionAvatar()

@@ -301,7 +301,6 @@
 
                 <div class="d-flex gap-2">
                     <button class="btn btn-warning btn-lg fw-bold flex-grow-1" type="button" @onclick="SubmitLoginRequest">Continue</button>
-                    <button class="btn btn-outline-secondary btn-lg fw-semibold" type="button" @onclick="CloseLoginRequestPopup">Cancel</button>
                 </div>
             </div>
         </div>
@@ -1023,7 +1022,7 @@
             // should still return home when browser storage is unavailable.
         }
 
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/#top", forceLoad: true);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

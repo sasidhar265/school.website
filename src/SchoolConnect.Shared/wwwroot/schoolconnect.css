@@ -1397,6 +1397,88 @@ html {
     gap: 1rem;
 }
 
+.careers-section {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.4rem;
+    border: 1px solid rgba(255, 255, 255, .68);
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at 92% 12%, rgba(250, 204, 21, .18), transparent 28%),
+        linear-gradient(135deg, rgba(236, 253, 245, .88), rgba(255, 255, 255, .72));
+    box-shadow: var(--glass-shadow);
+}
+
+.careers-intro {
+    align-items: end;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.25fr) auto;
+}
+
+.careers-intro .section-heading-modern,
+.careers-intro p {
+    margin: 0;
+}
+
+.careers-intro > p {
+    color: var(--school-muted);
+    line-height: 1.7;
+}
+
+.careers-apply {
+    align-items: center;
+    display: inline-flex;
+    gap: .55rem;
+    white-space: nowrap;
+}
+
+.careers-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.career-card {
+    align-items: start;
+    display: grid;
+    gap: .9rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    min-height: 100%;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, .82);
+    border-radius: 19px;
+    background: rgba(255, 255, 255, .62);
+    box-shadow: 0 12px 30px rgba(15, 118, 110, .09), inset 0 1px 0 #fff;
+    backdrop-filter: blur(16px);
+}
+
+.career-icon {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 14px;
+    color: #fff;
+    background: linear-gradient(145deg, var(--school-brand), var(--school-brand-strong));
+    box-shadow: 0 8px 18px rgba(15, 118, 110, .22);
+    font-size: 1.2rem;
+}
+
+.career-card h3 {
+    color: var(--school-ink);
+    font-size: 1.08rem;
+    font-weight: 900;
+    margin: .12rem 0 .35rem;
+}
+
+.career-card p:last-child {
+    color: var(--school-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
 .contacts-grid {
     display: grid;
     gap: 1rem;
@@ -1423,6 +1505,101 @@ html {
 
 .contact-action .bi {
     font-size: 1rem;
+}
+
+.school-footer {
+    margin: 1.5rem -1rem -1rem;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 24px 24px 0 0;
+    color: rgba(255, 255, 255, .82);
+    background:
+        radial-gradient(circle at 12% 10%, rgba(45, 212, 191, .18), transparent 30%),
+        linear-gradient(135deg, #10202f, #123c3a 58%, #14532d);
+    box-shadow: 0 -12px 36px rgba(16, 32, 47, .14);
+}
+
+.school-footer-main {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: minmax(0, 1.5fr) minmax(150px, .55fr) minmax(250px, .9fr);
+    padding: 2rem;
+}
+
+.school-footer-brand {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+}
+
+.school-footer-brand img {
+    width: 68px;
+    height: 68px;
+    padding: .35rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .92);
+}
+
+.school-footer-brand strong {
+    color: #fff;
+    display: block;
+    font-size: 1.15rem;
+    margin-bottom: .35rem;
+}
+
+.school-footer-brand p {
+    margin: 0;
+    max-width: 34rem;
+}
+
+.school-footer h2 {
+    color: #facc15;
+    font-size: .82rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    margin-bottom: .8rem;
+    text-transform: uppercase;
+}
+
+.school-footer-links,
+.school-footer-contact {
+    align-content: start;
+    display: grid;
+    gap: .55rem;
+}
+
+.school-footer a {
+    color: rgba(255, 255, 255, .88);
+    text-decoration: none;
+}
+
+.school-footer a:hover,
+.school-footer a:focus-visible {
+    color: #facc15;
+}
+
+.school-footer-contact p,
+.school-footer-contact a {
+    align-items: start;
+    display: flex;
+    gap: .65rem;
+    margin: 0;
+}
+
+.school-footer-contact .bi {
+    color: #5eead4;
+    margin-top: .18rem;
+}
+
+.school-footer-bottom {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: .9rem 2rem;
+    border-top: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(0, 0, 0, .12);
+    font-size: .88rem;
 }
 
 .back-link-icon {
@@ -1682,6 +1859,66 @@ html {
 .admissions-popup-small {
     max-height: min(88vh, 720px);
     width: min(100%, 520px);
+}
+
+.login-request-popup {
+    isolation: isolate;
+    position: relative;
+    background:
+        radial-gradient(circle at 14% 8%, rgba(255, 255, 255, .98) 0 7%, rgba(255, 255, 255, 0) 30%),
+        radial-gradient(circle at 88% 90%, rgba(45, 212, 191, .24), rgba(45, 212, 191, 0) 36%),
+        linear-gradient(145deg, rgba(255, 255, 255, .82), rgba(224, 242, 254, .60) 48%, rgba(236, 253, 245, .68));
+    border: 1px solid rgba(255, 255, 255, .88);
+    box-shadow:
+        0 28px 70px rgba(8, 47, 73, .30),
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 -18px 34px rgba(14, 165, 233, .08);
+    backdrop-filter: blur(30px) saturate(165%);
+    -webkit-backdrop-filter: blur(30px) saturate(165%);
+}
+
+.login-request-popup::before,
+.login-request-popup::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    z-index: -1;
+    border-radius: 999px;
+    filter: blur(1px);
+}
+
+.login-request-popup::before {
+    top: .45rem;
+    left: 8%;
+    width: 58%;
+    height: 11px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .92), rgba(255, 255, 255, .08));
+    box-shadow: 0 8px 20px rgba(255, 255, 255, .45);
+}
+
+.login-request-popup::after {
+    right: -2.5rem;
+    bottom: -3.25rem;
+    width: 10rem;
+    height: 10rem;
+    background: radial-gradient(circle at 35% 28%, rgba(255, 255, 255, .80), rgba(56, 189, 248, .20) 38%, rgba(13, 148, 136, .10) 68%, transparent 72%);
+    box-shadow: inset 10px 12px 24px rgba(255, 255, 255, .58);
+}
+
+.login-request-popup > * {
+    position: relative;
+    z-index: 1;
+}
+
+.login-request-popup .input-shell {
+    background: rgba(255, 255, 255, .54);
+    border-color: rgba(255, 255, 255, .86);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 10px 24px rgba(14, 116, 144, .08);
+    backdrop-filter: blur(12px);
+}
+
+.login-request-popup .btn-warning {
+    box-shadow: 0 12px 28px rgba(245, 158, 11, .26), inset 0 1px 0 rgba(255, 255, 255, .62);
 }
 
 .about-popup {
@@ -2952,7 +3189,21 @@ html {
     .portal-grid,
     .content-showcase,
     .admissions-inline-cta,
-    .events-strip {
+    .events-strip,
+    .careers-intro,
+    .school-footer-main {
+        grid-template-columns: 1fr;
+    }
+
+    .careers-intro {
+        align-items: start;
+    }
+
+    .careers-apply {
+        justify-self: start;
+    }
+
+    .careers-grid {
         grid-template-columns: 1fr;
     }
 
@@ -3034,6 +3285,20 @@ html {
 
     .role-picker {
         grid-template-columns: 1fr;
+    }
+
+    .school-footer {
+        margin-inline: -.5rem;
+    }
+
+    .school-footer-main {
+        padding: 1.4rem;
+    }
+
+    .school-footer-bottom {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: .9rem 1.4rem;
     }
 }
 .assessment-choice-list > div {
