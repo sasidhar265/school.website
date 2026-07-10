@@ -52,7 +52,17 @@ public sealed record StudentCurriculumUnit(string Subject, string[] Topics, stri
 
 public sealed record StudentStudyContent(string ClassName, string[] Categories, IReadOnlyList<StudentStudyContentItem> Items);
 
-public sealed record StudentStudyContentItem(string Category, string Title, string Detail, string ActionLabel);
+public sealed record StudentStudyContentItem(string Category, string Title, string Detail, string ActionLabel, string Subject = "")
+{
+    public IReadOnlyList<StudentAssessmentQuestion> AssessmentQuestions { get; init; } = [];
+}
+
+public sealed record StudentAssessmentQuestion(
+    int Number,
+    string Prompt,
+    int Marks,
+    IReadOnlyList<string> Choices,
+    string CorrectAnswer);
 
 public sealed record StudentProgressSummary(
     string ClassName,

@@ -64,8 +64,12 @@ public sealed class SchoolContentServiceTests
             Assert.That(curriculum.Units.Single().Topics, Is.EqualTo(new[] { "Plants" }));
             Assert.That(curriculum.Units.Single().Outcome, Is.EqualTo("Understand plant life."));
 
-            Assert.That(content.Categories, Is.EqualTo(new[] { "Worksheet" }));
-            Assert.That(content.Items.Single().ActionLabel, Is.EqualTo("Open"));
+            Assert.That(content.Categories, Is.EqualTo(new[] { "Worksheet", "Assessments" }));
+            Assert.That(content.Items.Single(item => item.Category == "Worksheet").ActionLabel, Is.EqualTo("Open"));
+            var assessment = content.Items.Single(item => item.Category == "Assessments");
+            Assert.That(assessment.Subject, Is.EqualTo("Science"));
+            Assert.That(assessment.Detail, Does.Contain("Plants"));
+            Assert.That(assessment.Detail, Does.Contain("20 marks"));
 
             Assert.That(progress.Attendance, Is.EqualTo("96%"));
             Assert.That(progress.Subjects.Single().Score, Is.EqualTo("A"));

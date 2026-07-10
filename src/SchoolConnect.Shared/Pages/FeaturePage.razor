@@ -620,7 +620,7 @@
                     <div class="timetable-popup-header">
                         <div>
                             <p class="eyebrow mb-1">Student Content</p>
-                            <h2 id="student-content-popup-title" class="mb-0">Notes, worksheets, and homework</h2>
+                            <h2 id="student-content-popup-title" class="mb-0">Notes, worksheets, homework, and assessments</h2>
                         </div>
                         <button type="button" class="timetable-popup-close" aria-label="Close student content" @onclick="CloseStudentContentPopup">x</button>
                     </div>
@@ -650,16 +650,39 @@
                                 }
                             </div>
 
+                            @if (IsAssessmentCategorySelected())
+                            {
+                                <div class="timetable-class-tabs curriculum-subject-tabs" role="tablist" aria-label="Assessment subject selector">
+                                    @foreach (var subject in GetAssessmentSubjects(selectedContent))
+                                    {
+                                        <button type="button"
+                                                class="@GetAssessmentSubjectTabClass(subject)"
+                                                @onclick="() => SelectAssessmentSubject(subject)">
+                                            @subject
+                                        </button>
+                                    }
+                                </div>
+                            }
+
                             <div class="curriculum-unit-list">
                                 @foreach (var item in GetFilteredStudentContentItems(selectedContent))
                                 {
                                     <article class="curriculum-unit-card">
                                         <div class="d-flex flex-wrap align-items-start justify-content-between gap-2">
                                             <div>
-                                                <p class="eyebrow mb-1">@item.Category</p>
+                                                <p class="eyebrow mb-1">@item.Category@(!string.IsNullOrWhiteSpace(item.Subject) ? $" · {item.Subject}" : string.Empty)</p>
                                                 <h4 class="mb-2">@item.Title</h4>
                                             </div>
-                                            <span class="badge rounded-pill text-bg-light">@item.ActionLabel</span>
+                                            @if (string.Equals(item.Category, "Assessments", StringComparison.OrdinalIgnoreCase))
+                                            {
+                                                <button class="btn btn-warning btn-sm fw-bold" type="button" @onclick="() => OpenAssessment(item)">
+                                                    @item.ActionLabel
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge rounded-pill text-bg-light">@item.ActionLabel</span>
+                                            }
                                         </div>
                                         <p class="mb-0 text-muted">@item.Detail</p>
                                     </article>
@@ -667,6 +690,86 @@
                             </div>
                         </div>
                     }
+                </div>
+            </div>
+        }
+
+        @if (portalRole == PortalRoles.Student && activeAssessment is not null)
+        {
+            <div class="timetable-popup-backdrop assessment-runner-backdrop" role="presentation" @onclick="CloseAssessment">
+                <div class="timetable-popup curriculum-popup assessment-runner" role="dialog" aria-modal="true" aria-labelledby="assessment-title" @onclick:stopPropagation="true">
+                    <div class="timetable-popup-header">
+                        <div>
+                            <p class="eyebrow mb-1">@activeStudentContentClass · @activeAssessment.Subject</p>
+                            <h2 id="assessment-title" class="mb-0">@activeAssessment.Title</h2>
+                        </div>
+                        <button type="button" class="timetable-popup-close" aria-label="Close assessment" @onclick="CloseAssessment">x</button>
+                    </div>
+
+                    <div class="timetable-popup-body">
+                        <div class="timetable-viewer-header mb-3">
+                            <div>
+                                <p class="mb-1">Answer every question before submitting.</p>
+                                <small class="text-muted">Choose one answer for each question.</small>
+                            </div>
+                            <div class="timetable-meta">
+                                <span>@activeAssessment.AssessmentQuestions.Count questions</span>
+                                <span>@activeAssessment.AssessmentQuestions.Sum(question => question.Marks) marks</span>
+                            </div>
+                        </div>
+
+                        <div class="curriculum-unit-list">
+                            @foreach (var question in activeAssessment.AssessmentQuestions)
+                            {
+                                var answer = GetAssessmentAnswer(question.Number);
+                                <article class="curriculum-unit-card assessment-question-card">
+                                    <div class="d-flex align-items-start justify-content-between gap-3">
+                                        <h4 class="mb-2">@question.Number. @question.Prompt</h4>
+                                        <span class="badge rounded-pill text-bg-light">@question.Marks marks</span>
+                                    </div>
+                                    <div class="assessment-choice-list" role="radiogroup" aria-label="Choose one answer">
+                                        <InputRadioGroup Name="@($"assessment-question-{question.Number}")" @bind-Value="answer.Response">
+                                            @foreach (var option in question.Choices)
+                                            {
+                                                var isSelected = string.Equals(answer.Response, option, StringComparison.Ordinal);
+                                                <label class="btn text-start assessment-choice @(isSelected ? "btn-success" : "btn-outline-secondary")">
+                                                    <InputRadio Value="@option"
+                                                                disabled="@assessmentSubmitted"
+                                                                data-question-number="@question.Number" />
+                                                    <span class="ms-2">@option</span>
+                                                </label>
+                                            }
+                                        </InputRadioGroup>
+                                    </div>
+                                    @if (assessmentSubmitted)
+                                    {
+                                        <p class="mt-2 mb-0 fw-semibold @(IsAssessmentAnswerCorrect(question) ? "text-success" : "text-danger")">
+                                            @(IsAssessmentAnswerCorrect(question) ? "Correct" : $"Correct answer: {question.CorrectAnswer}")
+                                        </p>
+                                    }
+                                </article>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(assessmentMessage))
+                        {
+                            <div class="alert @(assessmentSubmitted ? "alert-success" : "alert-warning") mt-3" role="status">
+                                @assessmentMessage
+                            </div>
+                        }
+
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+                            @if (!assessmentSubmitted)
+                            {
+                                <button class="btn btn-warning btn-lg fw-bold" type="button" @onclick="SubmitAssessment">Submit assessment</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-success btn-lg fw-bold" type="button" @onclick="CloseAssessment">Done</button>
+                            }
+                            <button class="btn btn-outline-secondary btn-lg" type="button" @onclick="CloseAssessment">Close</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         }
@@ -867,6 +970,11 @@
     private string? activeCurriculumSubject;
     private string? activeStudentContentClass;
     private string? activeStudentContentCategory;
+    private string? activeAssessmentSubject;
+    private StudentStudyContentItem? activeAssessment;
+    private readonly List<AssessmentAnswerState> assessmentAnswers = [];
+    private bool assessmentSubmitted;
+    private string? assessmentMessage;
     private string? activeStudentProgressClass;
     private bool isTimetablePopupOpen;
     private bool isCurriculumPopupOpen;
@@ -1227,6 +1335,7 @@
     {
         activeStudentContentClass = className;
         activeStudentContentCategory = null;
+        activeAssessmentSubject = null;
     }
 
     private void CloseStudentContentPopup()
@@ -1234,12 +1343,84 @@
         activeStudentModule = null;
         isStudentContentPopupOpen = false;
         activeStudentContentCategory = null;
+        activeAssessmentSubject = null;
     }
 
     private void SelectStudentContentCategory(string category)
     {
         activeStudentContentCategory = category;
+        activeAssessmentSubject = null;
     }
+
+    private void SelectAssessmentSubject(string subject) => activeAssessmentSubject = subject;
+
+    private void OpenAssessment(StudentStudyContentItem assessment)
+    {
+        activeAssessment = assessment;
+        assessmentAnswers.Clear();
+        foreach (var question in assessment.AssessmentQuestions)
+        {
+            assessmentAnswers.Add(new AssessmentAnswerState(question.Number));
+        }
+        assessmentSubmitted = false;
+        assessmentMessage = null;
+    }
+
+    private void CloseAssessment()
+    {
+        activeAssessment = null;
+        assessmentAnswers.Clear();
+        assessmentSubmitted = false;
+        assessmentMessage = null;
+    }
+
+    private string GetAssessmentResponse(int questionNumber) =>
+        assessmentAnswers.FirstOrDefault(answer => answer.QuestionNumber == questionNumber)?.Response ?? string.Empty;
+
+    private AssessmentAnswerState GetAssessmentAnswer(int questionNumber) =>
+        assessmentAnswers.First(answer => answer.QuestionNumber == questionNumber);
+
+    private async Task SubmitAssessment()
+    {
+        if (activeAssessment is null)
+        {
+            return;
+        }
+
+        var selectionPayload = await JsRuntime.InvokeAsync<string>("schoolConnectAssessment.getSelections");
+        foreach (var selection in selectionPayload.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = selection.Split('\t', 2);
+            if (parts.Length < 2 || !int.TryParse(parts[0], out var questionNumber))
+            {
+                continue;
+            }
+
+            var answer = assessmentAnswers.FirstOrDefault(item => item.QuestionNumber == questionNumber);
+            if (answer is not null)
+            {
+                answer.Response = parts[1];
+            }
+        }
+
+        var unanswered = activeAssessment.AssessmentQuestions
+            .Count(question => string.IsNullOrWhiteSpace(GetAssessmentResponse(question.Number)));
+        if (unanswered > 0)
+        {
+            assessmentMessage = $"Please answer all questions. {unanswered} {(unanswered == 1 ? "answer is" : "answers are")} still missing.";
+            return;
+        }
+
+        assessmentSubmitted = true;
+        var score = activeAssessment.AssessmentQuestions
+            .Where(IsAssessmentAnswerCorrect)
+            .Sum(question => question.Marks);
+        var totalMarks = activeAssessment.AssessmentQuestions.Sum(question => question.Marks);
+        assessmentMessage = $"Assessment submitted successfully. Your score is {score} out of {totalMarks}.";
+    }
+
+    private bool IsAssessmentAnswerCorrect(StudentAssessmentQuestion question) =>
+        string.Equals(GetAssessmentResponse(question.Number), question.CorrectAnswer, StringComparison.Ordinal);
 
     private void SelectStudentProgress(string className)
     {
@@ -1390,10 +1571,35 @@
             activeStudentContentCategory = categories[0];
         }
 
-        return content.Items
-            .Where(item => string.Equals(item.Category, activeStudentContentCategory, StringComparison.OrdinalIgnoreCase))
-            .ToArray();
+        var filtered = content.Items
+            .Where(item => string.Equals(item.Category, activeStudentContentCategory, StringComparison.OrdinalIgnoreCase));
+
+        if (IsAssessmentCategorySelected())
+        {
+            var subjects = GetAssessmentSubjects(content);
+            if (subjects.Count > 0 && (string.IsNullOrWhiteSpace(activeAssessmentSubject) || !subjects.Contains(activeAssessmentSubject, StringComparer.OrdinalIgnoreCase)))
+            {
+                activeAssessmentSubject = subjects[0];
+            }
+
+            filtered = filtered.Where(item => string.Equals(item.Subject, activeAssessmentSubject, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return filtered.ToArray();
     }
+
+    private bool IsAssessmentCategorySelected() =>
+        string.Equals(activeStudentContentCategory, "Assessments", StringComparison.OrdinalIgnoreCase);
+
+    private IReadOnlyList<string> GetAssessmentSubjects(StudentStudyContent content) =>
+        content.Items
+            .Where(item => string.Equals(item.Category, "Assessments", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(item.Subject))
+            .Select(item => item.Subject)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+    private string GetAssessmentSubjectTabClass(string subject) =>
+        ("timetable-tab " + (string.Equals(activeAssessmentSubject, subject, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)).Trim();
 
     private string GetStudentContentTabClass(string className) =>
         ("timetable-tab " + (string.Equals(activeStudentContentClass, className, StringComparison.OrdinalIgnoreCase) ? "active" : string.Empty)).Trim();
@@ -1495,4 +1701,12 @@
             AdditionalDetails = string.Empty;
         }
     }
+
+    private sealed class AssessmentAnswerState(int questionNumber)
+    {
+        public int QuestionNumber { get; } = questionNumber;
+
+        public string Response { get; set; } = string.Empty;
+    }
+
 }

@@ -14,9 +14,9 @@ public sealed class SchoolConnectOptions
 
     public List<QuickAction> QuickActions { get; set; } = [];
 
-    public List<RoleModule> StudentModules { get; set; } = [];
+    public List<RoleModuleOptions> StudentModules { get; set; } = [];
 
-    public List<RoleModule> TeacherModules { get; set; } = [];
+    public List<RoleModuleOptions> TeacherModules { get; set; } = [];
 
     public List<BusRoute> BusRoutes { get; set; } = [];
 
@@ -33,6 +33,15 @@ public sealed class SchoolConnectOptions
     public List<StudentProgressOptions> StudentProgresses { get; set; } = [];
 
     public List<GalleryYearGroupOptions> GalleryYearGroups { get; set; } = [];
+}
+
+public sealed class RoleModuleOptions
+{
+    public string Title { get; set; } = string.Empty;
+
+    public string Description { get; set; } = string.Empty;
+
+    public List<string> Tasks { get; set; } = [];
 }
 
 public sealed class SchoolIdentityOptions
@@ -173,6 +182,8 @@ public sealed class StudentContentOptions
 public sealed class StudentContentItemOptions
 {
     public string Category { get; set; } = string.Empty;
+
+    public string Subject { get; set; } = string.Empty;
 
     public string Title { get; set; } = string.Empty;
 

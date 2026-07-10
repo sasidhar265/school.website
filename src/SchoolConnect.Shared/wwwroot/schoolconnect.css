@@ -3036,3 +3036,20 @@ html {
         grid-template-columns: 1fr;
     }
 }
+.assessment-choice-list > div {
+    display: grid;
+    gap: 0.65rem;
+    margin-top: 0.5rem;
+}
+
+.assessment-choice {
+    align-items: center;
+    display: flex;
+    min-height: 2.85rem;
+    white-space: normal;
+    width: 100%;
+}
+
+.assessment-choice input {
+    flex: 0 0 auto;
+}

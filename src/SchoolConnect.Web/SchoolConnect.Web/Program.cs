@@ -12,6 +12,9 @@ var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
     WebRootPath = webRootPath
 });
 
+// CreateEmptyBuilder still supplies default configuration providers. Replace them
+// before loading the copied appsettings files so nested arrays are not bound twice.
+builder.Configuration.Sources.Clear();
 builder.Configuration.SetBasePath(AppContext.BaseDirectory);
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
 builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false);
