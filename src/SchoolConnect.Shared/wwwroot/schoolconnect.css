@@ -3053,3 +3053,33 @@ html {
 .assessment-choice input {
     flex: 0 0 auto;
 }
+/* Persistent English/Telugu control shared by every page and portal view. */
+.language-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1100;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    min-height: 44px;
+    padding: .65rem 1rem;
+    border: 1px solid rgba(255, 255, 255, .45);
+    border-radius: 999px;
+    color: #fff;
+    background: #14532d;
+    box-shadow: 0 8px 24px rgba(20, 83, 45, .28);
+    font-weight: 700;
+}
+
+.language-toggle:hover,
+.language-toggle:focus-visible {
+    color: #14532d;
+    background: #facc15;
+    outline: 3px solid rgba(250, 204, 21, .35);
+    outline-offset: 2px;
+}
+
+html[lang="te"] body {
+    font-family: "Noto Sans Telugu", "Nirmala UI", system-ui, sans-serif;
+}
