@@ -21,6 +21,19 @@ builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.Environment
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddCommandLine(args);
 builder.WebHost.UseKestrel();
+
+// Cloud hosts such as Render provide the public HTTP port through PORT.
+// Bind to every container interface so the platform's proxy can reach Kestrel.
+var platformPort = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(platformPort))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{platformPort}");
+}
+else if (!string.IsNullOrWhiteSpace(builder.Configuration["ASPNETCORE_URLS"]))
+{
+    builder.WebHost.UseUrls(builder.Configuration["ASPNETCORE_URLS"]!);
+}
+
 builder.WebHost.UseStaticWebAssets();
 
 // Add services to the container.

@@ -46,6 +46,19 @@ dotnet build src/SchoolConnect.Mobile/SchoolConnect.Mobile.csproj -f net8.0-ios
 
 iOS builds require Xcode and Apple signing setup on macOS. Android builds require the Android SDK/emulator setup from the MAUI workload.
 
+## Deploy as a Website on Render
+
+The repository includes a production `Dockerfile` and `render.yaml` Blueprint.
+
+1. Sign in to Render and choose **New > Blueprint**.
+2. Connect the `sasidhar265/school.website` GitHub repository.
+3. Keep `render.yaml` as the Blueprint path and apply the Blueprint.
+4. Open the generated `schoolconnect-web.onrender.com` address after the first deployment completes.
+
+Render supplies the `PORT` environment variable automatically. The application binds to that port on `0.0.0.0`. Each push to `master` triggers a new deployment.
+
+The site works with the configuration fallback and does not require a database. To persist edited content in PostgreSQL, add a Render PostgreSQL database and set the web service secret named `ConnectionStrings__SchoolConnectDb` to its connection string.
+
 ## Next Production Work
 
 - Replace the demo login flow with hashed credentials and real role-based identity.

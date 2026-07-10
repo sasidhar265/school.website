@@ -1,0 +1,14 @@
+.git
+.agents
+.codex
+.vs
+.vscode
+**/bin
+**/obj
+**/TestResults
+screenshots
+docs
+tests
+*.user
+*.suo
+*.binlog
