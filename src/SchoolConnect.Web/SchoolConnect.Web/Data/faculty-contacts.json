@@ -1,0 +1,21 @@
+{
+  "SchoolConnect": {
+    "FacultyContacts": [
+      {
+        "Name": "S. Priya",
+        "Role": "Principal",
+        "Phone": "+91 90000 10001"
+      },
+      {
+        "Name": "K. Ravi",
+        "Role": "Admissions",
+        "Phone": "+91 90000 10002"
+      },
+      {
+        "Name": "M. Anusha",
+        "Role": "Transport Coordinator",
+        "Phone": "+91 90000 10003"
+      }
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "SchoolConnect": {
+    "School": {
+      "Name": "Sri Venkateswara Convent",
+      "ShortName": "SVC",
+      "Tagline": "Digital school operations for parents, students, teachers, and administrators.",
+      "Location": "Bayyavaram, Krosur Mandal, Palnadu District, Andhra Pradesh, India",
+      "Phone": "+91 98765 43210",
+      "Email": "office@srivenkateswaraconvent.in",
+      "AdmissionsBanner": "Admissions Open 2026-2027",
+      "AdmissionsHeadline": "Ready to join the 2026-2027 academic year?",
+      "CampusLabel": "Bayyavaram Campus",
+      "CampusMapTitle": "Visit Sri Venkateswara Convent",
+      "BoardLabel": "State Board",
+      "StateLabel": "Andhra Pradesh"
+    }
+  }
+}

@@ -22,6 +22,8 @@ That keeps UI, validation, and school workflows in one shared codebase.
 
 Set `ConnectionStrings:SchoolConnectDb` in `src/SchoolConnect.Web/SchoolConnect.Web/appsettings.json` or through an environment variable before production deployment.
 
+Application-level settings remain in `appsettings.json`. Editable school content is split by feature under `src/SchoolConnect.Web/SchoolConnect.Web/Data`, including school identity, authentication, notices, academics, transport, gallery, and student records.
+
 ```bash
 dotnet restore src/SchoolConnect.Web/SchoolConnect.Web/SchoolConnect.Web.csproj --ignore-failed-sources
 dotnet run --project src/SchoolConnect.Web/SchoolConnect.Web/SchoolConnect.Web.csproj

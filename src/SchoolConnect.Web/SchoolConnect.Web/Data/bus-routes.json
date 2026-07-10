@@ -1,0 +1,24 @@
+{
+  "SchoolConnect": {
+    "BusRoutes": [
+      {
+        "Name": "Route A",
+        "StartsAt": "7:10 AM",
+        "Areas": "Bayyavaram, Krosur, local village stops",
+        "Driver": "Ramesh"
+      },
+      {
+        "Name": "Route B",
+        "StartsAt": "7:00 AM",
+        "Areas": "Krosur Mandal nearby routes and Palnadu rural stops",
+        "Driver": "Suresh"
+      },
+      {
+        "Name": "Route C",
+        "StartsAt": "7:20 AM",
+        "Areas": "Bayyavaram school route and parent pickup points",
+        "Driver": "Lakshmi"
+      }
+    ]
+  }
+}

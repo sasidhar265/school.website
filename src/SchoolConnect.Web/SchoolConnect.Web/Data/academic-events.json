@@ -1,0 +1,21 @@
+{
+  "SchoolConnect": {
+    "AcademicEvents": [
+      {
+        "Date": "15 Jul",
+        "Title": "Science Lab Orientation",
+        "Description": "Hands-on safety briefing for classes 8-10."
+      },
+      {
+        "Date": "19 Jul",
+        "Title": "Foundational Literacy Review",
+        "Description": "Assessment for primary classes with teacher feedback."
+      },
+      {
+        "Date": "26 Jul",
+        "Title": "Sports Selection Trials",
+        "Description": "Kho-kho, kabaddi, cricket, and athletics selection."
+      }
+    ]
+  }
+}

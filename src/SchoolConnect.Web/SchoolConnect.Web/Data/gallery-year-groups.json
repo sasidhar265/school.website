@@ -1,0 +1,57 @@
+{
+  "SchoolConnect": {
+    "GalleryYearGroups": [
+      {
+        "PassedOutYear": "2025",
+        "Title": "Class 5 Memories - 2025",
+        "Description": "Photos and moments from students who completed their primary schooling in 2025.",
+        "Photos": [
+          {
+            "Title": "Farewell Day",
+            "Caption": "A memory from the final school gathering before students moved to the next stage.",
+            "ImageUrl": "_content/SchoolConnect.Shared/home-classroom.jpg"
+          },
+          {
+            "Title": "Activity Practice",
+            "Caption": "Students participating in school activities during the academic year.",
+            "ImageUrl": "_content/SchoolConnect.Shared/home-sports.jpg"
+          }
+        ]
+      },
+      {
+        "PassedOutYear": "2024",
+        "Title": "Class 5 Memories - 2024",
+        "Description": "A collection of school memories from the 2024 passed-out batch.",
+        "Photos": [
+          {
+            "Title": "Campus Memory",
+            "Caption": "A school-day memory captured on campus.",
+            "ImageUrl": "_content/SchoolConnect.Shared/home-campus.jpg"
+          },
+          {
+            "Title": "Classroom Moment",
+            "Caption": "Students during a regular classroom learning session.",
+            "ImageUrl": "_content/SchoolConnect.Shared/home-classroom.jpg"
+          }
+        ]
+      },
+      {
+        "PassedOutYear": "2023",
+        "Title": "Class 5 Memories - 2023",
+        "Description": "Old school photos and moments from the 2023 passed-out batch.",
+        "Photos": [
+          {
+            "Title": "School Activities",
+            "Caption": "A remembered activity from the school year.",
+            "ImageUrl": "_content/SchoolConnect.Shared/home-sports.jpg"
+          },
+          {
+            "Title": "School Campus",
+            "Caption": "A campus memory from the passed-out year.",
+            "ImageUrl": "_content/SchoolConnect.Shared/home-campus.jpg"
+          }
+        ]
+      }
+    ]
+  }
+}

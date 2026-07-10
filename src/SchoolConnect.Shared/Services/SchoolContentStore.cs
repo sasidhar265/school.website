@@ -52,7 +52,7 @@ public sealed class SchoolContentStore
         }
         catch (Exception ex)
         {
-            logger.LogWarning(ex, "Falling back to appsettings content because PostgreSQL content load failed.");
+            logger.LogWarning(ex, "Falling back to JSON configuration content because PostgreSQL content load failed.");
             return seed;
         }
     }

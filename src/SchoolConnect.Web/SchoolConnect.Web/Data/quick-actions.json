@@ -1,0 +1,30 @@
+{
+  "SchoolConnect": {
+    "QuickActions": [
+      {
+        "Title": "Student Login",
+        "Description": "Academic dashboard for timetable, curriculum, lessons, assignments, fees, and notices.",
+        "Route": "/student-login",
+        "Metric": "Learn"
+      },
+      {
+        "Title": "Teacher Login",
+        "Description": "Teacher workspace for student records, academics, attendance, communication, and admin tasks.",
+        "Route": "/teacher-login",
+        "Metric": "Manage"
+      },
+      {
+        "Title": "Admissions",
+        "Description": "Admission enquiries, document collection, and fee confirmation.",
+        "Route": "/admissions",
+        "Metric": "Open"
+      },
+      {
+        "Title": "Notices",
+        "Description": "Latest circulars, events, and school-wide announcements.",
+        "Route": "/notices",
+        "Metric": "3"
+      }
+    ]
+  }
+}

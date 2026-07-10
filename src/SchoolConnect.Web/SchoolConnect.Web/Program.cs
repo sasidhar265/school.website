@@ -13,11 +13,40 @@ var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
 });
 
 // CreateEmptyBuilder still supplies default configuration providers. Replace them
-// before loading the copied appsettings files so nested arrays are not bound twice.
+// before loading application settings and the separate school-content files so
+// nested arrays are not bound twice.
 builder.Configuration.Sources.Clear();
 builder.Configuration.SetBasePath(AppContext.BaseDirectory);
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
 builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: false);
+
+string[] schoolContentFiles =
+[
+    "school.json",
+    "portal-auth.json",
+    "notices.json",
+    "academic-events.json",
+    "quick-actions.json",
+    "student-modules.json",
+    "teacher-modules.json",
+    "bus-routes.json",
+    "faculty-contacts.json",
+    "about-us.json",
+    "student-timetables.json",
+    "student-curricula.json",
+    "student-contents.json",
+    "student-progresses.json",
+    "gallery-year-groups.json"
+];
+
+foreach (var schoolContentFile in schoolContentFiles)
+{
+    builder.Configuration.AddJsonFile(
+        Path.Combine("Data", schoolContentFile),
+        optional: false,
+        reloadOnChange: false);
+}
+
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddCommandLine(args);
 builder.WebHost.UseKestrel();

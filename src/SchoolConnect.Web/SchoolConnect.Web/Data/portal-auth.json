@@ -1,0 +1,27 @@
+{
+  "SchoolConnect": {
+    "PortalAuth": {
+      "Student": {
+        "Pin": "STU1001",
+        "Password": "student@123",
+        "DisplayName": "Student User",
+        "ClassName": "Class 5",
+        "Gender": "Male",
+        "GuardianName": "Parent / Guardian Name",
+        "MobileNumber": "+91 90000 20001",
+        "ClassTeacher": "S. Priya",
+        "SchoolJoinedYear": "2022"
+      },
+      "Teacher": {
+        "Pin": "TCH1001",
+        "Password": "teacher@123",
+        "DisplayName": "Teacher User",
+        "ClassName": "Staff",
+        "Gender": "Female",
+        "ClassDealingWith": "Class 5",
+        "Subject": "English",
+        "Qualification": "B.Ed"
+      }
+    }
+  }
+}

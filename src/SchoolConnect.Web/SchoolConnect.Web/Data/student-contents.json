@@ -1,0 +1,182 @@
+{
+  "SchoolConnect": {
+    "StudentContents": [
+      {
+        "ClassName": "Nursery",
+        "Categories": [
+          "Notes",
+          "Worksheets",
+          "Activities"
+        ],
+        "Items": [
+          {
+            "Category": "Activities",
+            "Title": "Alphabet tracing",
+            "Detail": "Trace letters with teacher-guided strokes and picture prompts.",
+            "ActionLabel": "Open activity"
+          },
+          {
+            "Category": "Worksheets",
+            "Title": "Colour and match sheet",
+            "Detail": "Match colours, shapes, and objects using playful classroom exercises.",
+            "ActionLabel": "Download sheet"
+          }
+        ]
+      },
+      {
+        "ClassName": "LKG",
+        "Categories": [
+          "Notes",
+          "Worksheets",
+          "Practice"
+        ],
+        "Items": [
+          {
+            "Category": "Notes",
+            "Title": "Rhymes and reading sheet",
+            "Detail": "Short rhymes, listening practice, and spoken repetition support.",
+            "ActionLabel": "View notes"
+          },
+          {
+            "Category": "Practice",
+            "Title": "Number practice bundle",
+            "Detail": "Counting, matching, and handwriting practice for daily revision.",
+            "ActionLabel": "Open practice"
+          }
+        ]
+      },
+      {
+        "ClassName": "UKG",
+        "Categories": [
+          "Notes",
+          "Worksheets",
+          "Homework"
+        ],
+        "Items": [
+          {
+            "Category": "Homework",
+            "Title": "Weekly reading homework",
+            "Detail": "Simple sentences, sight words, and guided reading tasks.",
+            "ActionLabel": "View homework"
+          },
+          {
+            "Category": "Worksheets",
+            "Title": "Pattern and writing sheet",
+            "Detail": "Pattern recognition and controlled writing practice.",
+            "ActionLabel": "Download sheet"
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 1",
+        "Categories": [
+          "Notes",
+          "Worksheets",
+          "Homework"
+        ],
+        "Items": [
+          {
+            "Category": "Notes",
+            "Title": "English lesson notes",
+            "Detail": "Phonics, short reading passages, and sentence building support.",
+            "ActionLabel": "View notes"
+          },
+          {
+            "Category": "Homework",
+            "Title": "Maths practice set",
+            "Detail": "Number writing, addition drills, and guided sums for revision.",
+            "ActionLabel": "Open homework"
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 2",
+        "Categories": [
+          "Notes",
+          "Worksheets",
+          "Homework"
+        ],
+        "Items": [
+          {
+            "Category": "Notes",
+            "Title": "EVS concept notes",
+            "Detail": "Home, school, plants, and daily life topics with examples.",
+            "ActionLabel": "View notes"
+          },
+          {
+            "Category": "Worksheets",
+            "Title": "Maths worksheet pack",
+            "Detail": "Tables, sums, and word problem worksheets for weekly practice.",
+            "ActionLabel": "Download pack"
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 3",
+        "Categories": [
+          "Notes",
+          "Worksheets",
+          "Homework"
+        ],
+        "Items": [
+          {
+            "Category": "Notes",
+            "Title": "Science revision notes",
+            "Detail": "Living things, materials, and environment with short examples.",
+            "ActionLabel": "View notes"
+          },
+          {
+            "Category": "Homework",
+            "Title": "Social studies task",
+            "Detail": "Map reading, local surroundings, and community based homework.",
+            "ActionLabel": "Open homework"
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 4",
+        "Categories": [
+          "Notes",
+          "Worksheets",
+          "Homework"
+        ],
+        "Items": [
+          {
+            "Category": "Notes",
+            "Title": "English grammar notes",
+            "Detail": "Parts of speech, paragraph writing, and reading comprehension.",
+            "ActionLabel": "View notes"
+          },
+          {
+            "Category": "Worksheets",
+            "Title": "Science activity sheet",
+            "Detail": "Short experiments, diagrams, and observation exercises.",
+            "ActionLabel": "Download sheet"
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 5",
+        "Categories": [
+          "Notes",
+          "Worksheets",
+          "Homework"
+        ],
+        "Items": [
+          {
+            "Category": "Notes",
+            "Title": "History and civics notes",
+            "Detail": "Core points for Indian history, civic sense, and local governance.",
+            "ActionLabel": "View notes"
+          },
+          {
+            "Category": "Homework",
+            "Title": "Science revision homework",
+            "Detail": "Short answer practice, concept recap, and weekly self-checks.",
+            "ActionLabel": "Open homework"
+          }
+        ]
+      }
+    ]
+  }
+}

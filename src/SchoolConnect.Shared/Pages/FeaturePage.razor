@@ -1011,8 +1011,19 @@
     private async Task SignOut(string role)
     {
         PortalSession.SignOut(role);
-        await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", PortalSessionService.BrowserSessionRoleKey);
-        Navigation.NavigateTo("/login");
+
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", PortalSessionService.BrowserSessionRoleKey);
+            await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", "schoolconnect.alreadyLoggedInNotice");
+        }
+        catch
+        {
+            // The authenticated server-side session is already cleared, so sign-out
+            // should still return home when browser storage is unavailable.
+        }
+
+        Navigation.NavigateTo("/");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

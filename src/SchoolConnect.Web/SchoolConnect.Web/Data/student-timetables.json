@@ -1,0 +1,582 @@
+{
+  "SchoolConnect": {
+    "StudentTimetables": [
+      {
+        "ClassName": "Nursery",
+        "PeriodLabels": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5"
+        ],
+        "Days": [
+          {
+            "Day": "Monday",
+            "Lessons": [
+              "Circle Time",
+              "Rhymes",
+              "Colors",
+              "Story Time",
+              "Free Play"
+            ]
+          },
+          {
+            "Day": "Tuesday",
+            "Lessons": [
+              "Greeting",
+              "Shapes",
+              "Numbers",
+              "Craft",
+              "Outdoor Play"
+            ]
+          },
+          {
+            "Day": "Wednesday",
+            "Lessons": [
+              "Mind Warm-up",
+              "Alphabet Fun",
+              "Rhymes",
+              "Art",
+              "Puzzle Time"
+            ]
+          },
+          {
+            "Day": "Thursday",
+            "Lessons": [
+              "Circle Talk",
+              "Counting",
+              "Drawing",
+              "Story Time",
+              "Music"
+            ]
+          },
+          {
+            "Day": "Friday",
+            "Lessons": [
+              "Greeting",
+              "Colors",
+              "Tracing",
+              "Clay Work",
+              "Play Corner"
+            ]
+          },
+          {
+            "Day": "Saturday",
+            "Lessons": [
+              "Assembly",
+              "Rhymes",
+              "Revision",
+              "Game Time",
+              "Show and Tell"
+            ]
+          }
+        ]
+      },
+      {
+        "ClassName": "LKG",
+        "PeriodLabels": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5"
+        ],
+        "Days": [
+          {
+            "Day": "Monday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Rhymes",
+              "EVS",
+              "Art"
+            ]
+          },
+          {
+            "Day": "Tuesday",
+            "Lessons": [
+              "Telugu",
+              "Maths",
+              "English",
+              "EVS",
+              "Games"
+            ]
+          },
+          {
+            "Day": "Wednesday",
+            "Lessons": [
+              "English",
+              "Number Work",
+              "Story",
+              "Drawing",
+              "Reading"
+            ]
+          },
+          {
+            "Day": "Thursday",
+            "Lessons": [
+              "Maths",
+              "English",
+              "Telugu",
+              "EVS",
+              "Music"
+            ]
+          },
+          {
+            "Day": "Friday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Rhymes",
+              "Craft",
+              "Story Time"
+            ]
+          },
+          {
+            "Day": "Saturday",
+            "Lessons": [
+              "Revision",
+              "Reading",
+              "Maths Fun",
+              "Activity",
+              "Show and Tell"
+            ]
+          }
+        ]
+      },
+      {
+        "ClassName": "UKG",
+        "PeriodLabels": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5"
+        ],
+        "Days": [
+          {
+            "Day": "Monday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "EVS",
+              "Art"
+            ]
+          },
+          {
+            "Day": "Tuesday",
+            "Lessons": [
+              "Maths",
+              "English",
+              "Writing",
+              "EVS",
+              "Games"
+            ]
+          },
+          {
+            "Day": "Wednesday",
+            "Lessons": [
+              "English",
+              "Number Work",
+              "Telugu",
+              "Reading",
+              "Music"
+            ]
+          },
+          {
+            "Day": "Thursday",
+            "Lessons": [
+              "Maths",
+              "English",
+              "EVS",
+              "Craft",
+              "Story Time"
+            ]
+          },
+          {
+            "Day": "Friday",
+            "Lessons": [
+              "Telugu",
+              "English",
+              "Maths",
+              "Drawing",
+              "Activity"
+            ]
+          },
+          {
+            "Day": "Saturday",
+            "Lessons": [
+              "Revision",
+              "Reading",
+              "Puzzle Work",
+              "Games",
+              "Show and Tell"
+            ]
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 1",
+        "PeriodLabels": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5"
+        ],
+        "Days": [
+          {
+            "Day": "Monday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "EVS",
+              "Art"
+            ]
+          },
+          {
+            "Day": "Tuesday",
+            "Lessons": [
+              "Maths",
+              "English",
+              "Hindi",
+              "EVS",
+              "Games"
+            ]
+          },
+          {
+            "Day": "Wednesday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "Reading",
+              "GK"
+            ]
+          },
+          {
+            "Day": "Thursday",
+            "Lessons": [
+              "EVS",
+              "Maths",
+              "English",
+              "Writing",
+              "Music"
+            ]
+          },
+          {
+            "Day": "Friday",
+            "Lessons": [
+              "English",
+              "Telugu",
+              "Maths",
+              "EVS",
+              "Craft"
+            ]
+          },
+          {
+            "Day": "Saturday",
+            "Lessons": [
+              "Revision",
+              "Reading",
+              "Maths Practice",
+              "Value Education",
+              "Activity"
+            ]
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 2",
+        "PeriodLabels": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5"
+        ],
+        "Days": [
+          {
+            "Day": "Monday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "EVS",
+              "Computer"
+            ]
+          },
+          {
+            "Day": "Tuesday",
+            "Lessons": [
+              "Maths",
+              "English",
+              "Hindi",
+              "EVS",
+              "Games"
+            ]
+          },
+          {
+            "Day": "Wednesday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "Reading",
+              "GK"
+            ]
+          },
+          {
+            "Day": "Thursday",
+            "Lessons": [
+              "EVS",
+              "Maths",
+              "English",
+              "Writing",
+              "Music"
+            ]
+          },
+          {
+            "Day": "Friday",
+            "Lessons": [
+              "English",
+              "Telugu",
+              "Maths",
+              "Computer",
+              "Craft"
+            ]
+          },
+          {
+            "Day": "Saturday",
+            "Lessons": [
+              "Revision",
+              "Reading",
+              "Maths Practice",
+              "Value Education",
+              "Activity"
+            ]
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 3",
+        "PeriodLabels": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5"
+        ],
+        "Days": [
+          {
+            "Day": "Monday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "Science",
+              "Computer"
+            ]
+          },
+          {
+            "Day": "Tuesday",
+            "Lessons": [
+              "Maths",
+              "English",
+              "Hindi",
+              "EVS",
+              "Games"
+            ]
+          },
+          {
+            "Day": "Wednesday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "Social",
+              "GK"
+            ]
+          },
+          {
+            "Day": "Thursday",
+            "Lessons": [
+              "Science",
+              "Maths",
+              "English",
+              "Writing",
+              "Music"
+            ]
+          },
+          {
+            "Day": "Friday",
+            "Lessons": [
+              "English",
+              "Telugu",
+              "Maths",
+              "Computer",
+              "Art"
+            ]
+          },
+          {
+            "Day": "Saturday",
+            "Lessons": [
+              "Revision",
+              "Reading",
+              "Maths Practice",
+              "Value Education",
+              "Activity"
+            ]
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 4",
+        "PeriodLabels": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5"
+        ],
+        "Days": [
+          {
+            "Day": "Monday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "Science",
+              "Computer"
+            ]
+          },
+          {
+            "Day": "Tuesday",
+            "Lessons": [
+              "Maths",
+              "English",
+              "Hindi",
+              "Social",
+              "Games"
+            ]
+          },
+          {
+            "Day": "Wednesday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "Science",
+              "GK"
+            ]
+          },
+          {
+            "Day": "Thursday",
+            "Lessons": [
+              "Science",
+              "Maths",
+              "English",
+              "Social",
+              "Music"
+            ]
+          },
+          {
+            "Day": "Friday",
+            "Lessons": [
+              "English",
+              "Telugu",
+              "Maths",
+              "Computer",
+              "Art"
+            ]
+          },
+          {
+            "Day": "Saturday",
+            "Lessons": [
+              "Revision",
+              "Reading",
+              "Maths Practice",
+              "Value Education",
+              "Activity"
+            ]
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 5",
+        "PeriodLabels": [
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5"
+        ],
+        "Days": [
+          {
+            "Day": "Monday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "Science",
+              "Computer"
+            ]
+          },
+          {
+            "Day": "Tuesday",
+            "Lessons": [
+              "Maths",
+              "English",
+              "Hindi",
+              "Social",
+              "Games"
+            ]
+          },
+          {
+            "Day": "Wednesday",
+            "Lessons": [
+              "English",
+              "Maths",
+              "Telugu",
+              "Science",
+              "GK"
+            ]
+          },
+          {
+            "Day": "Thursday",
+            "Lessons": [
+              "Science",
+              "Maths",
+              "English",
+              "Social",
+              "Music"
+            ]
+          },
+          {
+            "Day": "Friday",
+            "Lessons": [
+              "English",
+              "Telugu",
+              "Maths",
+              "Computer",
+              "Art"
+            ]
+          },
+          {
+            "Day": "Saturday",
+            "Lessons": [
+              "Revision",
+              "Reading",
+              "Maths Practice",
+              "Value Education",
+              "Activity"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

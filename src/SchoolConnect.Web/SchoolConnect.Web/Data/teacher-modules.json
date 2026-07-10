@@ -1,0 +1,60 @@
+{
+  "SchoolConnect": {
+    "TeacherModules": [
+      {
+        "Title": "Student Academic View",
+        "Description": "Everything available to students, including timetable, curriculum, content, assignments, and progress.",
+        "Tasks": [
+          "Open student timetable",
+          "Review curriculum",
+          "Audit submitted homework"
+        ]
+      },
+      {
+        "Title": "Attendance Management",
+        "Description": "Mark daily attendance, update late entries, approve corrections, and notify parents.",
+        "Tasks": [
+          "Mark class attendance",
+          "Review absentee list",
+          "Send absence alerts"
+        ]
+      },
+      {
+        "Title": "Academic Content Admin",
+        "Description": "Create and maintain lesson plans, curriculum units, study material, homework, and exam schedules.",
+        "Tasks": [
+          "Upload study content",
+          "Publish homework",
+          "Update exam timetable"
+        ]
+      },
+      {
+        "Title": "Student Records",
+        "Description": "Maintain profiles, guardian contacts, health notes, fee status visibility, and progress records.",
+        "Tasks": [
+          "Search student records",
+          "Update remarks",
+          "Export class reports"
+        ]
+      },
+      {
+        "Title": "School Management",
+        "Description": "Operational tasks for notices, circulars, events, transport coordination, staff communication, and maintenance requests.",
+        "Tasks": [
+          "Publish circulars",
+          "Manage events",
+          "Raise maintenance tasks"
+        ]
+      },
+      {
+        "Title": "Administration Reports",
+        "Description": "Class summaries, attendance trends, academic progress, fee follow-up lists, and management dashboards.",
+        "Tasks": [
+          "Generate reports",
+          "Review class metrics",
+          "Share admin summaries"
+        ]
+      }
+    ]
+  }
+}

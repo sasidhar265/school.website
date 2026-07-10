@@ -1,0 +1,25 @@
+{
+  "SchoolConnect": {
+    "AboutUs": {
+      "Title": "Welcome to Our School",
+      "Summary": "With a proud legacy of 35+ years of excellence in education, our school has been committed to shaping young minds through quality learning, strong values, and holistic development.",
+      "Highlights": [
+        "Over 35 years of trusted educational excellence",
+        "Quality education from Nursery to Class 5",
+        "Telugu Medium and English Medium instruction",
+        "Dedicated and experienced teaching faculty",
+        "Strong emphasis on academics, discipline, and moral values",
+        "Safe, caring, and child-friendly learning environment",
+        "Holistic development through co-curricular and extracurricular activities",
+        "A proud alumni network of 1,000+ successful students serving in various professions across the globe"
+      ],
+      "Principles": [
+        "Academic excellence",
+        "Creativity and curiosity",
+        "Discipline and character",
+        "Confidence and responsibility",
+        "Compassion and moral values"
+      ]
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "SchoolConnect": {
+    "StudentProgresses": [
+      {
+        "ClassName": "Nursery",
+        "Attendance": "96%",
+        "Status": "Very Good",
+        "Remark": "Regular attendance and steady classroom participation.",
+        "Subjects": [
+          {
+            "Subject": "Motor Skills",
+            "Score": "A",
+            "Remark": "Shows confidence in guided activities."
+          },
+          {
+            "Subject": "Rhymes",
+            "Score": "A",
+            "Remark": "Recites with clarity and enthusiasm."
+          }
+        ]
+      },
+      {
+        "ClassName": "LKG",
+        "Attendance": "95%",
+        "Status": "Good",
+        "Remark": "Consistent attendance with positive progress in early learning.",
+        "Subjects": [
+          {
+            "Subject": "English",
+            "Score": "A",
+            "Remark": "Recognises words and follows instructions well."
+          },
+          {
+            "Subject": "Maths",
+            "Score": "A-",
+            "Remark": "Shows good counting and matching skills."
+          }
+        ]
+      },
+      {
+        "ClassName": "UKG",
+        "Attendance": "94%",
+        "Status": "Good",
+        "Remark": "Keeps pace with classwork and participates in activities.",
+        "Subjects": [
+          {
+            "Subject": "English",
+            "Score": "A",
+            "Remark": "Reads simple sentences and writes neatly."
+          },
+          {
+            "Subject": "EVS",
+            "Score": "A-",
+            "Remark": "Understands familiar topics clearly."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 1",
+        "Attendance": "93%",
+        "Status": "Good",
+        "Remark": "Shows steady growth in reading and arithmetic.",
+        "Subjects": [
+          {
+            "Subject": "English",
+            "Score": "A-",
+            "Remark": "Improving fluency and comprehension."
+          },
+          {
+            "Subject": "Maths",
+            "Score": "A",
+            "Remark": "Strong progress in number work."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 2",
+        "Attendance": "92%",
+        "Status": "Good",
+        "Remark": "Maintains classroom discipline and task completion.",
+        "Subjects": [
+          {
+            "Subject": "English",
+            "Score": "A-",
+            "Remark": "Writes complete sentences with support."
+          },
+          {
+            "Subject": "Maths",
+            "Score": "B+",
+            "Remark": "Needs more speed in tables practice."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 3",
+        "Attendance": "91%",
+        "Status": "Satisfactory",
+        "Remark": "Needs a little more consistency in homework submission.",
+        "Subjects": [
+          {
+            "Subject": "Science",
+            "Score": "B+",
+            "Remark": "Understands concepts but needs revision."
+          },
+          {
+            "Subject": "Social Studies",
+            "Score": "A-",
+            "Remark": "Answers classroom questions well."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 4",
+        "Attendance": "90%",
+        "Status": "Satisfactory",
+        "Remark": "Can improve regularity in revision and test preparation.",
+        "Subjects": [
+          {
+            "Subject": "English",
+            "Score": "A-",
+            "Remark": "Good comprehension with better writing needed."
+          },
+          {
+            "Subject": "Maths",
+            "Score": "B+",
+            "Remark": "Works steadily on fractions and division."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 5",
+        "Attendance": "89%",
+        "Status": "Needs Focus",
+        "Remark": "Encourage daily revision and timely homework completion.",
+        "Subjects": [
+          {
+            "Subject": "Science",
+            "Score": "B+",
+            "Remark": "Understands key ideas and needs revision."
+          },
+          {
+            "Subject": "Social Studies",
+            "Score": "A-",
+            "Remark": "Shows good awareness of civic topics."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "SchoolConnect": {
+    "StudentModules": [
+      {
+        "Title": "Timetable",
+        "Description": "Daily and weekly class schedule with subject, teacher, room, and period timings.",
+        "Tasks": [
+          "View today's classes",
+          "Download weekly timetable",
+          "Track exam timetable updates"
+        ]
+      },
+      {
+        "Title": "Curriculum",
+        "Description": "Class-wise syllabus, lesson plan, subjects, learning outcomes, and academic calendar.",
+        "Tasks": [
+          "Review subject syllabus",
+          "Open lesson units",
+          "Check completion status"
+        ]
+      },
+      {
+        "Title": "Study Content",
+        "Description": "Digital academic content for students, including notes, worksheets, assignments, and reference material.",
+        "Tasks": [
+          "Open class notes",
+          "Submit homework",
+          "Download worksheets"
+        ]
+      },
+      {
+        "Title": "Attendance and Progress",
+        "Description": "Attendance percentage, performance summaries, teacher remarks, and parent-visible progress updates.",
+        "Tasks": [
+          "Check attendance",
+          "Review marks",
+          "Read teacher feedback"
+        ]
+      },
+      {
+        "Title": "School Details",
+        "Description": "Student profile, fee status, notices, transport details, and contact information.",
+        "Tasks": [
+          "View notices",
+          "Check fee receipts",
+          "Review bus route"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "SchoolConnect": {
+    "Notices": [
+      {
+        "Title": "Unit Test Timetable Published",
+        "Audience": "Classes 6-10",
+        "Date": "08 Jul 2026",
+        "Summary": "Students can review the timetable and subject-wise portions in the academics section.",
+        "Priority": "High"
+      },
+      {
+        "Title": "Parent Teacher Meeting",
+        "Audience": "Parents",
+        "Date": "12 Jul 2026",
+        "Summary": "Class teachers will be available between 9:30 AM and 1:00 PM.",
+        "Priority": "Medium"
+      },
+      {
+        "Title": "Monsoon Transport Advisory",
+        "Audience": "Bus Students",
+        "Date": "07 Jul 2026",
+        "Summary": "Buses may run 10 minutes early during heavy rain. Track route status before pickup.",
+        "Priority": "Medium"
+      }
+    ]
+  }
+}

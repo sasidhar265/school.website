@@ -1,0 +1,542 @@
+{
+  "SchoolConnect": {
+    "StudentCurricula": [
+      {
+        "ClassName": "Nursery",
+        "Subjects": [
+          "English Readiness",
+          "Maths Readiness",
+          "Rhymes",
+          "Motor Skills",
+          "Creative Play"
+        ],
+        "Units": [
+          {
+            "Subject": "English Readiness",
+            "Topics": [
+              "Uppercase letters A-Z",
+              "Picture and object vocabulary",
+              "Listening to short stories",
+              "Pre-writing strokes and patterns",
+              "Speaking in simple phrases"
+            ],
+            "Outcome": "Recognise uppercase letters, follow simple instructions, name familiar objects, and use controlled pre-writing strokes."
+          },
+          {
+            "Subject": "Maths Readiness",
+            "Topics": [
+              "Numbers 1-20",
+              "One-to-one counting",
+              "Circle, square and triangle",
+              "Big and small; more and less",
+              "Sorting by colour, shape and size"
+            ],
+            "Outcome": "Count objects to 20, recognise basic shapes, compare quantities, and sort objects using one attribute."
+          },
+          {
+            "Subject": "Rhymes",
+            "Topics": [
+              "Action rhymes",
+              "Number rhymes",
+              "Animal and nature rhymes",
+              "Rhythm and repetition",
+              "Group recitation"
+            ],
+            "Outcome": "Recite age-appropriate rhymes with actions, rhythm, clear words, and confident group participation."
+          },
+          {
+            "Subject": "Motor Skills",
+            "Topics": [
+              "Pencil and crayon grip",
+              "Tracing and colouring",
+              "Clay modelling and paper tearing",
+              "Balancing, hopping and ball play",
+              "Hand-eye coordination"
+            ],
+            "Outcome": "Show improving hand control, coordination, balance, and safe movement during guided fine- and gross-motor activities."
+          },
+          {
+            "Subject": "Creative Play",
+            "Topics": [
+              "Pretend and role play",
+              "Building blocks and puzzles",
+              "Free drawing and colour exploration",
+              "Sand and water play",
+              "Sharing and turn-taking"
+            ],
+            "Outcome": "Use imagination to create, solve simple play challenges, share materials, and interact positively with classmates."
+          }
+        ]
+      },
+      {
+        "ClassName": "LKG",
+        "Subjects": [
+          "English",
+          "Maths",
+          "Environmental Studies",
+          "Rhymes",
+          "Art"
+        ],
+        "Units": [
+          {
+            "Subject": "English",
+            "Topics": [
+              "Uppercase and lowercase letters",
+              "Initial phonics sounds",
+              "Two- and three-letter words",
+              "Picture reading and vocabulary",
+              "Pre-writing and letter formation"
+            ],
+            "Outcome": "Identify and form letters, connect common sounds to letters, and read or speak familiar short words."
+          },
+          {
+            "Subject": "Maths",
+            "Topics": [
+              "Numbers 1-50",
+              "Counting and number order",
+              "Before, after and between",
+              "Basic shapes and patterns",
+              "More, less and equal"
+            ],
+            "Outcome": "Read and write numbers to 50, compare small quantities, and complete simple shape or number patterns."
+          },
+          {
+            "Subject": "Environmental Studies",
+            "Topics": [
+              "Myself and my family",
+              "Body parts and five senses",
+              "Food, clothes and shelter",
+              "Domestic and wild animals",
+              "Plants, weather and transport"
+            ],
+            "Outcome": "Talk about self, family, surroundings, living things, and healthy daily habits using suitable vocabulary."
+          },
+          {
+            "Subject": "Rhymes",
+            "Topics": [
+              "English action rhymes",
+              "Number and alphabet rhymes",
+              "Nature and festival songs",
+              "Voice modulation",
+              "Individual and group recitation"
+            ],
+            "Outcome": "Recite memorised rhymes with expression, correct sequence, actions, and growing confidence."
+          },
+          {
+            "Subject": "Art",
+            "Topics": [
+              "Colour recognition and mixing",
+              "Drawing with basic shapes",
+              "Colouring within outlines",
+              "Paper folding and collage",
+              "Clay and leaf printing"
+            ],
+            "Outcome": "Use basic art materials safely to create recognisable pictures, patterns, models, and simple craft work."
+          }
+        ]
+      },
+      {
+        "ClassName": "UKG",
+        "Subjects": [
+          "English",
+          "Maths",
+          "Telugu",
+          "EVS",
+          "Art and Craft"
+        ],
+        "Units": [
+          {
+            "Subject": "English",
+            "Topics": [
+              "Phonics and word families",
+              "Common sight words",
+              "Simple sentence reading",
+              "Capital letters and full stops",
+              "Guided sentence writing"
+            ],
+            "Outcome": "Read short sentences fluently, understand their meaning, and write simple sentences with basic punctuation."
+          },
+          {
+            "Subject": "Maths",
+            "Topics": [
+              "Numbers 1-100",
+              "Tens and ones",
+              "Addition and subtraction within 20",
+              "Shapes, patterns and comparisons",
+              "Time, money and measurement awareness"
+            ],
+            "Outcome": "Read and write numbers to 100 and solve simple addition, subtraction, comparison, and everyday maths tasks."
+          },
+          {
+            "Subject": "Telugu",
+            "Topics": [
+              "అచ్చులు and హల్లులు",
+              "Letter recognition and formation",
+              "Simple two-letter words",
+              "Picture vocabulary",
+              "Rhymes and oral expression"
+            ],
+            "Outcome": "Recognise and write foundational Telugu letters, read simple words, and recite short rhymes clearly."
+          },
+          {
+            "Subject": "EVS",
+            "Topics": [
+              "Family, school and neighbourhood",
+              "Healthy food and hygiene",
+              "Plants and animals",
+              "Community helpers",
+              "Seasons, safety and transport"
+            ],
+            "Outcome": "Describe familiar people, places, living things, healthy routines, and basic safety rules."
+          },
+          {
+            "Subject": "Art and Craft",
+            "Topics": [
+              "Drawing and colouring",
+              "Paper folding, cutting and pasting",
+              "Clay modelling",
+              "Pattern and print making",
+              "Festival and nature crafts"
+            ],
+            "Outcome": "Plan and complete simple creative work using colour, shape, texture, and age-appropriate craft techniques."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 1",
+        "Subjects": [
+          "English",
+          "Maths",
+          "Telugu",
+          "EVS",
+          "Computer Basics"
+        ],
+        "Units": [
+          {
+            "Subject": "English",
+            "Topics": [
+              "Phonics and vocabulary",
+              "Nouns, pronouns and action words",
+              "Sentence formation and punctuation",
+              "Short stories and poems",
+              "Guided handwriting and composition"
+            ],
+            "Outcome": "Read short texts, answer direct questions, use basic grammar, and write clear simple sentences."
+          },
+          {
+            "Subject": "Maths",
+            "Topics": [
+              "Numbers and place value to 100",
+              "Addition and subtraction",
+              "Shapes and spatial ideas",
+              "Measurement, time and money",
+              "Patterns and simple word problems"
+            ],
+            "Outcome": "Compare two-digit numbers and solve basic addition, subtraction, measurement, time, money, and pattern problems."
+          },
+          {
+            "Subject": "Telugu",
+            "Topics": [
+              "అచ్చులు, హల్లులు and గుణింతాలు",
+              "Simple words and sentences",
+              "Picture-based vocabulary",
+              "Short poems and stories",
+              "Copywriting and dictation"
+            ],
+            "Outcome": "Read and write familiar Telugu words and simple sentences, and understand short oral or written passages."
+          },
+          {
+            "Subject": "EVS",
+            "Topics": [
+              "My body, family and school",
+              "Food, water and shelter",
+              "Plants and animals around us",
+              "Neighbourhood and community helpers",
+              "Cleanliness, safety and seasons"
+            ],
+            "Outcome": "Observe and describe the immediate environment and practise healthy, clean, safe, and responsible habits."
+          },
+          {
+            "Subject": "Computer Basics",
+            "Topics": [
+              "Uses and parts of a computer",
+              "Keyboard and mouse skills",
+              "Starting and closing programs",
+              "Drawing with a paint program",
+              "Digital safety and care"
+            ],
+            "Outcome": "Identify main computer parts, operate a mouse and keyboard, create a simple drawing, and follow basic safety rules."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 2",
+        "Subjects": [
+          "English",
+          "Maths",
+          "Telugu",
+          "EVS",
+          "Computer"
+        ],
+        "Units": [
+          {
+            "Subject": "English",
+            "Topics": [
+              "Reading stories and poems",
+              "Nouns, verbs, adjectives and articles",
+              "Singular, plural and gender",
+              "Sentence order and punctuation",
+              "Picture composition and paragraph writing"
+            ],
+            "Outcome": "Read age-appropriate texts with understanding and produce connected, grammatically simple sentences."
+          },
+          {
+            "Subject": "Maths",
+            "Topics": [
+              "Numbers and place value to 1,000",
+              "Addition and subtraction with regrouping",
+              "Multiplication tables 2-10",
+              "Division as sharing",
+              "Money, time, measurement and geometry"
+            ],
+            "Outcome": "Use place value and the four basic operations to solve routine numerical and real-life problems."
+          },
+          {
+            "Subject": "Telugu",
+            "Topics": [
+              "గుణింతాలు and ఒత్తులు",
+              "Fluent word and sentence reading",
+              "Vocabulary and grammar foundations",
+              "Poems and short prose",
+              "Dictation and guided composition"
+            ],
+            "Outcome": "Read short Telugu texts, explain key ideas, spell familiar words, and write a few connected sentences."
+          },
+          {
+            "Subject": "EVS",
+            "Topics": [
+              "Families and occupations",
+              "Food sources and healthy living",
+              "Plants, animals and habitats",
+              "Water, air and weather",
+              "Transport, communication and safety"
+            ],
+            "Outcome": "Relate everyday needs and community life to the natural world and make responsible health and safety choices."
+          },
+          {
+            "Subject": "Computer",
+            "Topics": [
+              "Computer hardware and software",
+              "Keyboard keys and typing",
+              "Files and folders",
+              "Paint and simple text editing",
+              "Internet awareness and safe use"
+            ],
+            "Outcome": "Use basic input tools and applications, organise simple files, and explain safe, responsible computer use."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 3",
+        "Subjects": [
+          "English",
+          "Maths",
+          "Telugu",
+          "Science",
+          "Social Studies"
+        ],
+        "Units": [
+          {
+            "Subject": "English",
+            "Topics": [
+              "Prose and poetry comprehension",
+              "Parts of speech",
+              "Tenses and subject-verb agreement",
+              "Vocabulary and dictionary skills",
+              "Paragraphs, letters and creative writing"
+            ],
+            "Outcome": "Interpret short texts, apply foundational grammar, and organise ideas into a coherent paragraph or informal letter."
+          },
+          {
+            "Subject": "Maths",
+            "Topics": [
+              "Numbers to 10,000 and place value",
+              "Four operations and tables",
+              "Fractions and basic geometry",
+              "Length, mass, capacity, time and money",
+              "Data handling and word problems"
+            ],
+            "Outcome": "Calculate accurately with whole numbers and apply fractions, measurement, geometry, and data skills to problems."
+          },
+          {
+            "Subject": "Telugu",
+            "Topics": [
+              "Prose, poetry and reading fluency",
+              "Vocabulary, synonyms and antonyms",
+              "Basic grammar and sentence structure",
+              "Comprehension and oral expression",
+              "Paragraph and letter writing"
+            ],
+            "Outcome": "Understand grade-level Telugu passages and communicate ideas using accurate sentences and structured short writing."
+          },
+          {
+            "Subject": "Science",
+            "Topics": [
+              "Living and non-living things",
+              "Plant parts and animal life",
+              "Human body, food and health",
+              "Materials, matter, light and sound",
+              "Earth, water, air and conservation"
+            ],
+            "Outcome": "Classify living things and materials, explain basic body and physical processes, and suggest ways to protect resources."
+          },
+          {
+            "Subject": "Social Studies",
+            "Topics": [
+              "Family, community and local government",
+              "Maps, directions and landforms",
+              "Occupations and public services",
+              "Transport and communication",
+              "Culture, festivals and responsible citizenship"
+            ],
+            "Outcome": "Use simple maps and explain how communities, services, occupations, culture, and civic responsibilities are connected."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 4",
+        "Subjects": [
+          "English",
+          "Maths",
+          "Telugu",
+          "Science",
+          "Social Studies"
+        ],
+        "Units": [
+          {
+            "Subject": "English",
+            "Topics": [
+              "Detailed prose and poetry comprehension",
+              "Nouns, pronouns, adjectives and adverbs",
+              "Simple and continuous tenses",
+              "Vocabulary, prefixes and suffixes",
+              "Letters, stories and descriptive paragraphs"
+            ],
+            "Outcome": "Infer meaning from grade-level texts and write organised, varied paragraphs using appropriate grammar and vocabulary."
+          },
+          {
+            "Subject": "Maths",
+            "Topics": [
+              "Large numbers and Roman numerals",
+              "Multiplication and long division",
+              "Factors, multiples and fractions",
+              "Geometry, symmetry and perimeter",
+              "Measurement, time, money and data"
+            ],
+            "Outcome": "Solve multi-step numerical problems and represent reasoning using fractions, geometry, measurement, and data."
+          },
+          {
+            "Subject": "Telugu",
+            "Topics": [
+              "Prose and poetry appreciation",
+              "Grammar, verb forms and sentence types",
+              "Idioms and vocabulary development",
+              "Unseen passage comprehension",
+              "Essay, letter and creative writing"
+            ],
+            "Outcome": "Analyse grade-level Telugu texts and express ideas clearly through accurate, well-sequenced oral and written language."
+          },
+          {
+            "Subject": "Science",
+            "Topics": [
+              "Food, digestion and teeth",
+              "Plants, adaptation and reproduction",
+              "Animals and their habitats",
+              "Matter, force, work and energy",
+              "Water cycle, soil and environmental care"
+            ],
+            "Outcome": "Explain key life and physical science processes, record observations, and connect conservation choices to the environment."
+          },
+          {
+            "Subject": "Social Studies",
+            "Topics": [
+              "India's physical features and climate",
+              "States, capitals and resources",
+              "Early civilisations and local history",
+              "Government and public institutions",
+              "Agriculture, industry and transport"
+            ],
+            "Outcome": "Read maps and timelines and explain how geography, history, government, and economic activities shape life in India."
+          }
+        ]
+      },
+      {
+        "ClassName": "Class 5",
+        "Subjects": [
+          "English",
+          "Maths",
+          "Telugu",
+          "Science",
+          "Social Studies"
+        ],
+        "Units": [
+          {
+            "Subject": "English",
+            "Topics": [
+              "Critical prose and poetry comprehension",
+              "Parts of speech and tense consistency",
+              "Direct speech and sentence transformation",
+              "Vocabulary, idioms and reference skills",
+              "Essays, formal letters and creative narratives"
+            ],
+            "Outcome": "Analyse texts, support answers with evidence, and produce structured writing with accurate grammar and purposeful vocabulary."
+          },
+          {
+            "Subject": "Maths",
+            "Topics": [
+              "Large numbers and four operations",
+              "Factors, multiples and divisibility",
+              "Fractions, decimals and percentages",
+              "Angles, shapes, area and perimeter",
+              "Measurement, data handling and multi-step problems"
+            ],
+            "Outcome": "Select efficient strategies for multi-step problems and justify work involving numbers, fractions, geometry, measurement, and data."
+          },
+          {
+            "Subject": "Telugu",
+            "Topics": [
+              "Advanced prose and poetry comprehension",
+              "Grammar and sentence analysis",
+              "Proverbs, idioms and vocabulary",
+              "Summary and unseen passage work",
+              "Essays, formal letters and creative composition"
+            ],
+            "Outcome": "Interpret Telugu literature and informational text and communicate mature ideas through fluent, grammatically accurate speech and writing."
+          },
+          {
+            "Subject": "Science",
+            "Topics": [
+              "Nutrition, health and body systems",
+              "Plant and animal adaptation",
+              "States of matter and materials",
+              "Force, motion, machines, light and sound",
+              "Earth, space, natural resources and conservation"
+            ],
+            "Outcome": "Use evidence from observations to explain biological, physical, and earth science concepts and responsible resource use."
+          },
+          {
+            "Subject": "Social Studies",
+            "Topics": [
+              "Indian geography, climate and resources",
+              "Ancient to modern Indian history",
+              "The Constitution, rights and duties",
+              "Local, state and national government",
+              "Economy, diversity and global connections"
+            ],
+            "Outcome": "Connect geography and historical change with democratic institutions, citizenship, economic life, and India's cultural diversity."
+          }
+        ]
+      }
+    ]
+  }
+}
