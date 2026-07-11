@@ -8,7 +8,9 @@
         "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
         "applicationUrl": "http://0.0.0.0:5080",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "SchoolConnect__PortalAuth__Admin__Pin": "ADMIN",
+          "SchoolConnect__PortalAuth__Admin__Password": "admin@123"
         }
       },
       "https": {
@@ -18,7 +20,9 @@
         "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
         "applicationUrl": "https://localhost:5081;http://0.0.0.0:5080",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development"
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "SchoolConnect__PortalAuth__Admin__Pin": "ADMIN",
+          "SchoolConnect__PortalAuth__Admin__Password": "admin@123"
         }
       }
     }

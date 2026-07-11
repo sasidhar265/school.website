@@ -61,9 +61,23 @@ Render supplies the `PORT` environment variable automatically. The application b
 
 The site works with the configuration fallback and does not require a database. To persist edited content in PostgreSQL, add a Render PostgreSQL database and set the web service secret named `ConnectionStrings__SchoolConnectDb` to its connection string.
 
+## Administrator Dashboard
+
+The protected dashboard is available at `/admin`. It currently manages school contact details, the admissions headline, and public notices. Content changes are stored in PostgreSQL, so `ConnectionStrings__SchoolConnectDb` must be configured before saving.
+
+Set these Render environment variables before using the dashboard:
+
+```text
+SchoolConnect__PortalAuth__Admin__Pin=ADMIN
+SchoolConnect__PortalAuth__Admin__Password=<a-long-unique-password>
+ConnectionStrings__SchoolConnectDb=<Render PostgreSQL connection string>
+```
+
+The Blueprint declares the password and database connection as secret values and prompts for them during setup. The repository contains no default administrator password, so admin access remains disabled until the secret is configured. Portal sessions are server-signed, expire after eight hours, and reject edited browser-storage values.
+
 ## Next Production Work
 
-- Replace the demo login flow with hashed credentials and real role-based identity.
+- Move student and teacher demo accounts into a full per-user identity database with password reset and account lifecycle management.
 - Add a proper API boundary for mobile clients if the app will be installed on student and teacher devices.
 - Add push notifications through Firebase Cloud Messaging and Apple Push Notification service.
 - Integrate a payment gateway that supports Indian school fee payments.

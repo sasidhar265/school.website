@@ -80,6 +80,10 @@ public sealed class SchoolContentService
                     photo.ImageUrl)).ToArray())).ToArray());
     }
 
+    public SchoolConnectOptions GetEditableContent() => store.Options;
+
+    public void SaveEditableContent(SchoolConnectOptions options) => store.Save(options);
+
     private static IReadOnlyList<StudentStudyContent> BuildStudentContents(SchoolConnectOptions options)
     {
         return options.StudentContents.Select(content =>

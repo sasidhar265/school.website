@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
 using SchoolConnect.Shared.Configuration;
 using SchoolConnect.Shared.Models;
 using SchoolConnect.Shared.Services;
@@ -19,7 +21,10 @@ internal static class TestData
 
     public static PortalSessionService CreatePortalSession()
     {
-        return new PortalSessionService(CreateStore());
+        return new PortalSessionService(
+            CreateStore(),
+            new PasswordHasher<PortalAccountOptions>(),
+            new EphemeralDataProtectionProvider());
     }
 
     private static Dictionary<string, string?> CreateConfiguration()
@@ -56,6 +61,11 @@ internal static class TestData
             ["SchoolConnect:PortalAuth:Teacher:ClassDealingWith"] = "Class 5",
             ["SchoolConnect:PortalAuth:Teacher:Subject"] = "Science",
             ["SchoolConnect:PortalAuth:Teacher:Qualification"] = "B.Ed",
+
+            ["SchoolConnect:PortalAuth:Admin:Pin"] = "ADMIN",
+            ["SchoolConnect:PortalAuth:Admin:Password"] = "admin-test-password",
+            ["SchoolConnect:PortalAuth:Admin:DisplayName"] = "School Administrator",
+            ["SchoolConnect:PortalAuth:Admin:ClassName"] = "Administration",
 
             ["SchoolConnect:Notices:0:Date"] = "08 Jul 2026",
             ["SchoolConnect:Notices:0:Audience"] = "Students",

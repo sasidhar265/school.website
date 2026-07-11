@@ -11,3 +11,8 @@ These credentials are for development/testing only. Delete this file before prod
 
 - PIN: `TCH1001`
 - Password: `teacher@123`
+
+## Administration Login
+
+- Administrator ID: `ADMIN`
+- Password: `admin@123`

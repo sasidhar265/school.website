@@ -13,16 +13,45 @@ public sealed class SchoolContentStore
 
     private readonly IConfiguration configuration;
     private readonly ILogger<SchoolContentStore> logger;
-    private readonly Lazy<SchoolConnectOptions> cachedOptions;
+    private SchoolConnectOptions? cachedOptions;
+    private readonly object syncRoot = new();
 
     public SchoolContentStore(IConfiguration configuration, ILogger<SchoolContentStore> logger)
     {
         this.configuration = configuration;
         this.logger = logger;
-        cachedOptions = new Lazy<SchoolConnectOptions>(LoadOptions, LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
-    public SchoolConnectOptions Options => cachedOptions.Value;
+    public SchoolConnectOptions Options
+    {
+        get
+        {
+            lock (syncRoot)
+            {
+                return cachedOptions ??= LoadOptions();
+            }
+        }
+    }
+
+    public void Save(SchoolConnectOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        var connectionString = configuration.GetConnectionString("SchoolConnectDb");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException("Content editing requires ConnectionStrings:SchoolConnectDb to be configured.");
+        }
+
+        using var connection = new NpgsqlConnection(connectionString);
+        connection.Open();
+        EnsureSchema(connection);
+        UpsertPayload(connection, options);
+
+        lock (syncRoot)
+        {
+            cachedOptions = options;
+        }
+    }
 
     private SchoolConnectOptions LoadOptions()
     {
@@ -48,7 +77,15 @@ public sealed class SchoolContentStore
             }
 
             var loaded = JsonSerializer.Deserialize<SchoolConnectOptions>(storedPayload);
-            return loaded ?? seed;
+            if (loaded is null)
+            {
+                return seed;
+            }
+
+            // Authentication is configuration-only and must never be sourced from
+            // the editable content document stored in PostgreSQL.
+            loaded.PortalAuth = seed.PortalAuth;
+            return loaded;
         }
         catch (Exception ex)
         {
@@ -93,7 +130,15 @@ public sealed class SchoolContentStore
             on conflict (content_key)
             do update set payload = excluded.payload, updated_at = excluded.updated_at;";
         command.Parameters.AddWithValue("content_key", DefaultContentKey);
-        command.Parameters.AddWithValue("payload", JsonSerializer.Serialize(seed));
+        command.Parameters.AddWithValue("payload", SerializeContentOnly(seed));
         command.ExecuteNonQuery();
+    }
+
+    private static string SerializeContentOnly(SchoolConnectOptions options)
+    {
+        var clone = JsonSerializer.Deserialize<SchoolConnectOptions>(JsonSerializer.Serialize(options))
+            ?? new SchoolConnectOptions();
+        clone.PortalAuth = new PortalAuthOptions();
+        return JsonSerializer.Serialize(clone);
     }
 }

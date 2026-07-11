@@ -21,6 +21,11 @@
         "ClassDealingWith": "Class 5",
         "Subject": "English",
         "Qualification": "B.Ed"
+      },
+      "Admin": {
+        "Pin": "ADMIN",
+        "DisplayName": "School Administrator",
+        "ClassName": "Administration"
       }
     }
   }

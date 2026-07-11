@@ -71,8 +71,11 @@ public sealed class PortalSessionServiceTests
     public void RestoreAuthenticatedRole_RehydratesStudentSessionFromBrowserRole()
     {
         var session = TestData.CreatePortalSession();
+        session.TrySignIn(PortalRoles.Student, "STU1001", "student@123");
+        var token = session.CreateSessionToken();
+        session.SignOut(PortalRoles.Student);
 
-        var restored = session.RestoreAuthenticatedRole(PortalRoles.Student);
+        var restored = session.RestoreAuthenticatedRole(token);
         var activeSession = session.GetActiveSession();
 
         Assert.That(restored, Is.True);
@@ -82,6 +85,29 @@ public sealed class PortalSessionServiceTests
             Assert.That(activeSession!.Role, Is.EqualTo(PortalRoles.Student));
             Assert.That(activeSession.DisplayName, Is.EqualTo("Student User"));
         }
+    }
+
+    [Test]
+    public void RestoreAuthenticatedRole_WithTamperedToken_IsRejected()
+    {
+        var session = TestData.CreatePortalSession();
+
+        var restored = session.RestoreAuthenticatedRole("admin|9999999999");
+
+        Assert.That(restored, Is.False);
+        Assert.That(session.GetActiveSession(), Is.Null);
+    }
+
+    [Test]
+    public void TrySignIn_WithValidAdminCredentials_AuthenticatesAdministrator()
+    {
+        var session = TestData.CreatePortalSession();
+
+        var signedIn = session.TrySignIn(PortalRoles.Admin, "ADMIN", "admin-test-password");
+
+        Assert.That(signedIn, Is.True);
+        Assert.That(session.IsAuthenticated(PortalRoles.Admin), Is.True);
+        Assert.That(session.GetActiveSession()?.Role, Is.EqualTo(PortalRoles.Admin));
     }
 
     [Test]

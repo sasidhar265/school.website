@@ -1037,7 +1037,7 @@
         {
             try
             {
-                await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, requiredRole);
+                await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, PortalSession.CreateSessionToken());
             }
             catch
             {
@@ -1148,7 +1148,7 @@
 
         try
         {
-            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, loginRequestRole);
+            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, PortalSession.CreateSessionToken());
         }
         catch
         {

@@ -154,7 +154,7 @@
 
         try
         {
-            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, loginModel.Role);
+            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, PortalSession.CreateSessionToken());
         }
         catch
         {

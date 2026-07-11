@@ -76,6 +76,8 @@ public sealed class PortalAuthOptions
     public PortalAccountOptions Student { get; set; } = new();
 
     public PortalAccountOptions Teacher { get; set; } = new();
+
+    public PortalAccountOptions Admin { get; set; } = new();
 }
 
 public sealed class PortalAccountOptions
@@ -83,6 +85,8 @@ public sealed class PortalAccountOptions
     public string Pin { get; set; } = string.Empty;
 
     public string Password { get; set; } = string.Empty;
+
+    public string PasswordHash { get; set; } = string.Empty;
 
     public string DisplayName { get; set; } = string.Empty;
 

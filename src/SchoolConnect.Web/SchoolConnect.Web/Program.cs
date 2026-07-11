@@ -2,6 +2,8 @@ using SchoolConnect.Web.Components;
 using SchoolConnect.Shared.Services;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Microsoft.AspNetCore.Identity;
+using SchoolConnect.Shared.Configuration;
 
 var webRootPath = ResolveWebRootPath();
 
@@ -72,6 +74,8 @@ builder.Services.AddRazorComponents()
 builder.Services.AddSingleton<SchoolContentStore>();
 builder.Services.AddScoped<SchoolContentService>();
 builder.Services.AddScoped<PortalSessionService>();
+builder.Services.AddDataProtection();
+builder.Services.AddSingleton<IPasswordHasher<PortalAccountOptions>, PasswordHasher<PortalAccountOptions>>();
 
 var app = builder.Build();
 

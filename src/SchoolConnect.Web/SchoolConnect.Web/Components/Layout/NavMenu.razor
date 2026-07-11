@@ -76,6 +76,13 @@
                                         Teacher Login
                                     </button>
                                 </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <button class="dropdown-item login-profile-option" type="button" @onclick="() => OpenLoginRequestPopup(SchoolConnect.Shared.Services.PortalRoles.Admin)">
+                                        <span class="login-option-icon bi bi-shield-lock-fill" aria-hidden="true"></span>
+                                        Administration Login
+                                    </button>
+                                </li>
                             }
                             else
                             {
@@ -298,9 +305,12 @@
             return;
         }
 
-        var target = activeSession.Role == SchoolConnect.Shared.Services.PortalRoles.Teacher
-            ? "/teacher-login"
-            : "/student-login";
+        var target = activeSession.Role switch
+        {
+            SchoolConnect.Shared.Services.PortalRoles.Teacher => "/teacher-login",
+            SchoolConnect.Shared.Services.PortalRoles.Admin => "/admin",
+            _ => "/student-login"
+        };
 
         try
         {
@@ -369,7 +379,7 @@
 
         try
         {
-            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", SchoolConnect.Shared.Services.PortalSessionService.BrowserSessionRoleKey, loginRequestRole);
+            await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", SchoolConnect.Shared.Services.PortalSessionService.BrowserSessionRoleKey, PortalSession.CreateSessionToken());
         }
         catch
         {
@@ -377,7 +387,12 @@
         }
 
         isLoginRequestPopupOpen = false;
-        var target = loginRequestRole == SchoolConnect.Shared.Services.PortalRoles.Teacher ? "/teacher-login" : "/student-login";
+        var target = loginRequestRole switch
+        {
+            SchoolConnect.Shared.Services.PortalRoles.Teacher => "/teacher-login",
+            SchoolConnect.Shared.Services.PortalRoles.Admin => "/admin",
+            _ => "/student-login"
+        };
         Navigation.NavigateTo(target);
     }
 
@@ -422,7 +437,12 @@
     {
         if (string.IsNullOrWhiteSpace(activeSession?.DisplayName))
         {
-            return activeSession?.Role == SchoolConnect.Shared.Services.PortalRoles.Teacher ? "T" : "S";
+            return activeSession?.Role switch
+            {
+                SchoolConnect.Shared.Services.PortalRoles.Teacher => "T",
+                SchoolConnect.Shared.Services.PortalRoles.Admin => "A",
+                _ => "S"
+            };
         }
 
         return activeSession.DisplayName.Trim()[0].ToString().ToUpperInvariant();
@@ -442,6 +462,11 @@
                 : activeSession.ClassDealingWith;
         }
 
+        if (activeSession.Role == SchoolConnect.Shared.Services.PortalRoles.Admin)
+        {
+            return "School administration";
+        }
+
         return string.IsNullOrWhiteSpace(activeSession.ClassName)
             ? "Class not assigned"
             : activeSession.ClassName;
@@ -454,29 +479,38 @@
 
     private string GetLoginRequestEyebrow()
     {
-        return loginRequestRole == SchoolConnect.Shared.Services.PortalRoles.Teacher
-            ? "Teacher login request"
-            : "Student login request";
+        return loginRequestRole switch
+        {
+            SchoolConnect.Shared.Services.PortalRoles.Teacher => "Teacher login request",
+            SchoolConnect.Shared.Services.PortalRoles.Admin => "Restricted administration",
+            _ => "Student login request"
+        };
     }
 
     private string GetLoginRequestTitle()
     {
-        return loginRequestRole == SchoolConnect.Shared.Services.PortalRoles.Teacher
-            ? "Teacher portal access"
-            : "Student portal access";
+        return loginRequestRole switch
+        {
+            SchoolConnect.Shared.Services.PortalRoles.Teacher => "Teacher portal access",
+            SchoolConnect.Shared.Services.PortalRoles.Admin => "Administrator access",
+            _ => "Student portal access"
+        };
     }
 
     private string GetLoginRequestMessage()
     {
-        return loginRequestRole == SchoolConnect.Shared.Services.PortalRoles.Teacher
-            ? "Enter the teacher PIN and password to continue in the teacher portal."
-            : "Enter the student PIN and password to continue in the student portal.";
+        return loginRequestRole switch
+        {
+            SchoolConnect.Shared.Services.PortalRoles.Teacher => "Enter the teacher PIN and password to continue in the teacher portal.",
+            SchoolConnect.Shared.Services.PortalRoles.Admin => "Enter the administrator ID and password to open the protected content dashboard.",
+            _ => "Enter the student PIN and password to continue in the student portal."
+        };
     }
 
     private bool ShouldHideLoginNav()
     {
         var path = Navigation.ToBaseRelativePath(Navigation.Uri).Split('?', '#')[0].Trim('/');
-        return path is "login" or "student-login" or "teacher-login";
+        return path is "login" or "student-login" or "teacher-login" or "admin";
     }
 
     private sealed class LoginRequestModel

@@ -1,0 +1,194 @@
+@page "/admin"
+@rendermode Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer
+@using System.Text.Json
+@using SchoolConnect.Shared.Configuration
+@inject PortalSessionService PortalSession
+@inject SchoolContentService Content
+@inject IJSRuntime JsRuntime
+@inject NavigationManager Navigation
+
+<PageTitle>School administration</PageTitle>
+
+<main class="container py-5 admin-page">
+    @if (!isReady)
+    {
+        <div class="text-center py-5" role="status">Loading secure administration…</div>
+    }
+    else if (!PortalSession.IsAuthenticated(PortalRoles.Admin))
+    {
+        <section class="mx-auto feature-panel p-4 p-md-5" style="max-width: 34rem">
+            <p class="eyebrow">Restricted access</p>
+            <h1>Administrator login</h1>
+            <p class="text-secondary">Sign in with the administrator credentials configured securely on the server.</p>
+
+            @if (!string.IsNullOrWhiteSpace(loginError))
+            {
+                <div class="alert alert-danger" role="alert">@loginError</div>
+            }
+
+            <EditForm Model="login" OnValidSubmit="SignIn">
+                <DataAnnotationsValidator />
+                <div class="mb-3">
+                    <label class="form-label" for="admin-pin">Administrator ID</label>
+                    <InputText id="admin-pin" class="form-control form-control-lg" @bind-Value="login.Pin" autocomplete="username" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="admin-password">Password</label>
+                    <InputText id="admin-password" type="password" class="form-control form-control-lg" @bind-Value="login.Password" autocomplete="current-password" />
+                </div>
+                <button class="btn btn-success btn-lg w-100" type="submit">Sign in securely</button>
+            </EditForm>
+        </section>
+    }
+    else if (editable is not null)
+    {
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <p class="eyebrow">Administration</p>
+                <h1>School content dashboard</h1>
+                <p class="text-secondary mb-0">Update public school details and announcements without editing source files.</p>
+            </div>
+            <button class="btn btn-outline-danger" type="button" @onclick="SignOut">Sign out</button>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(statusMessage))
+        {
+            <div class="alert @(saveSucceeded ? "alert-success" : "alert-danger")" role="status">@statusMessage</div>
+        }
+
+        <EditForm Model="editable" OnValidSubmit="Save">
+            <section class="feature-panel p-4 mb-4">
+                <h2 class="h4 mb-3">School details</h2>
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">School name</label><InputText class="form-control" @bind-Value="editable.School.Name" /></div>
+                    <div class="col-md-6"><label class="form-label">Short name</label><InputText class="form-control" @bind-Value="editable.School.ShortName" /></div>
+                    <div class="col-md-6"><label class="form-label">Phone</label><InputText class="form-control" @bind-Value="editable.School.Phone" /></div>
+                    <div class="col-md-6"><label class="form-label">Email</label><InputText type="email" class="form-control" @bind-Value="editable.School.Email" /></div>
+                    <div class="col-12"><label class="form-label">Location</label><InputText class="form-control" @bind-Value="editable.School.Location" /></div>
+                    <div class="col-12"><label class="form-label">Admissions headline</label><InputText class="form-control" @bind-Value="editable.School.AdmissionsHeadline" /></div>
+                </div>
+            </section>
+
+            <section class="feature-panel p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <h2 class="h4 mb-0">Notices</h2>
+                    <button class="btn btn-outline-success" type="button" @onclick="AddNotice">Add notice</button>
+                </div>
+                @for (var index = 0; index < notices.Count; index++)
+                {
+                    var noticeIndex = index;
+                    <article class="border rounded-3 p-3 mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-8"><label class="form-label">Title</label><InputText class="form-control" @bind-Value="notices[noticeIndex].Title" /></div>
+                            <div class="col-md-4"><label class="form-label">Date</label><InputText class="form-control" @bind-Value="notices[noticeIndex].Date" /></div>
+                            <div class="col-md-6"><label class="form-label">Audience</label><InputText class="form-control" @bind-Value="notices[noticeIndex].Audience" /></div>
+                            <div class="col-md-6"><label class="form-label">Priority</label><InputSelect class="form-select" @bind-Value="notices[noticeIndex].Priority"><option>Normal</option><option>High</option><option>Urgent</option></InputSelect></div>
+                            <div class="col-12"><label class="form-label">Summary</label><InputTextArea class="form-control" rows="2" @bind-Value="notices[noticeIndex].Summary" /></div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger mt-3" type="button" @onclick="() => RemoveNotice(noticeIndex)">Remove</button>
+                    </article>
+                }
+            </section>
+
+            <button class="btn btn-warning btn-lg fw-bold" type="submit" disabled="@isSaving">@(isSaving ? "Saving…" : "Save changes")</button>
+        </EditForm>
+    }
+</main>
+
+@code {
+    private readonly AdminLoginModel login = new();
+    private SchoolConnectOptions? editable;
+    private List<AdminNoticeModel> notices = [];
+    private bool isReady;
+    private bool isSaving;
+    private bool saveSucceeded;
+    private string? loginError;
+    private string? statusMessage;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var token = await JsRuntime.InvokeAsync<string?>("sessionStorage.getItem", PortalSessionService.BrowserSessionRoleKey);
+        PortalSession.RestoreAuthenticatedRole(token);
+        if (PortalSession.IsAuthenticated(PortalRoles.Admin)) LoadEditableCopy();
+        isReady = true;
+        StateHasChanged();
+    }
+
+    private async Task SignIn()
+    {
+        loginError = null;
+        if (!PortalSession.TrySignIn(PortalRoles.Admin, login.Pin, login.Password))
+        {
+            loginError = "The administrator ID or password is incorrect, or the admin account has not been configured.";
+            return;
+        }
+
+        await JsRuntime.InvokeVoidAsync("sessionStorage.setItem", PortalSessionService.BrowserSessionRoleKey, PortalSession.CreateSessionToken());
+        login.Password = string.Empty;
+        LoadEditableCopy();
+    }
+
+    private void LoadEditableCopy()
+    {
+        var json = JsonSerializer.Serialize(Content.GetEditableContent());
+        editable = JsonSerializer.Deserialize<SchoolConnectOptions>(json) ?? new SchoolConnectOptions();
+        notices = editable.Notices.Select(notice => new AdminNoticeModel
+        {
+            Title = notice.Title,
+            Audience = notice.Audience,
+            Date = notice.Date,
+            Summary = notice.Summary,
+            Priority = notice.Priority
+        }).ToList();
+    }
+
+    private void AddNotice() => notices.Insert(0, new AdminNoticeModel { Title = "New notice", Audience = "All", Date = DateTime.Today.ToString("dd MMM yyyy"), Summary = "Add the announcement details.", Priority = "Normal" });
+    private void RemoveNotice(int index) => notices.RemoveAt(index);
+
+    private void Save()
+    {
+        if (editable is null) return;
+        isSaving = true;
+        statusMessage = null;
+        try
+        {
+            editable.Notices = notices.Select(notice => new Notice(notice.Title, notice.Audience, notice.Date, notice.Summary, notice.Priority)).ToList();
+            Content.SaveEditableContent(editable);
+            saveSucceeded = true;
+            statusMessage = "Changes saved successfully. The public website now uses the updated content.";
+        }
+        catch (Exception ex)
+        {
+            saveSucceeded = false;
+            statusMessage = ex.Message;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task SignOut()
+    {
+        PortalSession.SignOut(PortalRoles.Admin);
+        await JsRuntime.InvokeVoidAsync("sessionStorage.removeItem", PortalSessionService.BrowserSessionRoleKey);
+        editable = null;
+        Navigation.NavigateTo("/#top", forceLoad: true);
+    }
+
+    private sealed class AdminLoginModel
+    {
+        public string Pin { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private sealed class AdminNoticeModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Audience { get; set; } = string.Empty;
+        public string Date { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
+        public string Priority { get; set; } = "Normal";
+    }
+}
