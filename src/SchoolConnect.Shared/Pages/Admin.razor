@@ -16,10 +16,17 @@
     }
     else if (!PortalSession.IsAuthenticated(PortalRoles.Admin))
     {
-        <section class="mx-auto feature-panel p-4 p-md-5" style="max-width: 34rem">
-            <p class="eyebrow">Restricted access</p>
-            <h1>Administrator login</h1>
-            <p class="text-secondary">Sign in with the administrator credentials configured securely on the server.</p>
+        <section class="mx-auto card border-0 shadow-lg overflow-hidden admin-login-card" style="max-width: 58rem">
+            <div class="row g-0">
+            <div class="col-md-5 admin-login-brand p-4 p-lg-5 text-white d-flex flex-column justify-content-between">
+                <div><span class="badge text-bg-warning rounded-pill mb-4">SchoolConnect</span><h1 class="h2 fw-bold">Website administration</h1><p class="text-white-50">A secure workspace for keeping your school website accurate and up to date.</p></div>
+                <div class="small text-white-50"><span class="bi bi-shield-check me-2"></span>Protected administrator access</div>
+            </div>
+            <div class="col-md-7 p-4 p-lg-5">
+            <div class="admin-heading-icon mb-3"><i class="bi bi-person-lock"></i></div>
+            <p class="text-uppercase text-success small fw-bold mb-1">Restricted access</p>
+            <h2 class="h3 fw-bold">Welcome back</h2>
+            <p class="text-secondary mb-4">Sign in with the administrator credentials configured securely on the server.</p>
 
             @if (!string.IsNullOrWhiteSpace(loginError))
             {
@@ -29,55 +36,102 @@
             <EditForm Model="login" OnValidSubmit="SignIn">
                 <DataAnnotationsValidator />
                 <div class="mb-3">
-                    <label class="form-label" for="admin-pin">Administrator ID</label>
-                    <InputText id="admin-pin" class="form-control form-control-lg" @bind-Value="login.Pin" autocomplete="username" />
+                    <label class="form-label fw-semibold" for="admin-pin">Administrator ID</label>
+                    <div class="input-group input-group-lg"><span class="input-group-text bg-body-tertiary"><i class="bi bi-person"></i></span><InputText id="admin-pin" class="form-control" @bind-Value="login.Pin" autocomplete="username" /></div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="admin-password">Password</label>
-                    <InputText id="admin-password" type="password" class="form-control form-control-lg" @bind-Value="login.Password" autocomplete="current-password" />
+                    <label class="form-label fw-semibold" for="admin-password">Password</label>
+                    <div class="input-group input-group-lg"><span class="input-group-text bg-body-tertiary"><i class="bi bi-key"></i></span><InputText id="admin-password" type="password" class="form-control" @bind-Value="login.Password" autocomplete="current-password" /></div>
                 </div>
-                <button class="btn btn-success btn-lg w-100" type="submit">Sign in securely</button>
+                <button class="btn btn-success btn-lg w-100 fw-bold" type="submit"><i class="bi bi-box-arrow-in-right me-2"></i>Sign in securely</button>
             </EditForm>
+            </div>
+            </div>
         </section>
     }
     else if (editable is not null)
     {
-        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
-            <div>
-                <p class="eyebrow">Administration</p>
-                <h1>School content dashboard</h1>
-                <p class="text-secondary mb-0">Update public school details and announcements without editing source files.</p>
+        <section class="admin-dashboard-hero rounded-4 p-4 p-lg-5 mb-4 text-white shadow-lg overflow-hidden">
+            <div class="row align-items-center g-4 position-relative">
+                <div class="col-lg-8">
+                    <span class="badge rounded-pill text-bg-warning mb-3"><span class="bi bi-shield-check me-1"></span> Secure administration</span>
+                    <h1 class="display-6 fw-bold mb-2">Website Control Centre</h1>
+                    <p class="lead mb-0 text-white-50">Manage school information, announcements, events, transport and media from one modern workspace.</p>
+                </div>
+                <div class="col-lg-4 d-flex justify-content-lg-end">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="admin-avatar bg-white text-success rounded-circle d-grid place-items-center shadow"><span class="bi bi-person-gear"></span></div>
+                        <div><small class="text-white-50 d-block">Signed in as</small><strong>School Administrator</strong></div>
+                        <button class="btn btn-light btn-sm ms-2" type="button" @onclick="SignOut"><span class="bi bi-box-arrow-right me-1"></span> Sign out</button>
+                    </div>
+                </div>
             </div>
-            <button class="btn btn-outline-danger" type="button" @onclick="SignOut">Sign out</button>
+        </section>
+
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex align-items-center gap-3"><span class="admin-stat-icon bg-success-subtle text-success"><i class="bi bi-megaphone"></i></span><div><strong class="fs-4 d-block">@notices.Count</strong><small class="text-secondary">Notices</small></div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex align-items-center gap-3"><span class="admin-stat-icon bg-primary-subtle text-primary"><i class="bi bi-calendar-event"></i></span><div><strong class="fs-4 d-block">@events.Count</strong><small class="text-secondary">Events</small></div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex align-items-center gap-3"><span class="admin-stat-icon bg-warning-subtle text-warning-emphasis"><i class="bi bi-bus-front"></i></span><div><strong class="fs-4 d-block">@routes.Count</strong><small class="text-secondary">Bus routes</small></div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex align-items-center gap-3"><span class="admin-stat-icon bg-info-subtle text-info-emphasis"><i class="bi bi-images"></i></span><div><strong class="fs-4 d-block">@galleryGroups.Sum(group => group.Photos.Count)</strong><small class="text-secondary">Gallery photos</small></div></div></div></div>
         </div>
 
         @if (!string.IsNullOrWhiteSpace(statusMessage))
         {
-            <div class="alert @(saveSucceeded ? "alert-success" : "alert-danger")" role="status">@statusMessage</div>
+            <div class="alert @(saveSucceeded ? "alert-success" : "alert-danger") alert-dismissible shadow-sm" role="status"><span class="bi @(saveSucceeded ? "bi-check-circle-fill" : "bi-exclamation-triangle-fill") me-2"></span>@statusMessage</div>
         }
 
         <EditForm Model="editable" OnValidSubmit="Save">
-            <section class="feature-panel p-4 mb-4">
-                <h2 class="h4 mb-3">School details</h2>
+            <div class="row g-4 align-items-start">
+                <aside class="col-lg-3">
+                    <div class="card border-0 shadow-sm admin-sidebar">
+                        <div class="card-body p-3">
+                            <p class="text-uppercase text-secondary small fw-bold px-2 mb-2">Manage content</p>
+                            <nav class="list-group list-group-flush admin-section-nav" aria-label="Administration sections">
+                                @foreach (var adminSection in AdminSections)
+                                {
+                                    <button class="list-group-item list-group-item-action border-0 rounded-3 mb-1 @(activeSection == adminSection.Key ? "active" : string.Empty)" type="button" @onclick="() => activeSection = adminSection.Key">
+                                        <span class="bi @adminSection.Icon me-2" aria-hidden="true"></span> @adminSection.Label
+                                        <span class="bi bi-chevron-right float-end small"></span>
+                                    </button>
+                                }
+                            </nav>
+                            <hr />
+                            <a class="btn btn-outline-secondary w-100" href="/" target="_blank"><span class="bi bi-box-arrow-up-right me-2"></span>View website</a>
+                        </div>
+                    </div>
+                </aside>
+                <div class="col-lg-9">
+
+            @if (activeSection == "school")
+            {
+            <section class="card border-0 shadow-sm p-4 mb-4 admin-content-card">
+                <div class="d-flex align-items-center gap-3 mb-4"><span class="admin-heading-icon"><i class="bi bi-building"></i></span><div><p class="text-secondary small mb-0">General settings</p><h2 class="h4 mb-0">School identity and contact</h2></div></div>
                 <div class="row g-3">
                     <div class="col-md-6"><label class="form-label">School name</label><InputText class="form-control" @bind-Value="editable.School.Name" /></div>
                     <div class="col-md-6"><label class="form-label">Short name</label><InputText class="form-control" @bind-Value="editable.School.ShortName" /></div>
+                    <div class="col-12"><label class="form-label">Tagline</label><InputText class="form-control" @bind-Value="editable.School.Tagline" /></div>
                     <div class="col-md-6"><label class="form-label">Phone</label><InputText class="form-control" @bind-Value="editable.School.Phone" /></div>
                     <div class="col-md-6"><label class="form-label">Email</label><InputText type="email" class="form-control" @bind-Value="editable.School.Email" /></div>
                     <div class="col-12"><label class="form-label">Location</label><InputText class="form-control" @bind-Value="editable.School.Location" /></div>
+                    <div class="col-md-6"><label class="form-label">Board label</label><InputText class="form-control" @bind-Value="editable.School.BoardLabel" /></div>
+                    <div class="col-md-6"><label class="form-label">Campus label</label><InputText class="form-control" @bind-Value="editable.School.CampusLabel" /></div>
+                    <div class="col-12"><label class="form-label">Admissions banner</label><InputText class="form-control" @bind-Value="editable.School.AdmissionsBanner" /></div>
                     <div class="col-12"><label class="form-label">Admissions headline</label><InputText class="form-control" @bind-Value="editable.School.AdmissionsHeadline" /></div>
                 </div>
             </section>
+            }
 
-            <section class="feature-panel p-4 mb-4">
+            @if (activeSection == "notices")
+            {
+            <section class="card border-0 shadow-sm p-4 mb-4 admin-content-card">
                 <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-                    <h2 class="h4 mb-0">Notices</h2>
-                    <button class="btn btn-outline-success" type="button" @onclick="AddNotice">Add notice</button>
+                    <div class="d-flex align-items-center gap-3"><span class="admin-heading-icon"><i class="bi bi-megaphone"></i></span><div><p class="text-secondary small mb-0">Public updates</p><h2 class="h4 mb-0">Notices</h2></div></div>
+                    <button class="btn btn-success" type="button" @onclick="AddNotice"><i class="bi bi-plus-lg me-1"></i>Add notice</button>
                 </div>
                 @for (var index = 0; index < notices.Count; index++)
                 {
                     var noticeIndex = index;
-                    <article class="border rounded-3 p-3 mb-3">
+                    <article class="admin-editor-card card border-0 bg-body-tertiary">
                         <div class="row g-3">
                             <div class="col-md-8"><label class="form-label">Title</label><InputText class="form-control" @bind-Value="notices[noticeIndex].Title" /></div>
                             <div class="col-md-4"><label class="form-label">Date</label><InputText class="form-control" @bind-Value="notices[noticeIndex].Date" /></div>
@@ -89,16 +143,157 @@
                     </article>
                 }
             </section>
+            }
 
-            <button class="btn btn-warning btn-lg fw-bold" type="submit" disabled="@isSaving">@(isSaving ? "Saving…" : "Save changes")</button>
+            @if (activeSection == "events")
+            {
+            <section class="card border-0 shadow-sm p-4 mb-4 admin-content-card">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-3"><span class="admin-heading-icon"><i class="bi bi-calendar-event"></i></span><div><p class="text-secondary small mb-0">School calendar</p><h2 class="h4 mb-0">Academic events</h2></div></div>
+                    <button class="btn btn-success" type="button" @onclick="AddEvent"><i class="bi bi-plus-lg me-1"></i>Add event</button>
+                </div>
+                @for (var index = 0; index < events.Count; index++)
+                {
+                    var itemIndex = index;
+                    <article class="admin-editor-card">
+                        <div class="row g-3">
+                            <div class="col-md-4"><label class="form-label">Date</label><InputText class="form-control" @bind-Value="events[itemIndex].Date" /></div>
+                            <div class="col-md-8"><label class="form-label">Event title</label><InputText class="form-control" @bind-Value="events[itemIndex].Title" /></div>
+                            <div class="col-12"><label class="form-label">Description</label><InputTextArea class="form-control" rows="2" @bind-Value="events[itemIndex].Description" /></div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger mt-3" type="button" @onclick="() => events.RemoveAt(itemIndex)">Remove</button>
+                    </article>
+                }
+            </section>
+            }
+
+            @if (activeSection == "people")
+            {
+            <section class="card border-0 shadow-sm p-4 mb-4 admin-content-card">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-3"><span class="admin-heading-icon"><i class="bi bi-people"></i></span><div><p class="text-secondary small mb-0">Directory</p><h2 class="h4 mb-0">Faculty contacts</h2></div></div>
+                    <button class="btn btn-success" type="button" @onclick="AddFaculty"><i class="bi bi-plus-lg me-1"></i>Add contact</button>
+                </div>
+                @for (var index = 0; index < faculty.Count; index++)
+                {
+                    var itemIndex = index;
+                    <article class="admin-editor-card">
+                        <div class="row g-3">
+                            <div class="col-md-5"><label class="form-label">Name</label><InputText class="form-control" @bind-Value="faculty[itemIndex].Name" /></div>
+                            <div class="col-md-4"><label class="form-label">Role</label><InputText class="form-control" @bind-Value="faculty[itemIndex].Role" /></div>
+                            <div class="col-md-3"><label class="form-label">Phone</label><InputText class="form-control" @bind-Value="faculty[itemIndex].Phone" /></div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger mt-3" type="button" @onclick="() => faculty.RemoveAt(itemIndex)">Remove</button>
+                    </article>
+                }
+            </section>
+            }
+
+            @if (activeSection == "transport")
+            {
+            <section class="card border-0 shadow-sm p-4 mb-4 admin-content-card">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-3"><span class="admin-heading-icon"><i class="bi bi-bus-front"></i></span><div><p class="text-secondary small mb-0">Transportation</p><h2 class="h4 mb-0">Bus routes</h2></div></div>
+                    <button class="btn btn-success" type="button" @onclick="AddRoute"><i class="bi bi-plus-lg me-1"></i>Add route</button>
+                </div>
+                @for (var index = 0; index < routes.Count; index++)
+                {
+                    var itemIndex = index;
+                    <article class="admin-editor-card">
+                        <div class="row g-3">
+                            <div class="col-md-4"><label class="form-label">Route name</label><InputText class="form-control" @bind-Value="routes[itemIndex].Name" /></div>
+                            <div class="col-md-4"><label class="form-label">Start time</label><InputText class="form-control" @bind-Value="routes[itemIndex].StartsAt" /></div>
+                            <div class="col-md-4"><label class="form-label">Driver</label><InputText class="form-control" @bind-Value="routes[itemIndex].Driver" /></div>
+                            <div class="col-12"><label class="form-label">Areas covered</label><InputTextArea class="form-control" rows="2" @bind-Value="routes[itemIndex].Areas" /></div>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger mt-3" type="button" @onclick="() => routes.RemoveAt(itemIndex)">Remove</button>
+                    </article>
+                }
+            </section>
+            }
+
+            @if (activeSection == "about")
+            {
+            <section class="card border-0 shadow-sm p-4 mb-4 admin-content-card">
+                <div class="d-flex align-items-center gap-3 mb-4"><span class="admin-heading-icon"><i class="bi bi-info-circle"></i></span><div><p class="text-secondary small mb-0">School story</p><h2 class="h4 mb-0">About Us</h2></div></div>
+                <div class="row g-3">
+                    <div class="col-12"><label class="form-label">Section title</label><InputText class="form-control" @bind-Value="editable.AboutUs.Title" /></div>
+                    <div class="col-12"><label class="form-label">Summary</label><InputTextArea class="form-control" rows="4" @bind-Value="editable.AboutUs.Summary" /></div>
+                    <div class="col-md-6"><label class="form-label">Highlights <small class="text-secondary">(one per line)</small></label><InputTextArea class="form-control" rows="8" @bind-Value="aboutHighlights" /></div>
+                    <div class="col-md-6"><label class="form-label">Principles <small class="text-secondary">(one per line)</small></label><InputTextArea class="form-control" rows="8" @bind-Value="aboutPrinciples" /></div>
+                </div>
+            </section>
+            }
+
+            @if (activeSection == "gallery")
+            {
+            <section class="card border-0 shadow-sm p-4 mb-4 admin-content-card">
+                <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-3"><span class="admin-heading-icon"><i class="bi bi-images"></i></span><div><p class="text-secondary small mb-0">Media library</p><h2 class="h4 mb-0">Gallery collections</h2></div></div>
+                    <button class="btn btn-success" type="button" @onclick="AddGalleryGroup"><i class="bi bi-plus-lg me-1"></i>Add collection</button>
+                </div>
+                @for (var groupIndex = 0; groupIndex < galleryGroups.Count; groupIndex++)
+                {
+                    var currentGroup = groupIndex;
+                    <article class="admin-editor-card">
+                        <div class="row g-3">
+                            <div class="col-md-3"><label class="form-label">Year</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].PassedOutYear" /></div>
+                            <div class="col-md-9"><label class="form-label">Collection title</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].Title" /></div>
+                            <div class="col-12"><label class="form-label">Description</label><InputTextArea class="form-control" rows="2" @bind-Value="galleryGroups[currentGroup].Description" /></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
+                            <h3 class="h6 mb-0">Photos</h3>
+                            <button class="btn btn-sm btn-outline-success" type="button" @onclick="() => AddPhoto(currentGroup)">Add photo</button>
+                        </div>
+                        @for (var photoIndex = 0; photoIndex < galleryGroups[currentGroup].Photos.Count; photoIndex++)
+                        {
+                            var currentPhoto = photoIndex;
+                            <div class="border rounded-3 p-3 mb-2">
+                                <div class="row g-2">
+                                    <div class="col-md-4"><label class="form-label">Photo title</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].Photos[currentPhoto].Title" /></div>
+                                    <div class="col-md-8"><label class="form-label">Image URL</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].Photos[currentPhoto].ImageUrl" /></div>
+                                    <div class="col-12"><label class="form-label">Caption</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].Photos[currentPhoto].Caption" /></div>
+                                </div>
+                                <button class="btn btn-sm btn-link text-danger px-0" type="button" @onclick="() => galleryGroups[currentGroup].Photos.RemoveAt(currentPhoto)">Remove photo</button>
+                            </div>
+                        }
+                        <button class="btn btn-sm btn-outline-danger mt-2" type="button" @onclick="() => galleryGroups.RemoveAt(currentGroup)">Remove collection</button>
+                    </article>
+                }
+            </section>
+            }
+
+            <div class="admin-save-bar">
+                <span><i class="bi bi-cloud-check me-2 text-success"></i>Changes are applied to the public website after saving.</span>
+                <button class="btn btn-warning btn-lg fw-bold px-4 shadow-sm" type="submit" disabled="@isSaving"><span class="bi @(isSaving ? "bi-arrow-repeat" : "bi-floppy") me-2"></span>@(isSaving ? "Saving…" : "Save all changes")</button>
+            </div>
+                </div>
+            </div>
         </EditForm>
     }
 </main>
 
 @code {
     private readonly AdminLoginModel login = new();
+    private static readonly AdminSection[] AdminSections =
+    [
+        new("school", "School", "bi-building"),
+        new("notices", "Notices", "bi-megaphone"),
+        new("events", "Events", "bi-calendar-event"),
+        new("people", "Faculty", "bi-people"),
+        new("transport", "Transport", "bi-bus-front"),
+        new("about", "About", "bi-info-circle"),
+        new("gallery", "Gallery", "bi-images")
+    ];
     private SchoolConnectOptions? editable;
     private List<AdminNoticeModel> notices = [];
+    private List<AdminEventModel> events = [];
+    private List<AdminFacultyModel> faculty = [];
+    private List<AdminRouteModel> routes = [];
+    private List<AdminGalleryGroupModel> galleryGroups = [];
+    private string aboutHighlights = string.Empty;
+    private string aboutPrinciples = string.Empty;
+    private string activeSection = "school";
     private bool isReady;
     private bool isSaving;
     private bool saveSucceeded;
@@ -141,10 +336,48 @@
             Summary = notice.Summary,
             Priority = notice.Priority
         }).ToList();
+        events = editable.AcademicEvents.Select(item => new AdminEventModel
+        {
+            Date = item.Date,
+            Title = item.Title,
+            Description = item.Description
+        }).ToList();
+        faculty = editable.FacultyContacts.Select(item => new AdminFacultyModel
+        {
+            Name = item.Name,
+            Role = item.Role,
+            Phone = item.Phone
+        }).ToList();
+        routes = editable.BusRoutes.Select(item => new AdminRouteModel
+        {
+            Name = item.Name,
+            StartsAt = item.StartsAt,
+            Areas = item.Areas,
+            Driver = item.Driver
+        }).ToList();
+        galleryGroups = editable.GalleryYearGroups.Select(group => new AdminGalleryGroupModel
+        {
+            PassedOutYear = group.PassedOutYear,
+            Title = group.Title,
+            Description = group.Description,
+            Photos = group.Photos.Select(photo => new AdminPhotoModel
+            {
+                Title = photo.Title,
+                Caption = photo.Caption,
+                ImageUrl = photo.ImageUrl
+            }).ToList()
+        }).ToList();
+        aboutHighlights = string.Join(Environment.NewLine, editable.AboutUs.Highlights);
+        aboutPrinciples = string.Join(Environment.NewLine, editable.AboutUs.Principles);
     }
 
     private void AddNotice() => notices.Insert(0, new AdminNoticeModel { Title = "New notice", Audience = "All", Date = DateTime.Today.ToString("dd MMM yyyy"), Summary = "Add the announcement details.", Priority = "Normal" });
     private void RemoveNotice(int index) => notices.RemoveAt(index);
+    private void AddEvent() => events.Add(new AdminEventModel { Date = DateTime.Today.ToString("dd MMM"), Title = "New event" });
+    private void AddFaculty() => faculty.Add(new AdminFacultyModel { Name = "New contact", Role = "Staff" });
+    private void AddRoute() => routes.Add(new AdminRouteModel { Name = "New route", StartsAt = "8:00 AM" });
+    private void AddGalleryGroup() => galleryGroups.Insert(0, new AdminGalleryGroupModel { PassedOutYear = DateTime.Today.Year.ToString(), Title = "New collection" });
+    private void AddPhoto(int groupIndex) => galleryGroups[groupIndex].Photos.Add(new AdminPhotoModel { Title = "New photo" });
 
     private void Save()
     {
@@ -154,6 +387,23 @@
         try
         {
             editable.Notices = notices.Select(notice => new Notice(notice.Title, notice.Audience, notice.Date, notice.Summary, notice.Priority)).ToList();
+            editable.AcademicEvents = events.Select(item => new AcademicEvent(item.Date, item.Title, item.Description)).ToList();
+            editable.FacultyContacts = faculty.Select(item => new FacultyContact(item.Name, item.Role, item.Phone)).ToList();
+            editable.BusRoutes = routes.Select(item => new BusRoute(item.Name, item.StartsAt, item.Areas, item.Driver)).ToList();
+            editable.AboutUs.Highlights = SplitLines(aboutHighlights);
+            editable.AboutUs.Principles = SplitLines(aboutPrinciples);
+            editable.GalleryYearGroups = galleryGroups.Select(group => new GalleryYearGroupOptions
+            {
+                PassedOutYear = group.PassedOutYear,
+                Title = group.Title,
+                Description = group.Description,
+                Photos = group.Photos.Select(photo => new GalleryPhotoOptions
+                {
+                    Title = photo.Title,
+                    Caption = photo.Caption,
+                    ImageUrl = photo.ImageUrl
+                }).ToList()
+            }).ToList();
             Content.SaveEditableContent(editable);
             saveSucceeded = true;
             statusMessage = "Changes saved successfully. The public website now uses the updated content.";
@@ -168,6 +418,10 @@
             isSaving = false;
         }
     }
+
+    private static List<string> SplitLines(string value) => value
+        .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .ToList();
 
     private async Task SignOut()
     {
@@ -190,5 +444,44 @@
         public string Date { get; set; } = string.Empty;
         public string Summary { get; set; } = string.Empty;
         public string Priority { get; set; } = "Normal";
+    }
+
+    private sealed record AdminSection(string Key, string Label, string Icon);
+
+    private sealed class AdminEventModel
+    {
+        public string Date { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
+
+    private sealed class AdminFacultyModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+    }
+
+    private sealed class AdminRouteModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string StartsAt { get; set; } = string.Empty;
+        public string Areas { get; set; } = string.Empty;
+        public string Driver { get; set; } = string.Empty;
+    }
+
+    private sealed class AdminGalleryGroupModel
+    {
+        public string PassedOutYear { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public List<AdminPhotoModel> Photos { get; set; } = [];
+    }
+
+    private sealed class AdminPhotoModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Caption { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
     }
 }
