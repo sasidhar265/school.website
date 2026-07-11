@@ -36,7 +36,7 @@ public sealed class SchoolContentStore
     public void Save(SchoolConnectOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        var connectionString = configuration.GetConnectionString("SchoolConnectDb");
+        var connectionString = GetConnectionString();
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             throw new InvalidOperationException("Content editing requires ConnectionStrings:SchoolConnectDb to be configured.");
@@ -56,7 +56,7 @@ public sealed class SchoolContentStore
     private SchoolConnectOptions LoadOptions()
     {
         var seed = configuration.GetSection("SchoolConnect").Get<SchoolConnectOptions>() ?? new SchoolConnectOptions();
-        var connectionString = configuration.GetConnectionString("SchoolConnectDb");
+        var connectionString = GetConnectionString();
 
         if (string.IsNullOrWhiteSpace(connectionString))
         {
@@ -140,5 +140,31 @@ public sealed class SchoolContentStore
             ?? new SchoolConnectOptions();
         clone.PortalAuth = new PortalAuthOptions();
         return JsonSerializer.Serialize(clone);
+    }
+
+    private string? GetConnectionString()
+    {
+        var configured = configuration.GetConnectionString("SchoolConnectDb");
+        if (string.IsNullOrWhiteSpace(configured)
+            || (!configured.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase)
+                && !configured.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase)))
+        {
+            return configured;
+        }
+
+        var uri = new Uri(configured);
+        var credentials = uri.UserInfo.Split(':', 2);
+        var builder = new NpgsqlConnectionStringBuilder
+        {
+            Host = uri.Host,
+            Port = uri.IsDefaultPort ? 5432 : uri.Port,
+            Database = Uri.UnescapeDataString(uri.AbsolutePath.TrimStart('/')),
+            Username = Uri.UnescapeDataString(credentials[0]),
+            Password = credentials.Length > 1 ? Uri.UnescapeDataString(credentials[1]) : string.Empty,
+            Pooling = true,
+            ApplicationName = "SchoolConnect"
+        };
+
+        return builder.ConnectionString;
     }
 }

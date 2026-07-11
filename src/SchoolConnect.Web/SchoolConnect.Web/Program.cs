@@ -11,7 +11,10 @@ var builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
 {
     Args = args,
     ContentRootPath = AppContext.BaseDirectory,
-    WebRootPath = webRootPath
+    WebRootPath = webRootPath,
+    EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+        ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+        ?? Environments.Production
 });
 
 // CreateEmptyBuilder still supplies default configuration providers. Replace them

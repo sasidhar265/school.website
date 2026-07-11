@@ -17,4 +17,13 @@ services:
       - key: SchoolConnect__PortalAuth__Admin__Password
         sync: false
       - key: ConnectionStrings__SchoolConnectDb
-        sync: false
+        fromDatabase:
+          name: schoolconnect-db
+          property: connectionString
+
+databases:
+  - name: schoolconnect-db
+    databaseName: schoolconnect
+    region: singapore
+    plan: basic-256mb
+    ipAllowList: []
