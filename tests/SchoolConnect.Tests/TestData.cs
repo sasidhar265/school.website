@@ -33,7 +33,9 @@ internal static class TestData
         return new PortalSessionService(
             CreateStore(),
             new PasswordHasher<PortalAccountOptions>(),
-            new EphemeralDataProtectionProvider());
+            new EphemeralDataProtectionProvider(),
+            new LoginAttemptGuard(),
+            NullLogger<PortalSessionService>.Instance);
     }
 
     private static Dictionary<string, string?> CreateConfiguration()

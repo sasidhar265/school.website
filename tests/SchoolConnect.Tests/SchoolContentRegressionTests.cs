@@ -121,4 +121,19 @@ public sealed class SchoolContentRegressionTests
             Assert.That(content.Items, Has.None.Property("Category").EqualTo("Assessments"));
         }
     }
+
+    [TestCase("https://cdn.example.edu/faculty/photo.jpg", true)]
+    [TestCase("_content/SchoolConnect.Shared/photo.jpg", true)]
+    [TestCase("/images/faculty/photo.jpg", true)]
+    [TestCase("images/faculty/photo.jpg", true)]
+    [TestCase("http://example.edu/photo.jpg", false)]
+    [TestCase("javascript:alert(1)", false)]
+    [TestCase("data:image/svg+xml,<svg></svg>", false)]
+    [TestCase("//tracker.example/photo.jpg", false)]
+    [TestCase("../private/photo.jpg", false)]
+    [TestCase("images\\photo.jpg", false)]
+    public void SafeImageUrl_AllowsOnlyHttpsOrSafeLocalPaths(string url, bool expected)
+    {
+        Assert.That(SafeImageUrl.IsAllowed(url), Is.EqualTo(expected));
+    }
 }

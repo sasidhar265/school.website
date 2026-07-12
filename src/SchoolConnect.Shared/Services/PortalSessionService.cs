@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using SchoolConnect.Shared.Configuration;
 
 namespace SchoolConnect.Shared.Services;
@@ -12,16 +13,22 @@ public sealed class PortalSessionService
     private readonly SchoolContentStore store;
     private readonly IPasswordHasher<PortalAccountOptions> passwordHasher;
     private readonly IDataProtector sessionProtector;
+    private readonly LoginAttemptGuard loginAttemptGuard;
+    private readonly ILogger<PortalSessionService> logger;
     private string? currentRole;
 
     public PortalSessionService(
         SchoolContentStore store,
         IPasswordHasher<PortalAccountOptions> passwordHasher,
-        IDataProtectionProvider dataProtectionProvider)
+        IDataProtectionProvider dataProtectionProvider,
+        LoginAttemptGuard loginAttemptGuard,
+        ILogger<PortalSessionService> logger)
     {
         this.store = store;
         this.passwordHasher = passwordHasher;
         sessionProtector = dataProtectionProvider.CreateProtector("SchoolConnect.PortalSession.v1");
+        this.loginAttemptGuard = loginAttemptGuard;
+        this.logger = logger;
     }
 
     public event Action? Changed;
@@ -31,14 +38,23 @@ public sealed class PortalSessionService
 
     public bool TrySignIn(string role, string? pin, string? password)
     {
+        if (!loginAttemptGuard.IsAllowed(role))
+        {
+            logger.LogWarning("Blocked a portal sign-in attempt because the {Role} role is temporarily locked.", role);
+            return false;
+        }
+
         var account = GetAccount(role);
         if (account is null || string.IsNullOrWhiteSpace(password)
             || !string.Equals(pin?.Trim(), account.Pin, StringComparison.OrdinalIgnoreCase)
             || !VerifyPassword(account, password))
         {
+            loginAttemptGuard.RecordFailure(role);
+            logger.LogWarning("Portal sign-in failed for the {Role} role.", role);
             return false;
         }
 
+        loginAttemptGuard.RecordSuccess(role);
         SetAuthenticated(role, true);
         currentRole = role;
         NotifyChanged();

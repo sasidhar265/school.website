@@ -10,7 +10,7 @@
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development",
           "SchoolConnect__PortalAuth__Admin__Pin": "ADMIN",
-          "SchoolConnect__PortalAuth__Admin__Password": "admin@123"
+          "SchoolConnect__PortalAuth__Admin__Password": ""
         }
       },
       "https": {
@@ -22,7 +22,7 @@
         "environmentVariables": {
           "ASPNETCORE_ENVIRONMENT": "Development",
           "SchoolConnect__PortalAuth__Admin__Pin": "ADMIN",
-          "SchoolConnect__PortalAuth__Admin__Password": "admin@123"
+          "SchoolConnect__PortalAuth__Admin__Password": ""
         }
       }
     }

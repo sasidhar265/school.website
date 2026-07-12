@@ -226,7 +226,7 @@ public sealed class SchoolAppSmokeTests
     }
 
     [Test]
-    public async Task StudyContentApi_ReturnsAssessmentsWithAnswersAndExplanationsForPrimaryClass()
+    public async Task StudyContentApi_ReturnsQuestionsWithoutAnswerKeysForPrimaryClass()
     {
         var host = await AppHost.Value;
         using var response = await host.Client.GetAsync("/api/classes/Class%205/study-content");
@@ -241,8 +241,9 @@ public sealed class SchoolAppSmokeTests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(assessments.Length, Is.GreaterThan(1));
             Assert.That(assessments.All(item => item.GetProperty("assessmentQuestions").GetArrayLength() >= 10), Is.True);
-            Assert.That(questions.All(question => !string.IsNullOrWhiteSpace(question.GetProperty("correctAnswer").GetString())), Is.True);
-            Assert.That(questions.All(question => !string.IsNullOrWhiteSpace(question.GetProperty("explanation").GetString())), Is.True);
+            Assert.That(questions.All(question => question.TryGetProperty("correctAnswer", out _) is false), Is.True);
+            Assert.That(questions.All(question => question.TryGetProperty("explanation", out _) is false), Is.True);
+            Assert.That(body, Does.Not.Contain("correctAnswer").IgnoreCase);
             AssertApiHasNoPageMarkup(body);
         }
     }
@@ -278,7 +279,29 @@ public sealed class SchoolAppSmokeTests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             Assert.That(response.Content.Headers.ContentType?.MediaType, Is.EqualTo("application/json"));
             Assert.That(json.RootElement.GetProperty("code").GetString(), Is.EqualTo("class_not_found"));
+            Assert.That(json.RootElement.GetProperty("message").GetString(), Does.Not.Contain("Unknown"));
             AssertApiHasNoPageMarkup(body);
+        }
+    }
+
+    [Test]
+    public async Task Responses_IncludeSecurityHeadersAndSuppressKestrelDisclosure()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/");
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.Headers.TryGetValues("X-Content-Type-Options", out var contentTypeOptions), Is.True);
+            Assert.That(contentTypeOptions, Does.Contain("nosniff"));
+            Assert.That(response.Headers.TryGetValues("Referrer-Policy", out var referrerPolicy), Is.True);
+            Assert.That(referrerPolicy, Does.Contain("strict-origin-when-cross-origin"));
+            Assert.That(response.Headers.TryGetValues("Permissions-Policy", out _), Is.True);
+            Assert.That(response.Headers.TryGetValues("Content-Security-Policy", out var csp), Is.True);
+            Assert.That(csp!.Single(), Does.Contain("object-src 'none'"));
+            Assert.That(response.Headers.Server.Any(value => value.ToString().Contains("Kestrel", StringComparison.OrdinalIgnoreCase)), Is.False);
+            Assert.That(response.Headers.TryGetValues("X-Frame-Options", out var frameOptions), Is.True);
+            Assert.That(frameOptions, Does.Contain("SAMEORIGIN"));
         }
     }
 

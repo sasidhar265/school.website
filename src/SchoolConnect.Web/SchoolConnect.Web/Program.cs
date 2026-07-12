@@ -5,6 +5,8 @@ using System.IO;
 using Microsoft.AspNetCore.Identity;
 using SchoolConnect.Shared.Configuration;
 using SchoolConnect.Web;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Threading.RateLimiting;
 
 var webRootPath = ResolveWebRootPath();
 
@@ -55,7 +57,7 @@ foreach (var schoolContentFile in schoolContentFiles)
 
 builder.Configuration.AddEnvironmentVariables();
 builder.Configuration.AddCommandLine(args);
-builder.WebHost.UseKestrel();
+builder.WebHost.UseKestrel(options => options.AddServerHeader = false);
 
 // Cloud hosts such as Render provide the public HTTP port through PORT.
 // Bind to every container interface so the platform's proxy can reach Kestrel.
@@ -77,11 +79,57 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddSingleton<SchoolContentStore>();
 builder.Services.AddScoped<SchoolContentService>();
+builder.Services.AddSingleton<LoginAttemptGuard>();
 builder.Services.AddScoped<PortalSessionService>();
 builder.Services.AddDataProtection();
 builder.Services.AddSingleton<IPasswordHasher<PortalAccountOptions>, PasswordHasher<PortalAccountOptions>>();
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
+});
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 300,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+});
 
 var app = builder.Build();
+app.UseForwardedHeaders();
+
+app.Use(async (context, next) =>
+{
+    var headers = context.Response.Headers;
+    headers["X-Content-Type-Options"] = "nosniff";
+    headers["X-Frame-Options"] = "SAMEORIGIN";
+    headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(), payment=(), usb=()";
+    headers["Content-Security-Policy"] = "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' ws: wss:";
+    if (!app.Environment.IsDevelopment())
+    {
+        headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+    }
+
+    await next();
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -118,6 +166,7 @@ if (!app.Environment.IsDevelopment())
 app.UseAntiforgery();
 
 app.UseStaticFiles();
+app.UseRateLimiter();
 app.MapSchoolApi();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()

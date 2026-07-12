@@ -138,4 +138,30 @@ public sealed class PortalSessionServiceTests
         Assert.That(activeSession, Is.Not.Null);
         Assert.That(activeSession!.Role, Is.EqualTo(PortalRoles.Student));
     }
+
+    [Test]
+    public void TrySignIn_AfterRepeatedFailures_TemporarilyLocksRoleEvenWithCorrectPassword()
+    {
+        var session = TestData.CreatePortalSession();
+
+        for (var attempt = 0; attempt < LoginAttemptGuard.MaximumFailures; attempt++)
+        {
+            Assert.That(session.TrySignIn(PortalRoles.Student, "STU1001", "incorrect"), Is.False);
+        }
+
+        Assert.That(session.TrySignIn(PortalRoles.Student, "STU1001", "student@123"), Is.False);
+        Assert.That(session.IsAuthenticated(PortalRoles.Student), Is.False);
+    }
+
+    [Test]
+    public void TrySignIn_FailuresForOneRole_DoNotLockAnotherRole()
+    {
+        var session = TestData.CreatePortalSession();
+        for (var attempt = 0; attempt < LoginAttemptGuard.MaximumFailures; attempt++)
+        {
+            session.TrySignIn(PortalRoles.Student, "STU1001", "incorrect");
+        }
+
+        Assert.That(session.TrySignIn(PortalRoles.Teacher, "TCH1001", "teacher@123"), Is.True);
+    }
 }

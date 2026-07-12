@@ -3,7 +3,7 @@
     "PortalAuth": {
       "Student": {
         "Pin": "STU1001",
-        "Password": "student@123",
+        "Password": "",
         "DisplayName": "Student User",
         "ClassName": "Class 5",
         "Gender": "Male",
@@ -14,7 +14,7 @@
       },
       "Teacher": {
         "Pin": "TCH1001",
-        "Password": "teacher@123",
+        "Password": "",
         "DisplayName": "Teacher User",
         "ClassName": "Staff",
         "Gender": "Female",

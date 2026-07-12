@@ -61,8 +61,8 @@ public static class SchoolApiEndpoints
                 string.Equals(item.ClassName, className, StringComparison.OrdinalIgnoreCase));
 
             return studyContent is null
-                ? Results.NotFound(new ApiError("class_not_found", $"No study content was found for class '{className}'."))
-                : Results.Ok(studyContent);
+                ? Results.NotFound(new ApiError("class_not_found", "No study content was found for the requested class."))
+                : Results.Ok(ToStudentSafeContent(studyContent));
         });
 
         api.MapGet("/classes/{className}/curriculum", (string className, SchoolContentService content) =>
@@ -71,7 +71,7 @@ public static class SchoolApiEndpoints
                 string.Equals(item.ClassName, className, StringComparison.OrdinalIgnoreCase));
 
             return curriculum is null
-                ? Results.NotFound(new ApiError("class_not_found", $"No curriculum was found for class '{className}'."))
+                ? Results.NotFound(new ApiError("class_not_found", "No curriculum was found for the requested class."))
                 : Results.Ok(curriculum);
         });
 
@@ -86,6 +86,27 @@ public static class SchoolApiEndpoints
         _ when className.StartsWith("Class ", StringComparison.OrdinalIgnoreCase)
             && int.TryParse(className[6..], out var number) => number + 2,
         _ => int.MaxValue
+    };
+
+    private static object ToStudentSafeContent(StudentStudyContent content) => new
+    {
+        content.ClassName,
+        content.Categories,
+        Items = content.Items.Select(item => new
+        {
+            item.Category,
+            item.Title,
+            item.Detail,
+            item.ActionLabel,
+            item.Subject,
+            AssessmentQuestions = item.AssessmentQuestions.Select(question => new
+            {
+                question.Number,
+                question.Prompt,
+                question.Marks,
+                question.Choices
+            })
+        })
     };
 
     private sealed record ApiError(string Code, string Message);

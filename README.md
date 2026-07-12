@@ -149,12 +149,13 @@ The Blueprint uses Render's `basic-256mb` database plan for durable production s
 
 The protected dashboard is available from **Login > Administration Login** or directly at `/admin`.
 
-Local development credentials are:
+Local development identifiers are:
 
 ```text
 Administrator ID: ADMIN
-Password: admin@123
 ```
+
+No working passwords are stored in the repository. Configure the student, teacher, and administrator passwords through `SchoolConnect__PortalAuth__Student__Password`, `SchoolConnect__PortalAuth__Teacher__Password`, and `SchoolConnect__PortalAuth__Admin__Password` environment variables before starting the app.
 
 The dashboard manages:
 
@@ -169,16 +170,18 @@ The dashboard manages:
 
 Select a section, edit its fields, and choose **Save all changes**. After a successful save, refresh the public website to see the PostgreSQL-backed content. Signing out clears the protected browser session and returns to the homepage.
 
-### Production administrator configuration
+### Production portal configuration
 
 Set these Render environment variables before using the dashboard:
 
 ```text
 SchoolConnect__PortalAuth__Admin__Pin=ADMIN
 SchoolConnect__PortalAuth__Admin__Password=<a-long-unique-password>
+SchoolConnect__PortalAuth__Student__Password=<a-long-unique-password>
+SchoolConnect__PortalAuth__Teacher__Password=<a-long-unique-password>
 ```
 
-The Blueprint prompts for the administrator password and obtains the database connection directly from the managed `schoolconnect-db` resource. The repository contains no default production administrator password, so admin access remains disabled until the secret is configured. Portal sessions are server-signed, expire after eight hours, and reject edited browser-storage values.
+The Blueprint prompts for all three passwords and obtains the database connection directly from the managed `schoolconnect-db` resource. The repository contains no working portal passwords, so each role remains disabled until its secret is configured. Use unique values for every role and rotate any previously deployed defaults. Portal sessions are server-signed, expire after eight hours, reject edited browser-storage values, and lock a role temporarily after repeated failures.
 
 ## Public JSON API
 

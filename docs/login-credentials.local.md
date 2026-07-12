@@ -1,18 +1,11 @@
-# Temporary Login Credentials
+# Local Login Configuration
 
-These credentials are for development/testing only. Delete this file before production release.
+The repository does not contain working portal passwords. Set development-only secrets in your shell before starting the application:
 
-## Student Login
+```bash
+export SchoolConnect__PortalAuth__Student__Password='<unique-student-password>'
+export SchoolConnect__PortalAuth__Teacher__Password='<unique-teacher-password>'
+export SchoolConnect__PortalAuth__Admin__Password='<unique-admin-password>'
+```
 
-- PIN: `STU1001`
-- Password: `student@123`
-
-## Teacher Login
-
-- PIN: `TCH1001`
-- Password: `teacher@123`
-
-## Administration Login
-
-- Administrator ID: `ADMIN`
-- Password: `admin@123`
+The configured local identifiers are `STU1001`, `TCH1001`, and `ADMIN`. Never reuse production passwords locally or commit secret values to this file.

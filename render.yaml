@@ -16,6 +16,10 @@ services:
         value: ADMIN
       - key: SchoolConnect__PortalAuth__Admin__Password
         sync: false
+      - key: SchoolConnect__PortalAuth__Student__Password
+        sync: false
+      - key: SchoolConnect__PortalAuth__Teacher__Password
+        sync: false
       - key: ConnectionStrings__SchoolConnectDb
         fromDatabase:
           name: schoolconnect-db

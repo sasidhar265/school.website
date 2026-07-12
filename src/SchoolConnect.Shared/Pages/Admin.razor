@@ -476,7 +476,7 @@
         statusMessage = null;
         try
         {
-            if (!ValidateGallery())
+            if (!ValidateFacultyImages() || !ValidateGallery())
             {
                 showSaveResult = true;
                 return;
@@ -549,8 +549,30 @@
             return false;
         }
 
+        if (galleryGroups.SelectMany(group => group.Photos).Any(photo => !SafeImageUrl.IsAllowed(photo.ImageUrl)))
+        {
+            saveSucceeded = false;
+            statusMessage = "Gallery image URLs must use HTTPS or a safe local relative path.";
+            activeSection = "gallery";
+            return false;
+        }
+
         return true;
     }
+
+    private bool ValidateFacultyImages()
+    {
+        if (faculty.Any(item => !string.IsNullOrWhiteSpace(item.ImageUrl) && !SafeImageUrl.IsAllowed(item.ImageUrl)))
+        {
+            saveSucceeded = false;
+            statusMessage = "Faculty photo URLs must use HTTPS or a safe local relative path.";
+            activeSection = "people";
+            return false;
+        }
+
+        return true;
+    }
+
 
     private static List<string> SplitLines(string value) => value
         .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
