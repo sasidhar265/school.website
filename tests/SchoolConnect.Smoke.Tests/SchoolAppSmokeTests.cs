@@ -60,6 +60,112 @@ public sealed class SchoolAppSmokeTests
         Assert.That(body, Does.Contain("Password"));
     }
 
+    [TestCase("/about", "Welcome to Our School")]
+    [TestCase("/gallery", "Student Gallery")]
+    [TestCase("/notices", "Notices")]
+    [TestCase("/attendance", "Attendance")]
+    [TestCase("/homework", "Homework")]
+    [TestCase("/fees", "Fees")]
+    [TestCase("/messages", "Messages")]
+    [TestCase("/student-login", "Login required")]
+    [TestCase("/teacher-login", "Login required")]
+    public async Task PublicRoute_RendersExpectedPageWithoutServerError(string route, string expectedHeading)
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync(route);
+        var body = await response.Content.ReadAsStringAsync();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), route);
+            Assert.That(body, Does.Contain(expectedHeading), route);
+            Assert.That(body, Does.Contain("SchoolConnect"), route);
+            Assert.That(body, Does.Not.Contain("<title>Error"), route);
+            Assert.That(body, Does.Not.Contain("System.InvalidOperationException"), route);
+        }
+    }
+
+    [Test]
+    public async Task HomePage_ReferencesVersionedSharedAssetsToAvoidStaleRenderViews()
+    {
+        var host = await AppHost.Value;
+        var body = await host.Client.GetStringAsync("/");
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(body, Does.Contain("schoolconnect.css?v=20260712-2"));
+            Assert.That(body, Does.Contain("assessment.js?v=20260712-2"));
+            Assert.That(body, Does.Contain("painting.js?v=20260712-2"));
+        }
+    }
+
+    [TestCase("/_content/SchoolConnect.Shared/schoolconnect.css?v=20260712-2", "text/css", "assessment-workspace")]
+    [TestCase("/_content/SchoolConnect.Shared/assessment.js?v=20260712-2", "javascript", "getSelections")]
+    [TestCase("/_content/SchoolConnect.Shared/painting.js?v=20260712-2", "javascript", "loadTemplate")]
+    public async Task SharedAsset_IsServedWithExpectedContent(string route, string expectedMediaType, string expectedContent)
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync(route);
+        var body = await response.Content.ReadAsStringAsync();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Content.Headers.ContentType?.MediaType, Does.Contain(expectedMediaType));
+            Assert.That(body, Does.Contain(expectedContent));
+            Assert.That(body.Length, Is.GreaterThan(100));
+        }
+    }
+
+    [TestCase("elephant.png")]
+    [TestCase("school-bus.png")]
+    [TestCase("butterfly-garden.png")]
+    public async Task PaintingTemplate_IsServedAsNonEmptyPng(string fileName)
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync($"/_content/SchoolConnect.Shared/images/painting-templates/{fileName}");
+        var bytes = await response.Content.ReadAsByteArrayAsync();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Content.Headers.ContentType?.MediaType, Is.EqualTo("image/png"));
+            Assert.That(bytes.Length, Is.GreaterThan(10_000));
+            Assert.That(bytes.Take(8), Is.EqualTo(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }));
+        }
+    }
+
+    [Test]
+    public async Task AdminPage_UnauthenticatedRequestDoesNotExposeEditorOrCredentials()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/admin");
+        var body = await response.Content.ReadAsStringAsync();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(body, Does.Contain("Loading secure administration"));
+            Assert.That(body, Does.Not.Contain("Save all changes"));
+            Assert.That(body, Does.Not.Contain("admin@123"));
+        }
+    }
+
+    [Test]
+    public async Task UnknownRoute_ReturnsNotFoundStatusAndFriendlyPage()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/route-that-does-not-exist");
+        var body = await response.Content.ReadAsStringAsync();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(body, Does.Contain("not found").IgnoreCase);
+            Assert.That(body, Does.Not.Contain("System.").IgnoreCase);
+        }
+    }
+
     [OneTimeTearDown]
     public async Task TearDown() => await DisposeHostAsync();
 

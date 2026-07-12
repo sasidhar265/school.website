@@ -10,10 +10,19 @@ namespace SchoolConnect.Tests;
 
 internal static class TestData
 {
-    public static SchoolContentStore CreateStore()
+    public static SchoolContentStore CreateStore(IReadOnlyDictionary<string, string?>? overrides = null)
     {
+        var values = CreateConfiguration();
+        if (overrides is not null)
+        {
+            foreach (var item in overrides)
+            {
+                values[item.Key] = item.Value;
+            }
+        }
+
         var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(CreateConfiguration())
+            .AddInMemoryCollection(values)
             .Build();
 
         return new SchoolContentStore(configuration, NullLogger<SchoolContentStore>.Instance);
