@@ -55,18 +55,28 @@
                     <span>@activeGroup.Photos.Count photo@(activeGroup.Photos.Count == 1 ? string.Empty : "s")</span>
                 </div>
 
-                <div class="gallery-grid">
-                    @foreach (var photo in activeGroup.Photos)
-                    {
-                        <article class="gallery-card">
-                            <img src="@photo.ImageUrl" alt="@photo.Title" />
-                            <div>
-                                <h3>@photo.Title</h3>
-                                <p>@photo.Caption</p>
-                            </div>
-                        </article>
-                    }
-                </div>
+                @if (activeGroup.Photos.Count == 0)
+                {
+                    <div class="alert alert-light border text-center mb-0">
+                        <span class="bi bi-images fs-3 d-block mb-2 text-secondary"></span>
+                        No photos have been added to this collection yet.
+                    </div>
+                }
+                else
+                {
+                    <div class="gallery-grid">
+                        @foreach (var photo in activeGroup.Photos)
+                        {
+                            <article class="gallery-card" @key="photo.ImageUrl">
+                                <img src="@photo.ImageUrl" alt="@photo.Title" loading="lazy" />
+                                <div>
+                                    <h3>@photo.Title</h3>
+                                    <p>@photo.Caption</p>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
             </section>
         }
     }

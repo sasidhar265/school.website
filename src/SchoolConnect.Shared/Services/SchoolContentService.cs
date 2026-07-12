@@ -98,7 +98,8 @@ public sealed class SchoolContentService
             var curriculum = options.StudentCurricula.FirstOrDefault(item =>
                 string.Equals(item.ClassName, content.ClassName, StringComparison.OrdinalIgnoreCase));
 
-            if (curriculum is not null)
+            var isEarlyYearsClass = content.ClassName is "Nursery" or "LKG" or "UKG";
+            if (curriculum is not null && !isEarlyYearsClass)
             {
                 foreach (var subject in curriculum.Subjects.Distinct(StringComparer.OrdinalIgnoreCase))
                 {
@@ -107,10 +108,8 @@ public sealed class SchoolContentService
                         .ToArray();
                     var topics = units.SelectMany(unit => unit.Topics).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
                     var outcome = units.Select(unit => unit.Outcome).FirstOrDefault(text => !string.IsNullOrWhiteSpace(text));
-                    var isEarlyYears = content.ClassName is "Nursery" or "LKG" or "UKG";
-                    var format = isEarlyYears
-                        ? "Activity-based observation • Teacher rubric • 20-25 minutes"
-                        : "Formative assessment • 20 marks • 30 minutes";
+                    var isEarlyYears = false;
+                    var format = "Formative assessment • 20 marks • 30 minutes";
                     var scope = topics.Length > 0 ? string.Join(", ", topics) : $"Core {subject} skills for {content.ClassName}";
 
                     var questions = BuildAssessmentQuestions(subject, topics, isEarlyYears);
@@ -124,7 +123,10 @@ public sealed class SchoolContentService
                             isTelugu ? "ఈ మూల్యాంకనం ఏ పాఠ్యాంశానికి సంబంధించినది?" : $"Which subject does this assessment cover?",
                             20,
                             isTelugu ? ["తెలుగు పాఠ్యాంశం", "గణితం", "విజ్ఞాన శాస్త్రం", "క్రీడలు"] : [subject, "Physical Education", "Music", "General Knowledge"],
-                            correctAnswer)];
+                            correctAnswer,
+                            isTelugu
+                                ? "ఈ ప్రశ్న తెలుగు మూల్యాంకనం యొక్క పాఠ్యాంశాన్ని గుర్తించమని అడుగుతుంది."
+                                : $"This assessment is specifically designed to check learning in {subject}.")];
                     }
 
                     items.Add(new StudentStudyContentItem(
@@ -139,8 +141,19 @@ public sealed class SchoolContentService
                 }
             }
 
+            if (isEarlyYearsClass)
+            {
+                items.Add(new StudentStudyContentItem(
+                    "Painting & Drawing",
+                    "Online Creative Canvas",
+                    "Draw, colour, and explore ideas freely using a child-friendly online canvas.",
+                    "Start drawing",
+                    "Creative Arts"));
+            }
+
             var categories = content.Categories
-                .Append("Assessments")
+                .Where(category => !isEarlyYearsClass || !string.Equals(category, "Assessments", StringComparison.OrdinalIgnoreCase))
+                .Append(isEarlyYearsClass ? "Painting & Drawing" : "Assessments")
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
 
@@ -156,7 +169,7 @@ public sealed class SchoolContentService
             ? new[] { "గణిత గణనలు", "క్రీడా నియమాలు", "సంగీత సాధన", "ఆంగ్ల వ్యాకరణం" }
             : new[] { "Sports training", "Music practice", "School transport", "Free play" };
 
-        return localizedTopics.Take(5).Select((topic, index) =>
+        return localizedTopics.Take(5).SelectMany((topic, topicIndex) =>
         {
             var otherTopics = localizedTopics.Where(candidate => !string.Equals(candidate, topic, StringComparison.OrdinalIgnoreCase));
             var choices = new[] { topic }
@@ -164,16 +177,30 @@ public sealed class SchoolContentService
                 .Concat(fallbackChoices)
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Take(4)
-                .OrderBy(choice => StableChoiceOrder(choice, index))
+                .OrderBy(choice => StableChoiceOrder(choice, topicIndex))
                 .ToArray();
 
-            var prompt = isTelugu
-                ? $"కింది వాటిలో తెలుగు పాఠ్యాంశానికి సంబంధించిన అంశాన్ని ఎంచుకోండి. (ప్రశ్న {index + 1})"
+            var firstPrompt = isTelugu
+                ? $"కింది వాటిలో తెలుగు పాఠ్యాంశానికి సంబంధించిన అంశాన్ని ఎంచుకోండి. (భాగం {topicIndex + 1})"
                 : isEarlyYears
                     ? $"Which activity belongs to this {subject} learning section?"
                     : $"Which topic is included in this {subject} assessment section?";
 
-            return new StudentAssessmentQuestion(index + 1, prompt, 4, choices, topic);
+            var secondPrompt = isTelugu
+                ? $"తెలుగు అభ్యాసంలో నేర్చుకునే సరైన అంశాన్ని గుర్తించండి. (భాగం {topicIndex + 1})"
+                : isEarlyYears
+                    ? $"Choose the {subject} activity practised in class."
+                    : $"Select the topic that belongs to the {subject} syllabus.";
+
+            var questionNumber = topicIndex * 2 + 1;
+            var explanation = isTelugu
+                ? $"'{topic}' తెలుగు పాఠ్యప్రణాళికలోని అభ్యాస అంశం; మిగతా ఎంపికలు ఈ విభాగానికి సంబంధించినవి కావు."
+                : $"'{topic}' is one of the listed learning topics in the {subject} syllabus; the other choices do not match this section.";
+            return new[]
+            {
+                new StudentAssessmentQuestion(questionNumber, firstPrompt, 2, choices, topic, explanation),
+                new StudentAssessmentQuestion(questionNumber + 1, secondPrompt, 2, choices.Reverse().ToArray(), topic, explanation)
+            };
         }).ToArray();
     }
 

@@ -39,7 +39,12 @@ public sealed class SchoolContentStore
         var connectionString = GetConnectionString();
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            throw new InvalidOperationException("Content editing requires ConnectionStrings:SchoolConnectDb to be configured.");
+            SaveToLocalFile(options);
+            lock (syncRoot)
+            {
+                cachedOptions = options;
+            }
+            return;
         }
 
         using var connection = new NpgsqlConnection(connectionString);
@@ -60,7 +65,7 @@ public sealed class SchoolContentStore
 
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            return seed;
+            return LoadFromLocalFile(seed);
         }
 
         try
@@ -166,5 +171,63 @@ public sealed class SchoolContentStore
         };
 
         return builder.ConnectionString;
+    }
+
+    private SchoolConnectOptions LoadFromLocalFile(SchoolConnectOptions seed)
+    {
+        var path = GetLocalContentPath();
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            return seed;
+        }
+
+        try
+        {
+            var loaded = JsonSerializer.Deserialize<SchoolConnectOptions>(File.ReadAllText(path));
+            if (loaded is null)
+            {
+                return seed;
+            }
+
+            loaded.PortalAuth = seed.PortalAuth;
+            return loaded;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Falling back to configured JSON content because the local editable content file could not be read.");
+            return seed;
+        }
+    }
+
+    private void SaveToLocalFile(SchoolConnectOptions options)
+    {
+        var path = GetLocalContentPath();
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new InvalidOperationException("Content editing requires either ConnectionStrings:SchoolConnectDb or SchoolConnectContentFile to be configured.");
+        }
+
+        var directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        var temporaryPath = path + ".tmp";
+        File.WriteAllText(temporaryPath, SerializeContentOnly(options));
+        File.Move(temporaryPath, path, true);
+    }
+
+    private string? GetLocalContentPath()
+    {
+        var configured = configuration["SchoolConnectContentFile"];
+        if (string.IsNullOrWhiteSpace(configured))
+        {
+            return null;
+        }
+
+        return Path.IsPathRooted(configured)
+            ? configured
+            : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, configured));
     }
 }

@@ -38,7 +38,7 @@ public sealed record RoleModule(string Title, string Description, string[] Tasks
 
 public sealed record BusRoute(string Name, string StartsAt, string Areas, string Driver);
 
-public sealed record FacultyContact(string Name, string Role, string Phone);
+public sealed record FacultyContact(string Name, string Role, string Phone, string ImageUrl = "");
 
 public sealed record AboutUsSection(string Title, string Summary, string[] Highlights, string[] Principles);
 
@@ -62,7 +62,8 @@ public sealed record StudentAssessmentQuestion(
     string Prompt,
     int Marks,
     IReadOnlyList<string> Choices,
-    string CorrectAnswer);
+    string CorrectAnswer,
+    string Explanation = "");
 
 public sealed record StudentProgressSummary(
     string ClassName,

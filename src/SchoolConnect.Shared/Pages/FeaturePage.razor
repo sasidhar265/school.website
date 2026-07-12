@@ -204,9 +204,19 @@
                             @foreach (var contact in school.FacultyContacts)
                             {
                                 <article class="admissions-team-item">
-                                    <div>
+                                    <div class="faculty-contact-identity">
+                                        @if (!string.IsNullOrWhiteSpace(contact.ImageUrl))
+                                        {
+                                            <img class="faculty-photo" src="@contact.ImageUrl" alt="Photo of @contact.Name" loading="lazy" />
+                                        }
+                                        else
+                                        {
+                                            <span class="faculty-photo faculty-photo-placeholder" aria-hidden="true">@GetInitials(contact.Name)</span>
+                                        }
+                                        <div>
                                         <h3>@contact.Name</h3>
                                         <p>@contact.Role</p>
+                                        </div>
                                     </div>
                                     <a class="contact-action" href="tel:@contact.Phone">
                                         <span class="bi bi-telephone-fill" aria-hidden="true"></span>
@@ -627,42 +637,81 @@
                     @if (selectedContent is not null)
                     {
                         <div class="timetable-module-shell timetable-popup-body">
-                            <div class="timetable-class-tabs" role="tablist" aria-label="Class content selector">
-                                @foreach (var content in school.StudentContents)
-                                {
-                                    <button type="button"
-                                            class="@GetStudentContentTabClass(content.ClassName)"
-                                            @onclick="() => SelectStudentContent(content.ClassName)">
-                                        @content.ClassName
-                                    </button>
-                                }
-                            </div>
-
-                            <div class="timetable-class-tabs curriculum-subject-tabs" role="tablist" aria-label="Content category selector">
-                                @foreach (var category in GetStudentContentCategories(selectedContent))
-                                {
-                                    <button type="button"
-                                            class="@GetStudentContentCategoryTabClass(category)"
-                                            @onclick="() => SelectStudentContentCategory(category)">
-                                        @category
-                                    </button>
-                                }
+                            <div class="student-content-filters" aria-label="Student content filters">
+                                <div>
+                                    <label for="student-content-class" class="form-label">Class</label>
+                                    <select id="student-content-class" class="form-select" value="@activeStudentContentClass" @onchange="ChangeStudentContentClass">
+                                        @foreach (var content in school.StudentContents)
+                                        {
+                                            <option value="@content.ClassName">@content.ClassName</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="student-content-option" class="form-label">Content option</label>
+                                    <select id="student-content-option" class="form-select" value="@activeStudentContentCategory" @onchange="ChangeStudentContentCategory">
+                                        @foreach (var category in GetStudentContentCategories(selectedContent))
+                                        {
+                                            <option value="@category">@category</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
 
                             @if (IsAssessmentCategorySelected())
                             {
-                                <div class="timetable-class-tabs curriculum-subject-tabs" role="tablist" aria-label="Assessment subject selector">
-                                    @foreach (var subject in GetAssessmentSubjects(selectedContent))
-                                    {
-                                        <button type="button"
-                                                class="@GetAssessmentSubjectTabClass(subject)"
-                                                @onclick="() => SelectAssessmentSubject(subject)">
-                                            @subject
-                                        </button>
-                                    }
+                                <div class="assessment-workspace">
+                                    <aside class="assessment-subject-pane">
+                                        <p class="text-uppercase text-muted small fw-bold mb-2">Select subject</p>
+                                        <div class="assessment-subject-nav" role="tablist" aria-label="Assessment subject selector">
+                                            @foreach (var subject in GetAssessmentSubjects(selectedContent))
+                                            {
+                                                <button type="button"
+                                                        class="@GetAssessmentSubjectTabClass(subject)"
+                                                        aria-selected="@string.Equals(activeAssessmentSubject, subject, StringComparison.OrdinalIgnoreCase)"
+                                                        @onclick="() => SelectAssessmentSubject(subject)">
+                                                    <span><i class="bi bi-journal-check me-2" aria-hidden="true"></i>@subject</span>
+                                                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </aside>
+
+                                    <section class="assessment-exam-pane" aria-live="polite">
+                                        <div class="assessment-pane-heading">
+                                            <div>
+                                                <p class="eyebrow mb-1">@activeAssessmentSubject</p>
+                                                <h3 class="h4 mb-1">Available exams</h3>
+                                                <p class="text-muted mb-0">Choose an exam and answer every question.</p>
+                                            </div>
+                                            <span class="assessment-exam-count">@GetFilteredStudentContentItems(selectedContent).Count exam(s)</span>
+                                        </div>
+                                        <div class="curriculum-unit-list">
+                                            @foreach (var item in GetFilteredStudentContentItems(selectedContent))
+                                            {
+                                                <article class="curriculum-unit-card assessment-exam-card">
+                                                    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+                                                        <div>
+                                                            <p class="eyebrow mb-1">@item.Subject · Exam</p>
+                                                            <h4 class="mb-2">@item.Title</h4>
+                                                            <div class="assessment-exam-meta">
+                                                                <span><i class="bi bi-list-check"></i>@item.AssessmentQuestions.Count questions</span>
+                                                                <span><i class="bi bi-award"></i>@item.AssessmentQuestions.Sum(question => question.Marks) marks</span>
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn btn-warning fw-bold" type="button" @onclick="() => OpenAssessment(item)">
+                                                            @item.ActionLabel <i class="bi bi-arrow-right ms-1"></i>
+                                                        </button>
+                                                    </div>
+                                                    <p class="mb-0 mt-3 text-muted">@item.Detail</p>
+                                                </article>
+                                            }
+                                        </div>
+                                    </section>
                                 </div>
                             }
-
+                            else
+                            {
                             <div class="curriculum-unit-list">
                                 @foreach (var item in GetFilteredStudentContentItems(selectedContent))
                                 {
@@ -680,15 +729,55 @@
                                             }
                                             else
                                             {
-                                                <span class="badge rounded-pill text-bg-light">@item.ActionLabel</span>
+                                                @if (IsPaintingCategorySelected())
+                                                {
+                                                    <button class="btn btn-warning btn-sm fw-bold" type="button" @onclick="OpenPaintingStudio">
+                                                        <i class="bi bi-palette me-1"></i>@item.ActionLabel
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge rounded-pill text-bg-light">@item.ActionLabel</span>
+                                                }
                                             }
                                         </div>
                                         <p class="mb-0 text-muted">@item.Detail</p>
                                     </article>
                                 }
                             </div>
+                            }
                         </div>
                     }
+                </div>
+            </div>
+        }
+
+        @if (portalRole == PortalRoles.Student && isPaintingStudioOpen)
+        {
+            <div class="timetable-popup-backdrop" role="presentation" @onclick="ClosePaintingStudio">
+                <div class="timetable-popup painting-studio" role="dialog" aria-modal="true" aria-labelledby="painting-studio-title" @onclick:stopPropagation="true">
+                    <div class="timetable-popup-header">
+                        <div><p class="eyebrow mb-1">Creative activity</p><h2 id="painting-studio-title" class="mb-0">Online painting and drawing</h2></div>
+                        <button type="button" class="timetable-popup-close" aria-label="Close painting studio" @onclick="ClosePaintingStudio">x</button>
+                    </div>
+                    <div class="painting-template-picker" role="list" aria-label="Choose a picture to colour">
+                        @foreach (var template in PaintingTemplates)
+                        {
+                            <button class="painting-template @(activePaintingTemplate == template.Path ? "active" : string.Empty)"
+                                    type="button" role="listitem" aria-pressed="@(activePaintingTemplate == template.Path)"
+                                    @onclick="() => SelectPaintingTemplate(template.Path)">
+                                <img src="@template.Path" alt="@template.Label colouring template" />
+                                <span>@template.Label</span>
+                            </button>
+                        }
+                    </div>
+                    <div class="painting-toolbar">
+                        <label>Colour <input id="painting-colour" type="color" value="#0f766e" aria-label="Brush colour" /></label>
+                        <label>Brush <input id="painting-size" type="range" min="2" max="30" value="7" aria-label="Brush size" /></label>
+                        <button class="btn btn-outline-secondary" type="button" @onclick="ClearPainting"><i class="bi bi-eraser me-1"></i>Clear</button>
+                    </div>
+                    <canvas id="school-painting-canvas" class="painting-canvas" aria-label="Drawing canvas"></canvas>
+                    <p class="text-muted small mt-2 mb-0">Use your mouse, finger, or stylus to draw on the canvas.</p>
                 </div>
             </div>
         }
@@ -742,9 +831,17 @@
                                     </div>
                                     @if (assessmentSubmitted)
                                     {
-                                        <p class="mt-2 mb-0 fw-semibold @(IsAssessmentAnswerCorrect(question) ? "text-success" : "text-danger")">
-                                            @(IsAssessmentAnswerCorrect(question) ? "Correct" : $"Correct answer: {question.CorrectAnswer}")
-                                        </p>
+                                        <div class="assessment-answer-review @(IsAssessmentAnswerCorrect(question) ? "is-correct" : "is-incorrect")">
+                                            <p class="assessment-result-label mb-2">
+                                                <i class="bi @(IsAssessmentAnswerCorrect(question) ? "bi-check-circle-fill" : "bi-x-circle-fill") me-1"></i>
+                                                @(IsAssessmentAnswerCorrect(question) ? "Correct" : "Incorrect")
+                                            </p>
+                                            <dl class="assessment-answer-details mb-0">
+                                                <div><dt>Your answer</dt><dd>@GetAssessmentResponse(question.Number)</dd></div>
+                                                <div><dt>Correct answer</dt><dd>@question.CorrectAnswer</dd></div>
+                                                <div class="assessment-explanation"><dt>Explanation</dt><dd>@question.Explanation</dd></div>
+                                            </dl>
+                                        </div>
                                     }
                                 </article>
                             }
@@ -970,6 +1067,15 @@
     private string? activeStudentContentClass;
     private string? activeStudentContentCategory;
     private string? activeAssessmentSubject;
+    private bool isPaintingStudioOpen;
+    private bool paintingStudioNeedsSetup;
+    private string activePaintingTemplate = PaintingTemplates[0].Path;
+    private static readonly PaintingTemplate[] PaintingTemplates =
+    [
+        new("Elephant", "_content/SchoolConnect.Shared/images/painting-templates/elephant.png"),
+        new("School bus", "_content/SchoolConnect.Shared/images/painting-templates/school-bus.png"),
+        new("Butterfly garden", "_content/SchoolConnect.Shared/images/painting-templates/butterfly-garden.png")
+    ];
     private StudentStudyContentItem? activeAssessment;
     private readonly List<AssessmentAnswerState> assessmentAnswers = [];
     private bool assessmentSubmitted;
@@ -1027,6 +1133,12 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (paintingStudioNeedsSetup)
+        {
+            paintingStudioNeedsSetup = false;
+            await JsRuntime.InvokeVoidAsync("schoolConnectPainting.initialize", "school-painting-canvas", "painting-colour", "painting-size", activePaintingTemplate);
+        }
+
         var requiredRole = GetRequiredPortalRole();
         if (!firstRender || requiredRole is null)
         {
@@ -1362,6 +1474,26 @@
         activeAssessmentSubject = null;
     }
 
+    private void ChangeStudentContentClass(ChangeEventArgs args) => SelectStudentContent(args.Value?.ToString() ?? string.Empty);
+
+    private void ChangeStudentContentCategory(ChangeEventArgs args) => SelectStudentContentCategory(args.Value?.ToString() ?? string.Empty);
+
+    private void OpenPaintingStudio()
+    {
+        isPaintingStudioOpen = true;
+        paintingStudioNeedsSetup = true;
+    }
+
+    private void ClosePaintingStudio() => isPaintingStudioOpen = false;
+
+    private async Task ClearPainting() => await JsRuntime.InvokeVoidAsync("schoolConnectPainting.clear", "school-painting-canvas");
+
+    private async Task SelectPaintingTemplate(string path)
+    {
+        activePaintingTemplate = path;
+        await JsRuntime.InvokeVoidAsync("schoolConnectPainting.loadTemplate", "school-painting-canvas", path);
+    }
+
     private void SelectAssessmentSubject(string subject) => activeAssessmentSubject = subject;
 
     private void OpenAssessment(StudentStudyContentItem assessment)
@@ -1601,6 +1733,9 @@
     private bool IsAssessmentCategorySelected() =>
         string.Equals(activeStudentContentCategory, "Assessments", StringComparison.OrdinalIgnoreCase);
 
+    private bool IsPaintingCategorySelected() =>
+        string.Equals(activeStudentContentCategory, "Painting & Drawing", StringComparison.OrdinalIgnoreCase);
+
     private IReadOnlyList<string> GetAssessmentSubjects(StudentStudyContent content) =>
         content.Items
             .Where(item => string.Equals(item.Category, "Assessments", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(item.Subject))
@@ -1711,6 +1846,13 @@
             AdditionalDetails = string.Empty;
         }
     }
+
+    private sealed record PaintingTemplate(string Label, string Path);
+
+    private static string GetInitials(string name) => string.Concat(name
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
 
     private sealed class AssessmentAnswerState(int questionNumber)
     {

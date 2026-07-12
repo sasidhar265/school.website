@@ -450,9 +450,19 @@
                 @foreach (var contact in school.FacultyContacts)
                 {
                     <div class="contact-row">
-                        <div>
+                        <div class="faculty-contact-identity">
+                            @if (!string.IsNullOrWhiteSpace(contact.ImageUrl))
+                            {
+                                <img class="faculty-photo" src="@contact.ImageUrl" alt="Photo of @contact.Name" loading="lazy" />
+                            }
+                            else
+                            {
+                                <span class="faculty-photo faculty-photo-placeholder" aria-hidden="true">@GetInitials(contact.Name)</span>
+                            }
+                            <div>
                             <h3>@contact.Name</h3>
                             <p>@contact.Role</p>
+                            </div>
                         </div>
                         <a class="contact-action" href="tel:@contact.Phone">
                             <span class="bi bi-person-badge-fill" aria-hidden="true"></span>
@@ -655,6 +665,11 @@
             ? "Enter the teacher PIN and password to continue in the teacher portal."
             : "Enter the student PIN and password to continue in the student portal.";
     }
+
+    private static string GetInitials(string name) => string.Concat(name
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
 
     private async Task SubmitLoginRequest()
     {

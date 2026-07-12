@@ -75,11 +75,6 @@
             <div class="col-6 col-lg-3"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex align-items-center gap-3"><span class="admin-stat-icon bg-info-subtle text-info-emphasis"><i class="bi bi-images"></i></span><div><strong class="fs-4 d-block">@galleryGroups.Sum(group => group.Photos.Count)</strong><small class="text-secondary">Gallery photos</small></div></div></div></div>
         </div>
 
-        @if (!string.IsNullOrWhiteSpace(statusMessage))
-        {
-            <div class="alert @(saveSucceeded ? "alert-success" : "alert-danger") alert-dismissible shadow-sm" role="status"><span class="bi @(saveSucceeded ? "bi-check-circle-fill" : "bi-exclamation-triangle-fill") me-2"></span>@statusMessage</div>
-        }
-
         <EditForm Model="editable" OnValidSubmit="Save">
             <div class="row g-4 align-items-start">
                 <aside class="col-lg-3">
@@ -95,8 +90,6 @@
                                     </button>
                                 }
                             </nav>
-                            <hr />
-                            <a class="btn btn-outline-secondary w-100" href="/" target="_blank"><span class="bi bi-box-arrow-up-right me-2"></span>View website</a>
                         </div>
                     </div>
                 </aside>
@@ -179,9 +172,21 @@
                     var itemIndex = index;
                     <article class="admin-editor-card">
                         <div class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label">Preview</label>
+                                @if (!string.IsNullOrWhiteSpace(faculty[itemIndex].ImageUrl))
+                                {
+                                    <img class="admin-faculty-preview" src="@faculty[itemIndex].ImageUrl" alt="Photo preview for @faculty[itemIndex].Name" />
+                                }
+                                else
+                                {
+                                    <div class="admin-faculty-preview admin-faculty-placeholder"><i class="bi bi-person"></i></div>
+                                }
+                            </div>
                             <div class="col-md-5"><label class="form-label">Name</label><InputText class="form-control" @bind-Value="faculty[itemIndex].Name" /></div>
-                            <div class="col-md-4"><label class="form-label">Role</label><InputText class="form-control" @bind-Value="faculty[itemIndex].Role" /></div>
-                            <div class="col-md-3"><label class="form-label">Phone</label><InputText class="form-control" @bind-Value="faculty[itemIndex].Phone" /></div>
+                            <div class="col-md-5"><label class="form-label">Role</label><InputText class="form-control" @bind-Value="faculty[itemIndex].Role" /></div>
+                            <div class="col-md-4"><label class="form-label">Phone</label><InputText class="form-control" @bind-Value="faculty[itemIndex].Phone" /></div>
+                            <div class="col-md-8"><label class="form-label">Photo URL</label><InputText class="form-control" placeholder="https://example.com/faculty-photo.jpg" @bind-Value="faculty[itemIndex].ImageUrl" /><div class="form-text">Paste a direct image URL to add or replace the faculty photo.</div></div>
                         </div>
                         <button class="btn btn-sm btn-outline-danger mt-3" type="button" @onclick="() => faculty.RemoveAt(itemIndex)">Remove</button>
                     </article>
@@ -232,33 +237,77 @@
                     <div class="d-flex align-items-center gap-3"><span class="admin-heading-icon"><i class="bi bi-images"></i></span><div><p class="text-secondary small mb-0">Media library</p><h2 class="h4 mb-0">Gallery collections</h2></div></div>
                     <button class="btn btn-success" type="button" @onclick="AddGalleryGroup"><i class="bi bi-plus-lg me-1"></i>Add collection</button>
                 </div>
-                @for (var groupIndex = 0; groupIndex < galleryGroups.Count; groupIndex++)
+                @if (galleryGroups.Count == 0)
                 {
-                    var currentGroup = groupIndex;
-                    <article class="admin-editor-card">
+                    <div class="text-center border border-2 border-dashed rounded-4 p-5 bg-body-tertiary">
+                        <i class="bi bi-images display-5 text-secondary"></i>
+                        <h3 class="h5 mt-3">No gallery collections</h3>
+                        <p class="text-secondary mb-0">Add a collection, then add its photos and image URLs.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="row g-4 align-items-start">
+                    <div class="col-lg-4 col-xl-3">
+                        <div class="gallery-year-manager list-group shadow-sm rounded-3 overflow-hidden">
+                            <div class="list-group-item bg-body-tertiary border-0 py-3">
+                                <small class="text-uppercase text-secondary fw-bold">Collections by year</small>
+                            </div>
+                            @foreach (var yearGroup in galleryGroups.OrderByDescending(item => item.PassedOutYear))
+                            {
+                                <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center @(ReferenceEquals(selectedGalleryGroup, yearGroup) ? "active" : string.Empty)" type="button" @onclick="() => SelectGalleryGroup(yearGroup)" @key="yearGroup">
+                                    <span><strong class="d-block">@(string.IsNullOrWhiteSpace(yearGroup.PassedOutYear) ? "New year" : yearGroup.PassedOutYear)</strong><small class="gallery-year-manager-title">@yearGroup.Title</small></span>
+                                    <span class="badge @(ReferenceEquals(selectedGalleryGroup, yearGroup) ? "text-bg-light text-success" : "text-bg-secondary") rounded-pill">@yearGroup.Photos.Count</span>
+                                </button>
+                            }
+                        </div>
+                        <p class="small text-secondary mt-2 mb-0"><i class="bi bi-info-circle me-1"></i>Select a year to update only that collection.</p>
+                    </div>
+                    <div class="col-lg-8 col-xl-9">
+                    @if (selectedGalleryGroup is not null)
+                    {
+                    var group = selectedGalleryGroup;
+                    <article class="admin-editor-card mb-0" @key="group">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <div><p class="text-secondary small mb-0">Editing collection</p><h3 class="h5 mb-0">@(string.IsNullOrWhiteSpace(group.PassedOutYear) ? "New gallery year" : $"Gallery for {group.PassedOutYear}")</h3></div>
+                            <button class="btn btn-sm btn-outline-danger" type="button" @onclick="() => RemoveGalleryGroup(group)"><i class="bi bi-trash me-1"></i>Remove year</button>
+                        </div>
                         <div class="row g-3">
-                            <div class="col-md-3"><label class="form-label">Year</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].PassedOutYear" /></div>
-                            <div class="col-md-9"><label class="form-label">Collection title</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].Title" /></div>
-                            <div class="col-12"><label class="form-label">Description</label><InputTextArea class="form-control" rows="2" @bind-Value="galleryGroups[currentGroup].Description" /></div>
+                            <div class="col-md-3"><label class="form-label">Year</label><InputText class="form-control" @bind-Value="group.PassedOutYear" placeholder="2026" /></div>
+                            <div class="col-md-9"><label class="form-label">Collection title</label><InputText class="form-control" @bind-Value="group.Title" placeholder="Class 5 Memories - 2026" /></div>
+                            <div class="col-12"><label class="form-label">Description</label><InputTextArea class="form-control" rows="2" @bind-Value="group.Description" /></div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-4 mb-2">
-                            <h3 class="h6 mb-0">Photos</h3>
-                            <button class="btn btn-sm btn-outline-success" type="button" @onclick="() => AddPhoto(currentGroup)">Add photo</button>
+                            <h3 class="h6 mb-0">Photos <span class="badge text-bg-secondary rounded-pill">@group.Photos.Count</span></h3>
+                            <button class="btn btn-sm btn-outline-success" type="button" @onclick="() => AddPhoto(group)"><i class="bi bi-plus-lg me-1"></i>Add photo</button>
                         </div>
-                        @for (var photoIndex = 0; photoIndex < galleryGroups[currentGroup].Photos.Count; photoIndex++)
+                        @foreach (var photo in group.Photos)
                         {
-                            var currentPhoto = photoIndex;
-                            <div class="border rounded-3 p-3 mb-2">
-                                <div class="row g-2">
-                                    <div class="col-md-4"><label class="form-label">Photo title</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].Photos[currentPhoto].Title" /></div>
-                                    <div class="col-md-8"><label class="form-label">Image URL</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].Photos[currentPhoto].ImageUrl" /></div>
-                                    <div class="col-12"><label class="form-label">Caption</label><InputText class="form-control" @bind-Value="galleryGroups[currentGroup].Photos[currentPhoto].Caption" /></div>
+                            <div class="border rounded-3 p-3 mb-2 bg-white" @key="photo">
+                                <div class="row g-3 align-items-start">
+                                    <div class="col-lg-3">
+                                        @if (!string.IsNullOrWhiteSpace(photo.ImageUrl))
+                                        {
+                                            <img class="admin-gallery-preview" src="@photo.ImageUrl" alt="Preview for @photo.Title" />
+                                        }
+                                        else
+                                        {
+                                            <div class="admin-gallery-preview-placeholder"><i class="bi bi-image"></i><small>Preview</small></div>
+                                        }
+                                    </div>
+                                    <div class="col-lg-9"><div class="row g-2">
+                                    <div class="col-md-5"><label class="form-label">Photo title</label><InputText class="form-control" @bind-Value="photo.Title" /></div>
+                                    <div class="col-md-7"><label class="form-label">Image URL</label><InputText class="form-control" @bind-Value="photo.ImageUrl" placeholder="https://... or _content/..." /></div>
+                                    <div class="col-12"><label class="form-label">Caption</label><InputText class="form-control" @bind-Value="photo.Caption" /></div>
+                                    </div></div>
                                 </div>
-                                <button class="btn btn-sm btn-link text-danger px-0" type="button" @onclick="() => galleryGroups[currentGroup].Photos.RemoveAt(currentPhoto)">Remove photo</button>
+                                <button class="btn btn-sm btn-link text-danger px-0" type="button" @onclick="() => RemovePhoto(group, photo)"><i class="bi bi-trash me-1"></i>Remove photo</button>
                             </div>
                         }
-                        <button class="btn btn-sm btn-outline-danger mt-2" type="button" @onclick="() => galleryGroups.RemoveAt(currentGroup)">Remove collection</button>
                     </article>
+                    }
+                    </div>
+                    </div>
                 }
             </section>
             }
@@ -270,6 +319,28 @@
                 </div>
             </div>
         </EditForm>
+
+        @if (showSaveResult && !string.IsNullOrWhiteSpace(statusMessage))
+        {
+            <div class="modal fade show d-block admin-result-modal" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="admin-save-result-title" @onclick="CloseSaveResult">
+                <div class="modal-dialog modal-dialog-centered" role="document" @onclick:stopPropagation="true">
+                    <div class="modal-content border-0 shadow-lg overflow-hidden">
+                        <div class="modal-body text-center p-4 p-md-5">
+                            <div class="admin-result-icon @(saveSucceeded ? "is-success" : "is-failure") mx-auto mb-3">
+                                <i class="bi @(saveSucceeded ? "bi-check-lg" : "bi-x-lg")" aria-hidden="true"></i>
+                            </div>
+                            <p class="text-uppercase small fw-bold @(saveSucceeded ? "text-success" : "text-danger") mb-2">@(saveSucceeded ? "Save successful" : "Save failed")</p>
+                            <h2 id="admin-save-result-title" class="h3 fw-bold mb-3">@(saveSucceeded ? "Changes saved" : "Changes were not saved")</h2>
+                            <p class="text-secondary mb-4">@statusMessage</p>
+                            <button class="btn @(saveSucceeded ? "btn-success" : "btn-danger") btn-lg px-5" type="button" @onclick="CloseSaveResult">
+                                <i class="bi bi-check2 me-2"></i>OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-backdrop fade show"></div>
+        }
     }
 </main>
 
@@ -291,12 +362,14 @@
     private List<AdminFacultyModel> faculty = [];
     private List<AdminRouteModel> routes = [];
     private List<AdminGalleryGroupModel> galleryGroups = [];
+    private AdminGalleryGroupModel? selectedGalleryGroup;
     private string aboutHighlights = string.Empty;
     private string aboutPrinciples = string.Empty;
     private string activeSection = "school";
     private bool isReady;
     private bool isSaving;
     private bool saveSucceeded;
+    private bool showSaveResult;
     private string? loginError;
     private string? statusMessage;
 
@@ -346,7 +419,8 @@
         {
             Name = item.Name,
             Role = item.Role,
-            Phone = item.Phone
+            Phone = item.Phone,
+            ImageUrl = item.ImageUrl
         }).ToList();
         routes = editable.BusRoutes.Select(item => new AdminRouteModel
         {
@@ -367,6 +441,7 @@
                 ImageUrl = photo.ImageUrl
             }).ToList()
         }).ToList();
+        selectedGalleryGroup = galleryGroups.OrderByDescending(group => group.PassedOutYear).FirstOrDefault();
         aboutHighlights = string.Join(Environment.NewLine, editable.AboutUs.Highlights);
         aboutPrinciples = string.Join(Environment.NewLine, editable.AboutUs.Principles);
     }
@@ -376,8 +451,23 @@
     private void AddEvent() => events.Add(new AdminEventModel { Date = DateTime.Today.ToString("dd MMM"), Title = "New event" });
     private void AddFaculty() => faculty.Add(new AdminFacultyModel { Name = "New contact", Role = "Staff" });
     private void AddRoute() => routes.Add(new AdminRouteModel { Name = "New route", StartsAt = "8:00 AM" });
-    private void AddGalleryGroup() => galleryGroups.Insert(0, new AdminGalleryGroupModel { PassedOutYear = DateTime.Today.Year.ToString(), Title = "New collection" });
-    private void AddPhoto(int groupIndex) => galleryGroups[groupIndex].Photos.Add(new AdminPhotoModel { Title = "New photo" });
+    private void AddGalleryGroup()
+    {
+        var group = new AdminGalleryGroupModel { Title = "New collection" };
+        galleryGroups.Insert(0, group);
+        selectedGalleryGroup = group;
+    }
+    private void SelectGalleryGroup(AdminGalleryGroupModel group) => selectedGalleryGroup = group;
+    private static void AddPhoto(AdminGalleryGroupModel group) => group.Photos.Add(new AdminPhotoModel { Title = "New photo" });
+    private static void RemovePhoto(AdminGalleryGroupModel group, AdminPhotoModel photo) => group.Photos.Remove(photo);
+    private void RemoveGalleryGroup(AdminGalleryGroupModel group)
+    {
+        galleryGroups.Remove(group);
+        if (ReferenceEquals(selectedGalleryGroup, group))
+        {
+            selectedGalleryGroup = galleryGroups.OrderByDescending(item => item.PassedOutYear).FirstOrDefault();
+        }
+    }
 
     private void Save()
     {
@@ -386,9 +476,15 @@
         statusMessage = null;
         try
         {
+            if (!ValidateGallery())
+            {
+                showSaveResult = true;
+                return;
+            }
+
             editable.Notices = notices.Select(notice => new Notice(notice.Title, notice.Audience, notice.Date, notice.Summary, notice.Priority)).ToList();
             editable.AcademicEvents = events.Select(item => new AcademicEvent(item.Date, item.Title, item.Description)).ToList();
-            editable.FacultyContacts = faculty.Select(item => new FacultyContact(item.Name, item.Role, item.Phone)).ToList();
+            editable.FacultyContacts = faculty.Select(item => new FacultyContact(item.Name, item.Role, item.Phone, item.ImageUrl)).ToList();
             editable.BusRoutes = routes.Select(item => new BusRoute(item.Name, item.StartsAt, item.Areas, item.Driver)).ToList();
             editable.AboutUs.Highlights = SplitLines(aboutHighlights);
             editable.AboutUs.Principles = SplitLines(aboutPrinciples);
@@ -407,16 +503,53 @@
             Content.SaveEditableContent(editable);
             saveSucceeded = true;
             statusMessage = "Changes saved successfully. The public website now uses the updated content.";
+            showSaveResult = true;
         }
         catch (Exception ex)
         {
             saveSucceeded = false;
             statusMessage = ex.Message;
+            showSaveResult = true;
         }
         finally
         {
             isSaving = false;
         }
+    }
+
+    private void CloseSaveResult() => showSaveResult = false;
+
+    private bool ValidateGallery()
+    {
+        var duplicateYear = galleryGroups
+            .Where(group => !string.IsNullOrWhiteSpace(group.PassedOutYear))
+            .GroupBy(group => group.PassedOutYear.Trim(), StringComparer.OrdinalIgnoreCase)
+            .FirstOrDefault(group => group.Count() > 1)?.Key;
+        if (!string.IsNullOrWhiteSpace(duplicateYear))
+        {
+            saveSucceeded = false;
+            statusMessage = $"Gallery year {duplicateYear} is used more than once. Each collection needs a unique year.";
+            activeSection = "gallery";
+            return false;
+        }
+
+        if (galleryGroups.Any(group => string.IsNullOrWhiteSpace(group.PassedOutYear) || string.IsNullOrWhiteSpace(group.Title)))
+        {
+            saveSucceeded = false;
+            statusMessage = "Every gallery collection requires a year and title.";
+            activeSection = "gallery";
+            return false;
+        }
+
+        if (galleryGroups.SelectMany(group => group.Photos).Any(photo => string.IsNullOrWhiteSpace(photo.Title) || string.IsNullOrWhiteSpace(photo.ImageUrl)))
+        {
+            saveSucceeded = false;
+            statusMessage = "Every gallery photo requires a title and image URL.";
+            activeSection = "gallery";
+            return false;
+        }
+
+        return true;
     }
 
     private static List<string> SplitLines(string value) => value
@@ -460,6 +593,7 @@
         public string Name { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
     }
 
     private sealed class AdminRouteModel
