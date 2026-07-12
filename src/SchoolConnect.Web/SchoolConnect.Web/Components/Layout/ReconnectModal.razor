@@ -2,30 +2,33 @@
 
 <dialog id="components-reconnect-modal" data-nosnippet>
     <div class="components-reconnect-container">
-        <div class="components-rejoining-animation" aria-hidden="true">
-            <div></div>
-            <div></div>
+        <div class="svc-reconnect-brand" aria-hidden="true">
+            <img src="_content/SchoolConnect.Shared/venkateswara-logo.svg" alt="" />
+            <span>SVC</span>
         </div>
+        <p class="svc-reconnect-school">Sri Venkateswara Convent</p>
+        <div class="components-rejoining-animation" aria-hidden="true"><span></span></div>
         <p class="components-reconnect-first-attempt-visible">
-            Rejoining the server...
+            Preparing your school website...
         </p>
         <p class="components-reconnect-repeated-attempt-visible">
-            Rejoin failed... trying again in <span id="components-seconds-to-next-attempt"></span> seconds.
+            The school website is starting. Trying again in <span id="components-seconds-to-next-attempt"></span> seconds.
         </p>
         <p class="components-reconnect-failed-visible">
-            Failed to rejoin.<br />Please retry or reload the page.
+            The school website is taking longer than expected to start.
         </p>
         <button id="components-reconnect-button" class="components-reconnect-failed-visible">
-            Retry
+            Try again
         </button>
         <p class="components-pause-visible">
-            The session has been paused by the server.
+            Your school session is paused.
         </p>
         <button id="components-resume-button" class="components-pause-visible">
             Resume
         </button>
         <p class="components-resume-failed-visible">
-            Failed to resume the session.<br />Please reload the page.
+            We could not resume your session. Please reload the page.
         </p>
+        <p class="svc-reconnect-note">This page will open automatically when the service is ready.</p>
     </div>
 </dialog>
