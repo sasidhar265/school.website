@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 
 namespace SchoolConnect.Smoke.Tests;
 
@@ -82,6 +83,7 @@ public sealed class SchoolAppSmokeTests
             Assert.That(body, Does.Contain("SchoolConnect"), route);
             Assert.That(body, Does.Not.Contain("<title>Error"), route);
             Assert.That(body, Does.Not.Contain("System.InvalidOperationException"), route);
+            Assert.That(CountOccurrences(body, "<main"), Is.EqualTo(1), $"{route} rendered more than one page shell");
         }
     }
 
@@ -163,6 +165,135 @@ public sealed class SchoolAppSmokeTests
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
             Assert.That(body, Does.Contain("not found").IgnoreCase);
             Assert.That(body, Does.Not.Contain("System.").IgnoreCase);
+        }
+    }
+
+    [Test]
+    public async Task HealthApi_ReturnsStructuredJsonWithoutPageMarkup()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/api/health");
+        var body = await response.Content.ReadAsStringAsync();
+        using var json = JsonDocument.Parse(body);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(response.Content.Headers.ContentType?.MediaType, Is.EqualTo("application/json"));
+            Assert.That(json.RootElement.GetProperty("status").GetString(), Is.EqualTo("healthy"));
+            Assert.That(json.RootElement.GetProperty("service").GetString(), Is.EqualTo("SchoolConnect"));
+            AssertApiHasNoPageMarkup(body);
+        }
+    }
+
+    [Test]
+    public async Task SchoolApi_ReturnsPublicProfileWithoutAuthenticationConfiguration()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/api/school");
+        var body = await response.Content.ReadAsStringAsync();
+        using var json = JsonDocument.Parse(body);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(json.RootElement.GetProperty("name").GetString(), Is.EqualTo("Sri Venkateswara Convent"));
+            Assert.That(json.RootElement.GetProperty("shortName").GetString(), Is.EqualTo("SVC"));
+            Assert.That(body, Does.Not.Contain("portalAuth").IgnoreCase);
+            Assert.That(body, Does.Not.Contain("password").IgnoreCase);
+            AssertApiHasNoPageMarkup(body);
+        }
+    }
+
+    [TestCase("/api/notices")]
+    [TestCase("/api/events")]
+    [TestCase("/api/faculty")]
+    [TestCase("/api/classes")]
+    public async Task CollectionApi_ReturnsNonEmptyJsonArray(string route)
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync(route);
+        var body = await response.Content.ReadAsStringAsync();
+        using var json = JsonDocument.Parse(body);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(json.RootElement.ValueKind, Is.EqualTo(JsonValueKind.Array));
+            Assert.That(json.RootElement.GetArrayLength(), Is.GreaterThan(0));
+            AssertApiHasNoPageMarkup(body);
+        }
+    }
+
+    [Test]
+    public async Task StudyContentApi_ReturnsAssessmentsWithAnswersAndExplanationsForPrimaryClass()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/api/classes/Class%205/study-content");
+        var body = await response.Content.ReadAsStringAsync();
+        using var json = JsonDocument.Parse(body);
+        var items = json.RootElement.GetProperty("items").EnumerateArray().ToArray();
+        var assessments = items.Where(item => item.GetProperty("category").GetString() == "Assessments").ToArray();
+        var questions = assessments.SelectMany(item => item.GetProperty("assessmentQuestions").EnumerateArray()).ToArray();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(assessments.Length, Is.GreaterThan(1));
+            Assert.That(assessments.All(item => item.GetProperty("assessmentQuestions").GetArrayLength() >= 10), Is.True);
+            Assert.That(questions.All(question => !string.IsNullOrWhiteSpace(question.GetProperty("correctAnswer").GetString())), Is.True);
+            Assert.That(questions.All(question => !string.IsNullOrWhiteSpace(question.GetProperty("explanation").GetString())), Is.True);
+            AssertApiHasNoPageMarkup(body);
+        }
+    }
+
+    [Test]
+    public async Task StudyContentApi_ReturnsPaintingAndNoAssessmentForNursery()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/api/classes/Nursery/study-content");
+        var body = await response.Content.ReadAsStringAsync();
+        using var json = JsonDocument.Parse(body);
+        var categories = json.RootElement.GetProperty("categories").EnumerateArray().Select(item => item.GetString()).ToArray();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(categories, Does.Contain("Painting & Drawing"));
+            Assert.That(categories, Does.Not.Contain("Assessments"));
+            AssertApiHasNoPageMarkup(body);
+        }
+    }
+
+    [Test]
+    public async Task MissingApiResource_ReturnsJson404WithoutRenderingBlazorNotFoundPage()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/api/classes/Unknown/study-content");
+        var body = await response.Content.ReadAsStringAsync();
+        using var json = JsonDocument.Parse(body);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(response.Content.Headers.ContentType?.MediaType, Is.EqualTo("application/json"));
+            Assert.That(json.RootElement.GetProperty("code").GetString(), Is.EqualTo("class_not_found"));
+            AssertApiHasNoPageMarkup(body);
+        }
+    }
+
+    [Test]
+    public async Task UnknownApiRoute_ReturnsPlain404WithoutRenderingAnyPageShell()
+    {
+        var host = await AppHost.Value;
+        using var response = await host.Client.GetAsync("/api/route-that-does-not-exist");
+        var body = await response.Content.ReadAsStringAsync();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+            Assert.That(body, Is.Empty);
+            AssertApiHasNoPageMarkup(body);
         }
     }
 
@@ -299,6 +430,27 @@ public sealed class SchoolAppSmokeTests
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
         listener.Stop();
         return port;
+    }
+
+    private static int CountOccurrences(string source, string value)
+    {
+        var count = 0;
+        var index = 0;
+        while ((index = source.IndexOf(value, index, StringComparison.OrdinalIgnoreCase)) >= 0)
+        {
+            count++;
+            index += value.Length;
+        }
+
+        return count;
+    }
+
+    private static void AssertApiHasNoPageMarkup(string body)
+    {
+        Assert.That(body, Does.Not.Contain("<!DOCTYPE html>").IgnoreCase);
+        Assert.That(body, Does.Not.Contain("blazor-error-ui").IgnoreCase);
+        Assert.That(body, Does.Not.Contain("<main").IgnoreCase);
+        Assert.That(body, Does.Not.Contain("Page not found").IgnoreCase);
     }
 
     private sealed class SmokeAppHost : IDisposable

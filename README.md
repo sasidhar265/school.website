@@ -180,6 +180,23 @@ SchoolConnect__PortalAuth__Admin__Password=<a-long-unique-password>
 
 The Blueprint prompts for the administrator password and obtains the database connection directly from the managed `schoolconnect-db` resource. The repository contains no default production administrator password, so admin access remains disabled until the secret is configured. Portal sessions are server-signed, expire after eight hours, and reject edited browser-storage values.
 
+## Public JSON API
+
+SchoolConnect exposes read-only JSON endpoints for website and mobile clients:
+
+| Endpoint | Description |
+|---|---|
+| `GET /api/health` | Service health and UTC timestamp |
+| `GET /api/school` | Public school identity and contact details |
+| `GET /api/notices` | Published notices |
+| `GET /api/events` | Academic events |
+| `GET /api/faculty` | Faculty names, roles, contacts, and photo URLs |
+| `GET /api/classes` | Available classes in school order |
+| `GET /api/classes/{className}/study-content` | Notes, activities, and assessments for a class |
+| `GET /api/classes/{className}/curriculum` | Subjects, topics, and outcomes for a class |
+
+Unknown class resources return a structured JSON `404` response. API errors are isolated from the Blazor status-page pipeline, so API clients never receive an HTML page shell in place of JSON.
+
 ## Test and Verification
 
 Run the unit tests:

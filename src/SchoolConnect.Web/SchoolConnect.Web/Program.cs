@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.AspNetCore.Identity;
 using SchoolConnect.Shared.Configuration;
+using SchoolConnect.Web;
 
 var webRootPath = ResolveWebRootPath();
 
@@ -93,6 +94,21 @@ else
     app.UseHsts();
 }
 app.UseStatusCodePagesWithReExecute("/not-found");
+// Status-code pages wrap the remaining pipeline. Disable that feature only for
+// API requests so their 404 responses can never be replaced by Blazor markup.
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/api"))
+    {
+        var statusCodePages = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IStatusCodePagesFeature>();
+        if (statusCodePages is not null)
+        {
+            statusCodePages.Enabled = false;
+        }
+    }
+
+    await next();
+});
 
 if (!app.Environment.IsDevelopment())
 {
@@ -102,6 +118,7 @@ if (!app.Environment.IsDevelopment())
 app.UseAntiforgery();
 
 app.UseStaticFiles();
+app.MapSchoolApi();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddAdditionalAssemblies(typeof(SchoolConnect.Shared.Pages.Dashboard).Assembly);
